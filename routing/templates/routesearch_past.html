@@ -1,0 +1,238 @@
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 90%;
+        width: 100%;
+      }
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.21/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.21/"></script>
+
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/Graphic",
+            "esri/layers/WebTileLayer",
+            "esri/layers/FeatureLayer",
+            "esri/layers/GraphicsLayer",
+            "esri/rest/route",
+            "esri/rest/support/RouteParameters",
+            "esri/rest/support/FeatureSet",
+            "esri/geometry/Point"
+        ], function(
+            Map,
+            MapView,
+            Graphic,
+            WebTileLayer,
+            FeatureLayer,
+            GraphicsLayer,
+            route,
+            RouteParameters,
+            FeatureSet,
+            Point
+        ) {
+            //ポップアップの定義
+            const food_template = {
+                title: "{Name}",
+                content: [{
+                    type: "fields",
+                    fieldInfos: [{
+                        fieldName: "id",
+                        label: "ID",
+                        visible: true
+                    }, {
+                        fieldName: "genre",
+                        label: "ジャンル",
+                        visible: true
+                    },  {
+                        fieldName: "homepage",
+                        label: "ホームページ",
+                        visible: true
+                    }, {
+                        fieldName: "X",
+                        label: "経度",
+                        visible: true
+                    }, {
+                        fieldName: "Y",
+                        label: "緯度",
+                        visible: true
+                    }]
+                }]
+            };
+
+            // スポット表示レイヤのURL
+            const ChofuUrl = "https://services7.arcgis.com/rbNS7S9fqH4JaV7Y/arcgis/rest/services/spot_information_4data_for_read/FeatureServer";
+
+            //レイヤー作成用の関数
+            var foodLayer = new FeatureLayer({
+                // ArcGIS onlineで作成したレイヤーのURLを貼り付け
+                url: ChofuUrl,
+                id: "foodLayer",
+                // ポップアップの指定
+                popupTemplate: food_template
+            });
+
+
+            // 経路検索レイヤのURL
+            const routeUrl = "https://utility.arcgis.com/usrsvcs/servers/93b1e82c72c346af866326c919779088/rest/services/World/Route/NAServer/Route_World";
+
+            // スポットと経路を保存する
+            const routeLayer = new GraphicsLayer();
+
+            // 経路のパラメータを設定
+            const routeParams = new RouteParameters({
+                // 経路探索のためのAPIキー
+                apiKey: "AAPKd7386cedaae54cc791aab30ed385e246MFYJAiza5y_cHKUcM-dA_pclT36W3J5CqPpO2suGzMa5ybWpIps2_AHxVZuq1Y1W",
+                stops: new FeatureSet(),
+                outSpatialReference: {
+                    // autocasts as new SpatialReference()
+                    wkid: 3857
+                }
+            });
+
+            // シンボルを設定
+            const stopSymbol = {
+                type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+                style: "x",
+                size: 3,
+                outline: {
+                    // autocasts as new SimpleLineSymbol()
+                    width: 4
+                }
+            };
+
+            // 経路表示用スポットの定義
+            const routeSymbol = {
+                type: "simple-line", // autocasts as SimpleLineSymbol()
+                color: [0, 0, 255, 0.5],
+                width: 2
+            };
+
+            const map = new Map({
+                basemap: "streets-navigation-vector",
+                layers: [routeLayer,foodLayer] // Add the route layer to the map
+            });
+            
+            //マップ表示用の関数
+            const view = new MapView({
+                container: "viewDiv",  // ここのdivに表示
+                map: map, //表示するマップの指定
+                center: [139.545, 35.652],//マップの中心点
+                zoom: 14,//マップの縮尺
+            });
+            
+            function addStop(event) {
+                console.log(event.mapPoint);
+                // スポットを追加する関数　スポットの定義
+                const stop = new Graphic({
+                    geometry: event.mapPoint,
+                    symbol: stopSymbol
+                });
+                routeLayer.add(stop);
+                //　３つ以上のスポットが選択されたら実行
+                routeParams.stops.features.push(stop);
+                    if (routeParams.stops.features.length >= 2) {
+                        route.solve(routeUrl, routeParams).then(showRoute);
+                    }
+            }
+
+            // 座標をAPIから取得し、スポットを追加する関数
+            function getCoordsAndAddSpot() {
+                // APIから座標を取得するためのHTTPリクエスト
+                fetch('get_coordinates')
+                    .then(response => response.json())
+                    .then(data => {
+                        // 取得した座標を使用してスポットを追加
+                        console.log(`coordinates:${data.coordinates.longitude}`);
+                        coord = [data.coordinates.longitude,data.coordinates.latitude]
+                        addSpotCoord(coord);
+                    })
+                    .catch(error => console.error('Error fetching coordinates:', error));
+            }
+
+            // 座標を指定してスポットを追加 ここをAPIにしたい
+            coord = [139.625, 35.453]
+            addSpotCoord(coord);
+            coord = [139.625, 35.463]
+            addSpotCoord(coord);
+            getCoordsAndAddSpot();
+
+            function addSpotCoord(coordinates) {
+                const spotGeometry = new Point({
+                    longitude: coordinates[0],
+                    latitude: coordinates[1]
+                });
+
+                const spotGraphic = new Graphic({
+                    geometry: spotGeometry,
+                    symbol: stopSymbol  // stopSymbol はあらかじめ定義されていると仮定します
+                });
+
+                routeLayer.add(spotGraphic);
+                routeParams.stops.features.push({
+                    geometry: spotGeometry
+                });
+
+                if (routeParams.stops.features.length >= 2) {
+                    route.solve(routeUrl, routeParams).then(showRoute);
+                }
+            }
+
+
+            // マップに経路を描画
+            function showRoute(data) {
+                const routeResult = data.routeResults[0].route;
+                routeResult.symbol = routeSymbol;
+                routeLayer.add(routeResult);
+            }
+        });
+
+    </script>
+
+</head>
+
+<body>
+
+    <div id="formbox">
+        <form action="/routesearch/" method="post">
+            {% csrf_token %}
+            <label for="spot">スポット1:</label>
+            <select id="spot" name="spot">
+                <option value="セブンイレブン">セブンイレブン</option>
+                <option value="ファミリーマート">ファミリーマート</option>
+                <option value="ローソン">ローソン</option>
+            </select>
+
+            <input type="number" id="number" name="number">箇所<br><br>
+
+            <input type="submit" value="送信">
+        </form>
+
+        <p>メッセージ:{{ msg }}</p>
+        
+        {% if outputs %}
+            <p>出力:</p>
+            {% for line in outputs %}
+                <p>{{ line }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div id="viewbox">
+        <div id="viewDiv"></div>
+    </div>
+
+</body>
+
+</html>

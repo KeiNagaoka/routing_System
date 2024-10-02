@@ -1,0 +1,26 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    margin: 0; /* Remove default margin */
+}
+
+
+.form-group {
+    margin-bottom: 1rem; /* 各フォームグループの間のスペース */
+    display: flex; /* フレックスボックスを使用して横並びに */
+    align-items: center; /* 縦方向の中央揃え */
+}
+
+.form-group label {
+    flex: 0 0 100px; /* ラベルの幅を設定（適宜調整） */
+    margin-right: 10px; /* ラベルと入力欄の間にスペース */
+}
+
+.h1 {
+    font-size: 2.5em;  /* フォントサイズを大きく */
+    color: #333;       /* 色を濃いグレーに */
+    margin: 10px 0;   /* 上下のマージン */
+    font-weight: bold; /* 太字 */
+}

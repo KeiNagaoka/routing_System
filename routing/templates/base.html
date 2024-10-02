@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>まわるくん</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <!-- Google Fonts の Baloo 2 を読み込む -->
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
+
+    {% block header %}
+    {% endblock %}
+    <header>
+        <button class="toggle-btn">≡</button>
+        <h1>巡回経路探索システム「まわるくん」</h1>
+    </header>
+</head>
+<body>
+    
+    <div class="container">
+      {% if user.is_authenticated %}
+        <aside class="sidebar hidden">
+            <ul>
+                <br>
+                <li><a href="{% url 'accounts:index' %}">マイページ</a></li>
+                <li><a href="{% url 'accounts:display' %}">スポット情報</a></li>
+                <li><a href="{% url 'accounts:routesearch' %}">経路検索</a></li>
+                <li><a href="{% url 'accounts:logout' %}">ログアウト</a></li>
+            </ul>
+        </aside>
+        {% endif %}
+        <main class="content">
+            {% block title %}
+            {% endblock %}
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+    <script src="{% static 'scripts/scripts.js' %}"></script>
+</body>
+</html>

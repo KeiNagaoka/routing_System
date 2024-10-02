@@ -1,0 +1,17 @@
+{
+    "folder_path":"data",
+    "result_folder":"result",
+    "adjacent_matrix":"adjacent_matrix_chofu.npy",
+    "road_network":"chofu_map.pkl",
+    "inputfile":"inputfile_chofu.csv",
+    "result_text":"resulttext_tagfill_chofu.txt",
+    "spot_info":"spot_information_4data.csv",
+    "node_df":"nodes_df.csv",
+    "index_to_node":"index2node.json",
+
+    "network_view":"network_view.html",
+    "tsp_result":"sample_map.html",
+
+    "network_type":"walk",
+    "area":"Chofu,Tokyo,Japan"
+}

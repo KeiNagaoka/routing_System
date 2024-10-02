@@ -1,0 +1,47 @@
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* 各要素間の間隔 */
+    width: 100%; /* フォームの幅を親要素（または画面幅）に合わせる */
+    max-width: 600px; /* 最大幅を設定して、デスクトップではフォームが広がりすぎないようにする */
+    margin: 0 auto; /* フォームを中央に配置 */
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.form-group {
+    display: flex;
+    align-items: center; /* 垂直方向の中央揃え */
+    gap: 10px; /* ラベルと入力フィールドの間隔 */
+    margin-bottom: 10px; /* form-group同士の間隔 */
+    align-items: flex-start;
+}
+
+
+label {
+    margin-bottom: 0; /* デフォルトのマージンをリセット */
+    white-space: nowrap; /* ラベルが折り返されないようにする */
+}
+
+select, input[type="number"] {
+    padding: 5px;
+    font-size: 16px;
+    flex: 1; /* 必要に応じて入力フィールドを伸縮させる */
+}
+
+/* レスポンシブ対応：画面幅が600px以下のデバイス用 */
+@media (max-width: 600px) {
+    form {
+        max-width: 100%; /* 画面幅に合わせてフォーム全体を表示 */
+    }
+
+    .form-group {
+        flex-direction: column; /* ラベルと入力欄を縦に並べる */
+        align-items: stretch; /* 入力欄を画面いっぱいに伸ばす */
+    }
+
+    select, input[type="number"] {
+        font-size: 14px; /* フォントサイズを少し小さく */
+        padding: 8px;
+    }
+}

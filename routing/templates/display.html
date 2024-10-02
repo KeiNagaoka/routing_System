@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block header %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/display_styles.css' %}">
+{% endblock %}
+
+{% block title %}
+    <h2>スポット一覧</h2>
+{% endblock %}
+
+{% block content %}
+    <div class="display_container">
+        <div class="spot-list">
+            {% for spot in spots %}
+            <div class="spot-card">
+                <div class="spot-header">
+                    <h2>{{ spot.name }}</h2>
+                    <span class="spot-id">ID: {{ spot.id }}</span>
+                </div>
+                <div class="spot-details">
+                    <p>
+                        {% if spot.tags and spot.added_tags %}
+                            <strong>タグ:</strong> 
+                            {% for tag in spot.tags %}
+                                <span class="tag original_tag">{{ tag }}</span>
+                            {% endfor %}
+                            {% for tag in spot.added_tags %}
+                                <span class="tag added_tag">{{ tag }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <strong>タグなし</strong>
+                        {% endif %}
+                        <!-- スポットごとのボタンを追加 -->
+                        <button class="show-tooltip-btn" data-spot-id="{{ spot.id }}">+</button>
+                    </p>
+                    
+
+                    <!-- 吹き出し要素を追加 -->
+                    <div class="tooltip" id="tooltip-{{ spot.id }}">
+                        <!-- タグの追加処理 -->
+                        <form method="POST" action="{% url 'accounts:update_tag' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="spot_id" value="{{ spot.id }}">
+                            <label for="tags-{{ spot.id }}">タグを選択:</label>
+                            <select id="tags-{{ spot.id }}" name="tag">
+                                {% for tag in all_tags %}
+                                    <option value="{{ tag }}">{{ tag }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit">タグ追加</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            {% empty %}
+            <p>表示するスポットがありません。</p>
+            {% endfor %}
+        </div>
+
+        <!-- ページネーション -->
+        <div class="pagination">
+            {% if spots.has_previous %}
+                <a href="?page={{ spots.previous_page_number }}" class="prev">前のページ</a>
+            {% endif %}
+
+            <span class="current-page">Page {{ spots.number }} of {{ spots.paginator.num_pages }}</span>
+
+            {% if spots.has_next %}
+                <a href="?page={{ spots.next_page_number }}" class="next">次のページ</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- JavaScriptの追加 -->
+    <script src="{% static 'scripts/display_scripts.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,106 @@
+.h1 {
+    font-size: 2.5em;  /* フォントサイズを大きく */
+    color: #333;       /* 色を濃いグレーに */
+    margin: 10px 0;   /* 上下のマージン */
+    font-weight: bold; /* 太字 */
+}
+
+.h2 {
+    font-size: 1.5em;  /* フォントサイズ */
+    color: #555;       /* 色をグレーに */
+    margin: 5px 0;    /* 上下のマージン */
+}
+
+.detail_script {
+    font-size: 1em;    /* 標準的なフォントサイズ */
+    color: #666;       /* 色を薄いグレーに */
+    margin-top: 15px;  /* 上部にマージン */
+    line-height: 1.5;  /* 行間を広くする */
+}
+
+.top-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.top-container > div {
+    margin: 12px 0; /* 上下に20pxの間隔を設定 */
+}
+
+
+/* 経路リストのスタイル */
+.route-list {
+    display: grid;
+    grid-template-columns: 1fr; /* 1列に変更 */
+    gap: 1.5rem;
+}
+
+/* 各経路のカードスタイル */
+.route-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    width: 100%; /* 横幅を最大化 */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.route-header {
+    align-items: center;
+    border-bottom: 2px solid #4c54af;
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.route-title {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px; /* h2とh3の間を狭くするためのマージン */
+}
+
+.route-header h2 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.route-header h3 {
+    margin: 0; /* h3のマージンをリセット */
+    font-size: 1.2em; /* フォントサイズを調整（必要に応じて） */
+    color: #666; /* 色を調整（必要に応じて） */
+}
+
+.route-id {
+    font-size: 0.9rem;
+    background-color: #f1f1f1;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+}
+
+.route-details p {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0.2rem 0; /* 上下の余白を小さく設定 */
+}
+
+.route-details p span:first-child {
+    width: 120px; /* ラベルの幅を統一 */
+    text-align: right; /* ラベルを右揃えにする */
+    margin-right: 0.5rem; /* ラベルと値の間に余白を追加 */
+}
+
+.route-details p span:last-child {
+    flex-grow: 1; /* 値の部分が左詰めで広がる */
+}
+
+.for_login {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    text-align: center; /* Center text within the div */
+    margin: 2rem; /* Optional: Add margin around the element */
+}

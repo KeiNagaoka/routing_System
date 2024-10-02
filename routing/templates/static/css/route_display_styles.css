@@ -1,0 +1,16 @@
+.route_container, .route_html, .mypage {
+    display: block;  /* ブロック要素として表示 */
+    margin: 20px 0; /* 上下にマージンを追加 */
+}
+
+.route_html {
+    display: flex;          /* フレックスボックスを使用 */
+    justify-content: center; /* 子要素を中央寄せ */
+    margin: 20px 0;       /* 上下にマージンを追加 */
+}
+
+.route_html iframe {
+    max-width: 80%;       /* 幅の最大値を設定 */
+    height: 600px;        /* 高さを設定 */
+    border: 0;            /* 枠線をなくす */
+}

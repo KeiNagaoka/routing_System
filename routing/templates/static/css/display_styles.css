@@ -1,0 +1,172 @@
+.container {
+    width: 80%;
+    margin: 2rem auto;
+}
+
+/* スポットリストのスタイル */
+.spot-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* 各スポットのカードスタイル */
+.spot-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.spot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #4CAF50;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.spot-header h2 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.spot-id {
+    font-size: 0.9rem;
+    background-color: #f1f1f1;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+}
+
+.spot-details p {
+    margin: 0.5rem 0;
+}
+
+/* タグのスタイル */
+.tag {
+    display: inline-block;
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    margin-right: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.tag:last-child {
+    margin-right: 0;
+}
+
+/* タグのスタイル */
+.original_tag {
+    background-color: #e0e0e0;
+}
+.added_tag {
+    background-color: #eaa3a3;
+}
+
+
+/* display_styles.css */
+.add-tag-btn {
+    background-color: #4CAF50; /* 緑色 */
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin-left: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.add-tag-btn:hover {
+    background-color: #45a049;
+}
+
+/* display_styles.css */
+.show-tooltip-btn {
+    background-color: #4CAF50; /* 緑色 */
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    position: relative; /* 吹き出しの位置調整のため */
+}
+
+.show-tooltip-btn:hover {
+    background-color: #45a049;
+}
+
+.tooltip {
+    display: none; /* 初期状態で非表示 */
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    font-size: 12px;
+    z-index: 999;
+    max-width: 200px;
+    /* 吹き出しの位置調整 */
+    bottom: 100%; /* ボタンの上に表示 */
+    left: 50%;
+    transform: translateX(-50%); /* 中央に配置 */
+    margin-bottom: 10px; /* ボタンとのスペース */
+}
+
+.tooltip-content {
+    white-space: nowrap; /* テキストの折り返しを防ぐ */
+}
+
+.spot-card {
+    position: relative; /* 吹き出しの位置を調整するために相対位置を指定 */
+    margin-bottom: 20px; /* スポットカード間のスペース */
+}
+
+.tooltip form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* フォーム要素間のスペース */
+}
+
+
+
+
+/* ページネーションのスタイル */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.pagination a {
+    padding: 0.5rem 1rem;
+    border: 1px solid #4CAF50;
+    border-radius: 4px;
+    color: #4CAF50;
+    text-decoration: none;
+    margin: 0 0.5rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.pagination a:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.pagination .current-page {
+    font-weight: bold;
+    color: #333;
+}

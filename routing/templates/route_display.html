@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block header %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/display_styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/mypage_styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/route_display_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="route_container">
+    <h2>保存した巡回経路一覧</h2>
+
+    <div class="route-list">
+
+        <div class="route-card">
+            <div class="route-header">
+                <div class="route-title">
+                    <h2>{{ route.title }}</h2>
+                    <span class="route-id">ID: {{ route.id }}</span>
+                </div>
+                <h3>{{ route.start_spot }} ~ {{ route.goal_spot }}</h3>
+            </div>
+            <div class="route-details">
+                <p>
+                    <span>検索時刻:</span>
+                    <span class="time">{{ route.time }}</span>
+                </p>
+            
+                <p>
+                    <span>経由地点数:</span>
+                    <span class="time">{{ route.via_num }} 箇所</span>
+                </p>
+            
+                <p>
+                    <span>距離:</span>
+                    <span class="time">{{ route.distance }} m</span>
+                </p>
+                
+            </div>
+
+        </div>
+        
+    </div> 
+    
+</div>
+
+<div class="route_html">
+    {% load static %}
+    <iframe src="{% static iframe_src %}" width="80%" height="600px" frameborder="0" style="float: right;"></iframe>
+</div>
+
+<div class="mypage">
+    <a href="{% url 'accounts:index' %}" class="btn btn-primary">マイページに戻る</a> 
+</div>
+{% endblock %}

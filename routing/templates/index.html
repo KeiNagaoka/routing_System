@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block header %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/display_styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/mypage_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<!-- ログインされていればマイページ -->
+    <div class="top-container">
+
+        <div class="h1">
+            マイページ
+        </div>
+
+        <div class="h2">ようこそ {{ user.name }} さん</div>
+        
+        <!-- Center aligned buttons -->
+        <div class="btn-group">
+            <a href="{% url 'accounts:routesearch' %}" class="btn btn-primary">経路検索</a> 
+            <a href="{% url 'accounts:logout' %}" class="btn btn-primary">ログアウト</a> 
+        </div>
+
+        <div class="detail_script">このページでは、 {{ user.name }} さんの保存した経路の情報・追加したタグの情報を閲覧することができます。</div>
+    </div>
+    
+    <div class="route_container">
+        <h2>保存した巡回経路一覧</h2>
+
+        <div class="route-list">
+
+            {% for route in routes %}
+            <div class="route-card">
+                <div class="route-header">
+                    <div class="route-title">
+                        <h2>{{ route.title }}</h2>
+                        <span class="route-id">ID: {{ route.id }}</span>
+                    </div>
+                    <h3>{{ route.start_spot }} ~ {{ route.goal_spot }}</h3>
+                </div>
+                <div class="route-details">
+                    <p>
+                        <span>検索時刻:</span>
+                        <span class="time">{{ route.time }}</span>
+                    </p>
+                
+                    <p>
+                        <span>経由地点数:</span>
+                        <span class="time">{{ route.via_num }} 箇所</span>
+                    </p>
+                
+                    <p>
+                        <span>距離:</span>
+                        <span class="time">{{ route.distance }} m</span>
+                    </p>
+                    
+                    <a href="{% url 'accounts:route_display' %}" class="btn btn-primary">詳細を表示</a> 
+                </div>
+
+            </div>
+            {% empty %}
+            <p>保存した経路がありません。</p>
+            {% endfor %}
+        </div> 
+    </div>
+    &nbsp;
+
+    <div class="display_container">
+        <h2>タグを追加したスポット一覧</h2>
+
+        <div class="spot-list">
+            {% for spot in spots %}
+            <div class="spot-card">
+                <div class="spot-header">
+                    <h2>{{ spot.name }}</h2>
+                    <span class="spot-id">ID: {{ spot.id }}</span>
+                </div>
+                <div class="spot-details">
+                    <p>
+                        {% if spot.tags and spot.added_tags %}
+                            <strong>タグ:</strong> 
+                            {% for tag in spot.tags %}
+                                <span class="tag original_tag">{{ tag }}</span>
+                            {% endfor %}
+                            {% for tag in spot.added_tags %}
+                                <span class="tag added_tag">{{ tag }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <strong>タグなし</strong>
+                        {% endif %}
+                    </p>
+
+                    <!-- 吹き出し要素を追加 -->
+                    <div class="tooltip" id="tooltip-{{ spot.id }}">
+                        <form method="POST" action="{% url 'accounts:update_tag' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="spot_id" value="{{ spot.id }}">
+                            <label for="tags-{{ spot.id }}">タグを選択:</label>
+                            <select id="tags-{{ spot.id }}" name="tag">
+                                {% for tag in all_tags %}
+                                    <option value="{{ tag }}">{{ tag }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit">タグ追加</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            {% empty %}
+            <p>表示するスポットがありません。</p>
+            {% endfor %}
+        </div>
+
+        <!-- ページネーション -->
+        <div class="pagination">
+            {% if spots.has_previous %}
+                <a href="?page={{ spots.previous_page_number }}" class="prev">前のページ</a>
+            {% endif %}
+
+            <span class="current-page">Page {{ spots.number }} of {{ spots.paginator.num_pages }}</span>
+
+            {% if spots.has_next %}
+                <a href="?page={{ spots.next_page_number }}" class="next">次のページ</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- JavaScriptの追加 -->
+    <script src="{% static 'scripts/display_scripts.js' %}"></script>
+
+
+{% else %}
+    <div class="for_login">
+        <div class="h2">
+            アカウントを登録してください。アカウントをお持ちの方は、ログインしてください。
+        </div>
+
+        <div class="btn-group">
+            <a href="{% url 'accounts:signup' %}" class="btn btn-primary">アカウント登録</a>
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
