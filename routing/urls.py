@@ -13,6 +13,7 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view(), name="logout"), # ログアウト
     path('routesearch/', views.SearchingView.as_view(), name="routesearch"), # 経路探索
     path('routesearch/get_coordinates/', views.GetCoordView.as_view(), name="get_coordinates"), # 経路探索
+    path('routesearch/change_spot_num/', views.ChangeSpotNum.as_view(), name="change_spot_num"), # スポット数変更
     path('display/', views.SpotlistView.as_view(), name='display'),
     path('update_tag/', views.UpdateTagView.as_view(), name='update_tag'), # タグ更新
     path('route_display/', views.RouteInfoView.as_view(), name='route_display'), # 経路詳細表示

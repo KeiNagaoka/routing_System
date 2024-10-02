@@ -29,6 +29,26 @@ select, input[type="number"] {
     flex: 1; /* 必要に応じて入力フィールドを伸縮させる */
 }
 
+.route-display-area {
+    margin-bottom: 10px;
+}
+
+.route-wrapper {
+    display: flex;  /* フレックスボックスを使用 */
+    flex-direction: row;  /* 横並び */
+    margin-bottom: 50px;  /* 各route-wrapperの下に20pxのマージンを追加 */
+}
+
+.route-container {
+    flex: 1;  /* ルートコンテナのサイズを調整 */
+    margin-right: 10px;  /* 右側に少しマージンを追加 */
+}
+
+.routemap-container {
+    flex: 6;  /* 地図コンテナも同様にサイズ調整 */
+}
+
+
 /* レスポンシブ対応：画面幅が600px以下のデバイス用 */
 @media (max-width: 600px) {
     form {
@@ -43,5 +63,12 @@ select, input[type="number"] {
     select, input[type="number"] {
         font-size: 14px; /* フォントサイズを少し小さく */
         padding: 8px;
+    }
+    .route-wrapper {
+        flex-direction: column;  /* スマホサイズの場合は縦並び */
+    }
+    .route-container, .routemap-container {
+        margin-right: 0;  /* スマホではマージンをリセット */
+        margin-bottom: 10px;  /* 縦並びの場合の間隔 */
     }
 }

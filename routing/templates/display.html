@@ -20,7 +20,7 @@
                 </div>
                 <div class="spot-details">
                     <p>
-                        {% if spot.tags and spot.added_tags %}
+                        {% if spot.tags or spot.added_tags %}
                             <strong>タグ:</strong> 
                             {% for tag in spot.tags %}
                                 <span class="tag original_tag">{{ tag }}</span>

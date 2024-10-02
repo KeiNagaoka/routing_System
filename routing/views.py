@@ -77,10 +77,15 @@ class SearchingView(TemplateView):
     def get(self, request):
         ids = [1,2,3]
         routes = [
-            {'name': f'経路{id}', 'iframe_src': f'data/user_map{id}.html'}
+            {'name': f'経路{id}',
+             'iframe_src': f'data/user_map{id}.html',
+             'distance':6512,
+             'time':91,
+             'via_spots': ['京王多摩川駅','調布駅','布田駅','国領駅','柴崎駅']
+             }
             for id in ids
         ]
-        spot_num = 3
+        spot_num = 1
         spot_num_range = [i for i in range(1,spot_num+1)]
         data = {'routes':routes,
                 'spot_num_range':spot_num_range}
@@ -92,14 +97,31 @@ class SearchingView(TemplateView):
         # ここでPOSTされたデータを処理するロジックを記述する
         ids = [1,2,3]
         routes = [
-            {'name': f'経路{id}', 'iframe_src': f'data/user_map{id}.html'}
+            {'name': f'経路{id}',
+             'iframe_src': f'data/user_map{id}.html',
+             'distance':6512,
+             'time':91,
+             'via_spots': ['京王多摩川駅','国領駅','布田駅']
+             }
             for id in ids
         ]
-        spot_num = 3
+        spot_num = 1
         spot_num_range = [i for i in range(1,spot_num+1)]
         data = {'routes':routes,
                 'spot_num_range':spot_num_range}
         return render(request, 'routesearch.html', data)
+
+class ChangeSpotNum(View):
+    def post(self, request, *args, **kwargs):
+        # POSTされたデータからspot_numを取得
+        data = json.loads(request.body)
+        spot_num = int(data.get('spot_num', 1))  # デフォルト値を1に設定
+
+        # spot_numに基づいたリストを生成
+        spot_num_range = list(range(1, spot_num + 1))
+
+        # JSON形式で返す
+        return JsonResponse({'spot_num_range': spot_num_range})
 
 
 # get_coordonates.php(APIの役割)を返す

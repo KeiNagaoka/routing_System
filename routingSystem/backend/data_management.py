@@ -7,7 +7,7 @@ settings = get_setting()
 
 def get_spots_data():
     spot_info = get_spot_info()
-    added_tags = ["追加タグ1"]
+    added_tags = []
     spots_data = [
         {'id': idx,
          'name': row["name"],
@@ -17,6 +17,8 @@ def get_spots_data():
          }
         for idx, row in spot_info.iterrows()
     ]
+    spots_data[0]["added_tags"] = ["特急停車駅"]
+    spots_data[0]["tag_length"] = len(spots_data[0]["tags"]) + len(spots_data[0]["added_tags"])
     return spots_data
 
 def get_routes_data():
