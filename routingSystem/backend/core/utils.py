@@ -31,4 +31,7 @@ def get_spot_info(base_path=base_path):
     return spot_info
 
 def str2list_strings(string):
-    return string.replace('"','').replace("'","").strip('[]').split(', ')
+    if isinstance(string, list):
+        return string
+    else:
+        return string.replace('"','').replace("'","").strip('[]').split(', ')

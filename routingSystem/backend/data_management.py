@@ -21,6 +21,15 @@ def get_spots_data():
     spots_data[0]["tag_length"] = len(spots_data[0]["tags"]) + len(spots_data[0]["added_tags"])
     return spots_data
 
+def filter_tag_added_spot(spots_data):
+    new_spots_data = []
+    for spot in spots_data:
+        if spot["added_tags"]:
+            new_spots_data.append(spot)
+            
+    return new_spots_data
+    
+
 def get_routes_data():
     spots_data = [
         {

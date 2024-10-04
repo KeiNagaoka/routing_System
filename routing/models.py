@@ -61,20 +61,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.name
 
-class Tag(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+# class Tag(models.Model):
+#     name = models.CharField(max_length=100, unique=True)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
 # スポットデータ
 class Spot(models.Model):
+    idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデック
     name = models.CharField(max_length=64)
-    langitude = models.FloatField()
+    latitude = models.FloatField()
     longitude = models.FloatField()
-    categories = models.TextField()
-    tags = models.ManyToManyField(Tag, blank=True)  # タグを追加
-    posted_data = models.DateTimeField(auto_now_add=True)
+    hp = models.TextField()
+    tags = models.TextField()
 
     def __str__(self):
         return self.name
@@ -82,9 +82,9 @@ class Spot(models.Model):
 # ユーザが付与した新しいタグ
 class AddedTag(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Userとの関係
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)  # Tagとの関係
+    tag = models.TextField()  # Tag
     spot = models.ForeignKey(Spot, on_delete=models.CASCADE)  # Spotとの関係
     added_at = models.DateTimeField(auto_now_add=True)  # タグを追加した時間を記録
 
     def __str__(self):
-        return f"{self.user.name} added {self.tag.name} to {self.spot.name} at {self.added_at}"
+        return f"{self.user.name} added {self.tag} to {self.spot.name} at {self.added_at}"

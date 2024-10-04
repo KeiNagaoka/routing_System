@@ -1,6 +1,67 @@
 .container {
-    width: 80%;
+    width: 100%; /* 画面幅に合わせる */
+    max-width: 80%; /* 必要に応じて最大幅を調整 */
+
     margin: 2rem auto;
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+    width: 100%; /* 親コンテナに対して全幅を使用 */
+}
+
+.search-container form {
+    display: flex;
+    gap: 10px;
+    width: 100%; /* フォーム全体を横いっぱいに広げる */
+    max-width: 600px; /* フォームの最大幅を指定 */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.search-container input[type="text"] {
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.search-container input[type="text"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.search-container button {
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.search-container button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.search-container button:active {
+    background-color: #004085;
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* スポットリストのスタイル */
@@ -169,4 +230,21 @@
 .pagination .current-page {
     font-weight: bold;
     color: #333;
+}
+
+/* レスポンシブデザインの調整 */
+/* モバイル対応 */
+@media (max-width: 600px) {
+    .search-container {
+        padding: 20px;
+    }
+
+    input[type="text"] {
+        font-size: 14px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 10px;
+    }
 }

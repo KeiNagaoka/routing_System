@@ -9,11 +9,11 @@ from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .forms import SignUpForm, LoginFrom
-from .models import Spot, Tag, AddedTag
+from .models import Spot, AddedTag
 import sys
 sys.path.append('..')
 import json
-from routingSystem.backend.data_management import get_spots_data, get_routes_data
+from routingSystem.backend.data_management import get_spots_data, get_routes_data, filter_tag_added_spot
 
 class IndexView(TemplateView):
     template_name = "index.html"
@@ -22,6 +22,7 @@ class IndexView(TemplateView):
     def get(self, request, template_name=template_name):
         # スポット情報のリスト (ここでは例としてリストを作成しています)
         spots_data = get_spots_data()
+        spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
         all_tags = {"コンビニ","レストラン","公園","お気に入りスポット1"}
         
         paginator = Paginator(spots_data, 12)  # 12個ずつ表示
@@ -57,19 +58,6 @@ class LoginView(BaseLoginView):
 class LogoutView(BaseLogoutView):
     success_url = reverse_lazy("accounts:index")
 
-# class SearchingView(TemplateView):
-#     template_name = "routesearch.html"
-
-#     def get(self, request):
-#         return render(request, 'routesearch.html', {})
-
-#     def post(self, request):
-#         spot = request.POST.get('spot')
-#         number = request.POST.get('number')
-#         # ここでPOSTされたデータを処理するロジックを記述する
-#         msg = f"{number}箇所の{spot}を探します。"
-#         outputs = ["結果1", "結果2", "結果3"]  # 仮の出力
-#         return render(request, 'routesearch.html', {'msg': msg, 'outputs': outputs})
 
 class SearchingView(TemplateView):
     template_name = "routesearch.html"
