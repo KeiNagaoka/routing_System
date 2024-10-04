@@ -5,8 +5,13 @@ from core.utils import get_setting, get_spot_info
 
 settings = get_setting()
 
-def get_spots_data():
+def get_spots_data(spot_name=None,tag_name=None):
     spot_info = get_spot_info()
+    spot_info["tag_text"] = spot_info["tags"].apply(lambda tags:', '.join(tags))
+    if spot_name:
+        spot_info = spot_info[spot_info["name"].str.contains(spot_name, case=False, na=False)]
+    if tag_name:
+        spot_info = spot_info[spot_info["tag_text"].str.contains(tag_name, case=False, na=False)]
     added_tags = []
     spots_data = [
         {'id': idx,
@@ -17,8 +22,9 @@ def get_spots_data():
          }
         for idx, row in spot_info.iterrows()
     ]
-    spots_data[0]["added_tags"] = ["特急停車駅"]
-    spots_data[0]["tag_length"] = len(spots_data[0]["tags"]) + len(spots_data[0]["added_tags"])
+    if spots_data:
+        spots_data[0]["added_tags"] = ["特急停車駅"]
+        spots_data[0]["tag_length"] = len(spots_data[0]["tags"]) + len(spots_data[0]["added_tags"])
     return spots_data
 
 def filter_tag_added_spot(spots_data):

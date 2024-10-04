@@ -120,31 +120,48 @@ class SpotlistView(LoginRequiredMixin, TemplateView):
     template_name = "display.html"
     login_url = 'accounts:index'  # ログインページのURLを指定
 
+
     def get(self, request, template_name=template_name):
-        # スポット情報のリスト (ここでは例としてリストを作成しています)
-        spots_data = get_spots_data()
+        # GETリクエストからスポット名とタグ名を取得
+        spot_name = request.GET.get('spot_name', "")
+        tag_name = request.GET.get('tag_name', "")
+
+        # スポット情報のリストを取得
         all_tags = {"コンビニ","レストラン","公園","お気に入りスポット1"}
+        spots_data = get_spots_data(spot_name=spot_name, tag_name=tag_name)
         
+        # ページネーション
         paginator = Paginator(spots_data, 12)  # 12個ずつ表示
         page_number = request.GET.get('page')
         spots = paginator.get_page(page_number)
+        
+        # コンテキストを設定
+        values = {
+            'spots': spots,
+            'all_tags': all_tags,
+            'spot_name': spot_name,
+            'tag_name': tag_name,
+        }
 
-        return render(request, template_name, {'spots': spots, 'all_tags':all_tags})
+        return render(request, template_name, values)
 
     def post(self, request, template_name=template_name):
-    # スポット情報のリスト (ここでは例としてリストを作成しています)
-        spots_data = [
-            {'id': 1, 'name': 'スポット1', 'tags': ['公園', '観光']},
-            {'id': 2, 'name': 'スポット2', 'tags': ['博物館', '文化']},
-            # 他のスポットデータ...
-        ]
+        spot_name = request.POST.get('spot_name')
+        tag_name = request.POST.get('tag_name')
+        # スポット情報のリスト (ここでは例としてリストを作成しています)
+        spots_data = get_spots_data(spot_name=spot_name,tag_name=tag_name)
         all_tags = {"コンビニ","レストラン","公園","お気に入りスポット1"}
         
         paginator = Paginator(spots_data, 10)  # 10個ずつ表示
         page_number = request.GET.get('page')
         spots = paginator.get_page(page_number)
+        values = {'spots': spots,
+                  'all_tags':all_tags,
+                  'spot_name':spot_name,
+                  'tag_name':tag_name,
+                  }
 
-        return render(request, template_name, {'spots': spots, 'all_tags':all_tags})
+        return render(request, template_name, values)
 
 class UpdateTagView(View):
     def post(self, request, *args, **kwargs):
@@ -155,7 +172,7 @@ class UpdateTagView(View):
             try:
                 spot = Spot.objects.get(id=spot_id)
                 user = request.user  # ログインユーザーを取得
-                tag, created = Tag.objects.get_or_create(name=tag_name)  # タグを作成または取得
+                tag = tag_name
 
                 # タグがスポットに既に存在するか確認し、存在しない場合のみ追加
                 if not spot.tags.filter(id=tag.id).exists():
