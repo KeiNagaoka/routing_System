@@ -14,6 +14,7 @@ import sys
 sys.path.append('..')
 import json
 from routingSystem.backend.data_management import get_spots_data, get_routes_data, filter_tag_added_spot
+from routingSystem.backend.core.utils import str2list_strings
 
 class IndexView(TemplateView):
     template_name = "index.html"
@@ -21,7 +22,8 @@ class IndexView(TemplateView):
 
     def get(self, request, template_name=template_name):
         # スポット情報のリスト (ここでは例としてリストを作成しています)
-        spots_data = get_spots_data()
+        user_name = request.user.name
+        spots_data = get_spots_data(user_name)
         spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
         all_tags = {"コンビニ","レストラン","公園","お気に入りスポット1"}
         
@@ -125,10 +127,11 @@ class SpotlistView(LoginRequiredMixin, TemplateView):
         # GETリクエストからスポット名とタグ名を取得
         spot_name = request.GET.get('spot_name', "")
         tag_name = request.GET.get('tag_name', "")
+        user_name = request.user.name
 
         # スポット情報のリストを取得
         all_tags = {"コンビニ","レストラン","公園","お気に入りスポット1"}
-        spots_data = get_spots_data(spot_name=spot_name, tag_name=tag_name)
+        spots_data = get_spots_data(user_name,spot_name=spot_name, tag_name=tag_name)
         
         # ページネーション
         paginator = Paginator(spots_data, 12)  # 12個ずつ表示
@@ -148,8 +151,10 @@ class SpotlistView(LoginRequiredMixin, TemplateView):
     def post(self, request, template_name=template_name):
         spot_name = request.POST.get('spot_name')
         tag_name = request.POST.get('tag_name')
+        user_name = request.user.name
+
         # スポット情報のリスト (ここでは例としてリストを作成しています)
-        spots_data = get_spots_data(spot_name=spot_name,tag_name=tag_name)
+        spots_data = get_spots_data(user_name,spot_name=spot_name,tag_name=tag_name)
         all_tags = {"コンビニ","レストラン","公園","お気に入りスポット1"}
         
         paginator = Paginator(spots_data, 10)  # 10個ずつ表示
@@ -157,6 +162,7 @@ class SpotlistView(LoginRequiredMixin, TemplateView):
         spots = paginator.get_page(page_number)
         values = {'spots': spots,
                   'all_tags':all_tags,
+                  # 検索条件を保持するための変数
                   'spot_name':spot_name,
                   'tag_name':tag_name,
                   }
@@ -166,25 +172,22 @@ class SpotlistView(LoginRequiredMixin, TemplateView):
 class UpdateTagView(View):
     def post(self, request, *args, **kwargs):
         spot_id = request.POST.get('spot_id')
-        tag_name = request.POST.get('tag')
+        tag = request.POST.get('tag')
 
-        if spot_id and tag_name:
+        if spot_id and tag:
             try:
-                spot = Spot.objects.get(id=spot_id)
+                spot = Spot.objects.get(idx=spot_id)
                 user = request.user  # ログインユーザーを取得
-                tag = tag_name
+                spot_tags = str2list_strings(spot.tags)
 
                 # タグがスポットに既に存在するか確認し、存在しない場合のみ追加
-                if not spot.tags.filter(id=tag.id).exists():
-                    spot.tags.add(tag)  # スポットにタグを追加
-                    spot.save()
-
+                if tag not in spot_tags:
                     # AddedTagに記録を追加
                     AddedTag.objects.create(user=user, tag=tag, spot=spot)
 
-                    messages.success(request, f"タグ '{tag_name}' をスポット '{spot.name}' に追加しました。")
+                    messages.success(request, f"タグ '{tag}' をスポット '{spot.name}' に追加しました。")
                 else:
-                    messages.info(request, f"タグ '{tag_name}' は既にスポット '{spot.name}' に存在します。")
+                    messages.info(request, f"タグ '{tag}' は既にスポット '{spot.name}' に存在します。")
             except Spot.DoesNotExist:
                 messages.error(request, "指定されたスポットが見つかりませんでした。")
         else:

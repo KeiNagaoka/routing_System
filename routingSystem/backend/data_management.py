@@ -1,30 +1,34 @@
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from core.utils import get_setting, get_spot_info
+from core.utils import get_setting, get_spot_info, str2list_strings
+from routing.models import AddedTag
 
 settings = get_setting()
 
-def get_spots_data(spot_name=None,tag_name=None):
+def get_spots_data(user_name,spot_name=None,tag_name=None):
     spot_info = get_spot_info()
     spot_info["tag_text"] = spot_info["tags"].apply(lambda tags:', '.join(tags))
     if spot_name:
         spot_info = spot_info[spot_info["name"].str.contains(spot_name, case=False, na=False)]
     if tag_name:
         spot_info = spot_info[spot_info["tag_text"].str.contains(tag_name, case=False, na=False)]
-    added_tags = []
+
+    # ユーザ依存の追加タグを加える処理
+    spot_info['added_tags'] = [[] for _ in range(len(spot_info))]
+    added_tags = AddedTag.objects.filter(user__name=user_name)
+    for tag in added_tags:
+        spot_info.at[tag.spot.idx,'added_tags'] = tag.tag
+    invalid_spot_info = spot_info[~spot_info['tags'].apply(lambda x: isinstance(x, list))]
+
     spots_data = [
         {'id': idx,
          'name': row["name"],
          'tags': row["tags"],
-         'added_tags': added_tags,
-         'tag_length':len(row["tags"]) + len(added_tags)
+         'added_tags': str2list_strings(row["added_tags"])
          }
         for idx, row in spot_info.iterrows()
     ]
-    if spots_data:
-        spots_data[0]["added_tags"] = ["特急停車駅"]
-        spots_data[0]["tag_length"] = len(spots_data[0]["tags"]) + len(spots_data[0]["added_tags"])
     return spots_data
 
 def filter_tag_added_spot(spots_data):

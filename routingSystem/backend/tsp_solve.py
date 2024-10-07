@@ -58,7 +58,9 @@ city = query.split(',')[0].lower()
 n_agent = 300
 patrol = 10
 max_label = 20000 #プロットするときの縦軸の上限
-startNode = 625 #ここから始まる
+startNode = 0 #ここから始まる
+goalNode = 625 #ここから始まる
+# (nodes_dfのインデックス)
 ver = "tagfill"
 
 node_df = pd.read_csv(NODE_DF)
@@ -94,7 +96,7 @@ df_sym = pd.read_csv(NODE_DF) #csv読む
 class TSP:
 	def __init__(self,node_df=None,adj_matrix_path=None,alpha = 1.0,beta_pre = 10.0,beta_after = 1.0,Q = 1.0,vanish_ratio = 0.95,
 			  patrol_all=True,patrol=10,patrol_dict=10,kick_interval=50,kick_start=50,kick_ratio=1.1,
-			  start_random=True,startNode=None,index_name=index_name,
+			  start_random=True,startNode=None,goalNode=None,index_name=index_name,
 			  index_tags=index_tags,count_tags=count_tags,aim_tags=aim_tags):
 		#ここから初期化処理
 		#パラメータ関係
@@ -117,6 +119,7 @@ class TSP:
 		#スタート地点関係
 		self.start_random = start_random
 		self.startNode = startNode
+		self.goalNode = goalNode
 		#終了条件関係
 		self.index_name = index_name
 		self.index_tags = index_tags
@@ -261,7 +264,7 @@ class TSP:
 				if self.tag_fill():
 					break
 				
-			order.append(order[0]) #開始点=終了点の場合
+			order.append(self.goalNode) #開始点=終了点の場合
 			cost_order = self.cost(order) # 経路のコストを計算(L)
 			
 			# フェロモンの変化量を計算
@@ -316,11 +319,18 @@ class TSP:
 
 # 必要最低限のスポットに絞る
 def necessary_spots(order_name,aim_tags,name_tags=name_tags):
-	print([i in name_tags.keys() for i in order_name])
 	tags_dict = {name:name_tags[name] for name in order_name}
 	aim_tags_processed = {key:val for key,val in aim_tags.items() if val > 0}
 	necessary_tags = set(aim_tags_processed.keys())
-	result_order = [name for name, tags in tags_dict.items() if set(tags) & necessary_tags]
+	# start_and_goal = set([order_name[0],order_name[-1]])
+	start_and_goal = set(["電気通信大学正門","調布駅"])
+	print(f"tags_dict:{tags_dict}")
+	print(f"aim_tags_processed:{aim_tags_processed}")
+	print(f"necessary_tags:{necessary_tags}")
+	print(f"start_and_goal:{start_and_goal}")
+	# tagsがnecessary_tagsに含まれるものだけを抽出
+	
+	result_order = [name for name, tags in tags_dict.items() if set(tags) & necessary_tags or name in start_and_goal]
 	# result_order = []
 	# for name,tags in tags_dict.items():
 	# 	if len(set(tags) & necessary_tags) > 0:
@@ -343,12 +353,16 @@ def tsp_execute(index_name=index_name):
 		   kick_interval=10,
 		   count_tags=count_tags,
 		   startNode=startNode,
+		   goalNode=goalNode,
 		   patrol_all=False,
 		   patrol=patrol,
 		   start_random=False)
 	
 	startTime = time.time()
+
+	# メイン処理
 	order = tsp.solve(n_agent=n_agent)		# n_agent匹の蟻を歩かせる
+	
 	name_order = [index_name[i] for i in order]
 	spots_original = [name for L in name_order for name in str2list_strings(L)]
 	spots = necessary_spots(spots_original,aim_tags) # これを返す
@@ -357,8 +371,7 @@ def tsp_execute(index_name=index_name):
 	print(f'実行時間:{goalTime-startTime:.3f}秒')
 	tsp.save(printer=True)
 
-
-	#ルートの隣り合う同じ値を消す
+	# ルートの隣り合う同じ値を消す
 	def shrink_route(route):
 		if len(route) == 0: return []
 		shrunk_route = [route[0]]  # 最初の要素を追加
@@ -423,11 +436,11 @@ def tsp_execute(index_name=index_name):
 				loc = name_coord[name]
 				folium.Marker(loc, popup=name, icon=folium.Icon(color='red')).add_to(map)
 
-	# 通っていないシンボル
-	for i, symbol in enumerate(not_passed_symbols):
-		loc = [G.nodes[symbol]['y'], G.nodes[symbol]['x']]
-		name = G.nodes[symbol]['name']
-		folium.Marker(loc, popup=name, icon=folium.Icon(color='blue')).add_to(map)
+	# # 通っていないシンボル
+	# for i, symbol in enumerate(not_passed_symbols):
+	# 	loc = [G.nodes[symbol]['y'], G.nodes[symbol]['x']]
+	# 	name = G.nodes[symbol]['name']
+	# 	folium.Marker(loc, popup=name, icon=folium.Icon(color='blue')).add_to(map)
 
 	# 縮尺とズームを設定
 	map.fit_bounds(map.get_bounds())
