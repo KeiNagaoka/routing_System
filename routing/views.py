@@ -22,18 +22,21 @@ class IndexView(TemplateView):
 
     def get(self, request, template_name=template_name):
         # スポット情報のリスト (ここでは例としてリストを作成しています)
-        user_name = request.user.name
-        spots_data = get_spots_data(user_name)
-        spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
-        all_tags = {"コンビニ","レストラン","公園","お気に入りスポット1"}
-        
-        paginator = Paginator(spots_data, 12)  # 12個ずつ表示
-        page_number = request.GET.get('page')
-        spots = paginator.get_page(page_number)
-        routes = get_routes_data()
-        info_json = {'spots': spots,
-                     'routes':routes,
-                     'all_tags':all_tags}
+        if not request.user.is_authenticated:
+            info_json = {}
+        else:
+            user_name = request.user.name
+            spots_data = get_spots_data(user_name)
+            spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
+            all_tags = {"コンビニ","レストラン","公園","お気に入りスポット1"}
+            
+            paginator = Paginator(spots_data, 12)  # 12個ずつ表示
+            page_number = request.GET.get('page')
+            spots = paginator.get_page(page_number)
+            routes = get_routes_data()
+            info_json = {'spots': spots,
+                        'routes':routes,
+                        'all_tags':all_tags}
 
         return render(request, template_name, info_json)
 
@@ -69,9 +72,9 @@ class SearchingView(TemplateView):
         routes = [
             {'name': f'経路{id}',
              'iframe_src': f'data/user_map{id}.html',
-             'distance':6512,
-             'time':91,
-             'via_spots': ['京王多摩川駅','調布駅','布田駅','国領駅','柴崎駅']
+             'distance':1000,
+             'time':14,
+             'via_spots': ['セブン-イレブン 調布駅東口店','ティオ・ダンジョウ']
              }
             for id in ids
         ]
@@ -82,22 +85,35 @@ class SearchingView(TemplateView):
         return render(request, 'routesearch.html', data)
 
     def post(self, request):
-        spot = request.POST.get('spot')
-        number = request.POST.get('number')
+        print(f"request.POST:{request.POST}")
+        start_spot = request.POST.get('start_spot')
+        goal_spot = request.POST.get('goal_spot')
+
         # ここでPOSTされたデータを処理するロジックを記述する
         ids = [1,2,3]
+        # routes = [
+        #     {'name': f'経路{id}',
+        #      'iframe_src': f'data/user_map{id}.html',
+        #      'distance':1000,
+        #      'time':14,
+        #      'via_spots': ['セブン-イレブン 調布駅東口店','ティオ・ダンジョウ']
+        #      }
+        #     for id in ids
+        # ]
         routes = [
             {'name': f'経路{id}',
              'iframe_src': f'data/user_map{id}.html',
-             'distance':6512,
-             'time':91,
-             'via_spots': ['京王多摩川駅','国領駅','布田駅']
+             'distance':1300,
+             'time':18,
+             'via_spots': ['セブン-イレブン 調布駅北口店','ASIANTAIPEIpresentsResortDiningアジタイ食堂']
              }
             for id in ids
         ]
         spot_num = 1
         spot_num_range = [i for i in range(1,spot_num+1)]
         data = {'routes':routes,
+                'start_spot':start_spot,
+                'goal_spot':goal_spot,
                 'spot_num_range':spot_num_range}
         return render(request, 'routesearch.html', data)
 

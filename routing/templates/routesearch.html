@@ -25,28 +25,21 @@
 
         <div class="form-group">
             <label for="spot_num">経由地点数:</label>
-            <input type="number" id="number_spot" name="number_spot" min="0" value="1">
+            <input type="number" id="number_spot" name="number_spot" min="0" max="10" value="0" onchange="ChangeSpotNum()">
         </div>
 
-        {% for i in spot_num_range %}
-            <div class="form-group">
-                <label for="spot{{ i }}">経由地点{{ i }}:</label>
-                <select id="spot{{ i }}" name="spot{{ i }}">
-                    <option value="セブンイレブン">セブンイレブン</option>
-                    <option value="ファミリーマート">ファミリーマート</option>
-                    <option value="ローソン">ローソン</option>
-                    <option value="レストラン">レストラン</option>
-                    <option value="駅">駅</option>
-                </select>
-
-                <label for="number{{ i }}">箇所数{{ i }}:</label>
-                <input type="number" id="number{{ i }}" name="number{{ i }}" min="1" value="1">
-            </div>
-        {% endfor %}
+        <div id="spots_container"></div>
         
         <div class="form-group">
-            <label for="start_spot">到着地点:</label>
-            <select id="start_spot" name="start_spot2">
+            <label for="spot11">経由地点11:</label>
+            <input type="text" name="spot11" placeholder="経由地点を入力" value="{{ spot_name11 }}" class="input-wide" />
+            <label for="number11">箇所数11:</label>
+            <input type="number" id="number11" name="number11" min="1" value="1" class="input-wide" />
+        </div>
+        
+        <div class="form-group">
+            <label for="goal_spot">到着地点:</label>
+            <select id="goal_spot" name="goal_spot">
                 <option value="電気通信大学">電気通信大学</option>
                 <option value="つつじヶ丘駅">つつじヶ丘駅</option>
             </select>
@@ -66,6 +59,7 @@
                     <h4>{{ route.name }}</h4>
                     <p>距離: {{ route.distance }} m</p>  <!-- 距離の表示 -->
                     <p>時間: {{ route.time }} 分</p>     <!-- 時間の表示 -->
+                    <p>出発: {{ start_spot }}</p>    <!-- 出発地点 -->
                     <p>経由地点:
                         <ol>
                             {% for via_spot in route.via_spots %}
@@ -73,11 +67,12 @@
                             {% endfor %}
                         </ol>
                     </p>
+                    <p>出発: {{ goal_spot }}</p>    <!-- 到着地点 -->
                     {% load static %}
                 </div>
                 <!-- 地図部分 -->
                 <div id="routemap-{{ forloop.counter }}" class="routemap-container">
-                    <iframe src="{% static 'data/user_map1.html' %}" width="100%" height="600px" frameborder="0" style="float: right;"></iframe>
+                    <iframe src="{% static 'data/user_map5.html' %}" width="100%" height="600px" frameborder="0" style="float: right;"></iframe>
                 </div>
             </div>
         {% endfor %}

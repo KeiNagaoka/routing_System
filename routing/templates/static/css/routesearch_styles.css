@@ -17,6 +17,11 @@ form {
     align-items: flex-start;
 }
 
+.form-group input[type="text"] {
+    padding: 5px;
+    font-size: 16px;
+    flex: 9; /* 必要に応じて入力フィールドを伸縮させる */
+}
 
 label {
     margin-bottom: 0; /* デフォルトのマージンをリセット */
@@ -27,6 +32,14 @@ select, input[type="number"] {
     padding: 5px;
     font-size: 16px;
     flex: 1; /* 必要に応じて入力フィールドを伸縮させる */
+}
+
+.input-wide {
+    width: 90%; /* 横幅を70%に設定 */
+}
+
+.input-narrow {
+    width: 50px; /* 固定値で横幅を狭く設定 */
 }
 
 .route-display-area {
@@ -59,7 +72,12 @@ select, input[type="number"] {
         flex-direction: column; /* ラベルと入力欄を縦に並べる */
         align-items: stretch; /* 入力欄を画面いっぱいに伸ばす */
     }
-
+    .form-group input[type="text"] {
+        flex: 1; /* スマホでは通常サイズに戻す */
+    }
+    .form-group input[type="number"] {
+        width: auto; /* 自動幅に戻す */
+    }
     select, input[type="number"] {
         font-size: 14px; /* フォントサイズを少し小さく */
         padding: 8px;
