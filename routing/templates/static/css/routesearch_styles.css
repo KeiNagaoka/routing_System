@@ -35,11 +35,11 @@ select, input[type="number"] {
 }
 
 .input-wide {
-    width: 90%; /* 横幅を70%に設定 */
+    width: 100%; /* 横幅を100%に設定 */
 }
 
 .input-narrow {
-    width: 50px; /* 固定値で横幅を狭く設定 */
+    width: 10%; /* 固定値で横幅を狭く設定 */
 }
 
 .route-display-area {
