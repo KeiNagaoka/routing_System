@@ -1,6 +1,8 @@
 {
     "folder_path":"data",
     "result_folder":"result",
+    "static_folder":"routing/templates/static",
+    "map_folder":"map",
     "adjacent_matrix":"adjacent_matrix_chofu.npy",
     "road_network":"chofu_map.pkl",
     "inputfile":"inputfile_chofu.csv",

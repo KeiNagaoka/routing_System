@@ -23,6 +23,7 @@ with open(SETTING_PATH, "r", encoding="utf-8") as json_file:
 # パスを指定
 FOLDER_PATH = os.path.join(base_path, settings["folder_path"])
 RESULT_FOLDER = os.path.join(base_path, settings["result_folder"])
+MAP_FOLDER = os.path.join(base_path, '..', '..', settings["static_folder"], settings["map_folder"])
 
 # input
 ROAD_NETWORK = os.path.join(FOLDER_PATH, settings["road_network"])
@@ -34,7 +35,7 @@ NODE_DF = os.path.join(FOLDER_PATH, settings["node_df"])
 SPOT_INFO = os.path.join(FOLDER_PATH, settings["spot_info"])
 
 # output
-TSP_RESULT = os.path.join(RESULT_FOLDER, settings["tsp_result"])
+MAP_PATH = os.path.join(RESULT_FOLDER, settings["tsp_result"])
 RESULT_TEXT = os.path.join(FOLDER_PATH, settings["result_text"])
 
 #コマンドライン引数を取得
@@ -58,8 +59,10 @@ city = query.split(',')[0].lower()
 n_agent = 300
 patrol = 10
 max_label = 20000 #プロットするときの縦軸の上限
-startNode = 0 #ここから始まる
-goalNode = 625 #ここから始まる
+start_name = "調布駅"
+goal_name = "電気通信大学正門"
+# startNode = 0 #ここから始まる
+# goalNode = 625 #ここから始まる
 # (nodes_dfのインデックス)
 ver = "tagfill"
 
@@ -83,6 +86,12 @@ for index,row in node_df.iterrows():
 			count_tags[category] += 1
 		else:
 			count_tags[category] = 1
+
+# name_index = {row['name']:index for index,row in node_df.iterrows()}
+name_index = dict({})
+for idx,row in node_df.iterrows():
+	for name in str2list_strings(row['name']):
+		name_index[name] = idx
 
 # raise ZeroDivisionError("ここで止める")
 #データのインポート
@@ -134,7 +143,6 @@ class TSP:
 		if adj_matrix_path is not None:
 			if '.npy' in adj_matrix_path:
 				self.dist = np.load(ADJACENT_MATRIX)
-				print(f"self.dist:{len(self.dist)}")
 			else:
 				self.dist = np.array(pd.read_csv(ADJACENT_MATRIX))
 				pd.DataFrame(self.dist).to_csv(ADJACENT_MATRIX,index=False)
@@ -179,8 +187,6 @@ class TSP:
 			raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags:{self.now_tags.keys()}に含まれないよ！")
 		for key_aim,val_aim in self.aim_tags.items():
 			if self.now_tags[key_aim] < val_aim:
-				# print(f"aim:{self.aim_tags}")
-				# print(f"now:{[(key,val) for key,val in self.now_tags.items() if val > 0]}")
 				return False
 		return True
 	
@@ -300,8 +306,8 @@ class TSP:
 				self.res_tags = self.now_tags.copy()
 
 			# デバッグ用
-			print("Agent ... %d , Cost ... %lf" % (k,self.cost(self.result)))
-			print(f'距離:{cost_order}\norder:{order}')
+			# print("Agent ... %d , Cost ... %lf" % (k,self.cost(self.result)))
+			# print(f'距離:{cost_order}\norder:{order}')
 
 		return self.result
 
@@ -324,22 +330,26 @@ def necessary_spots(order_name,aim_tags,name_tags=name_tags):
 	necessary_tags = set(aim_tags_processed.keys())
 	# start_and_goal = set([order_name[0],order_name[-1]])
 	start_and_goal = set(["電気通信大学正門","調布駅"])
-	print(f"tags_dict:{tags_dict}")
-	print(f"aim_tags_processed:{aim_tags_processed}")
-	print(f"necessary_tags:{necessary_tags}")
-	print(f"start_and_goal:{start_and_goal}")
 	# tagsがnecessary_tagsに含まれるものだけを抽出
 	
 	result_order = [name for name, tags in tags_dict.items() if set(tags) & necessary_tags or name in start_and_goal]
-	# result_order = []
-	# for name,tags in tags_dict.items():
-	# 	if len(set(tags) & necessary_tags) > 0:
-	# 		result_order.append(name)
+	
 	return result_order
 
 #実行部分
-def tsp_execute(index_name=index_name):
+def tsp_execute(
+				route_index=0,
+				start_name=start_name,
+				goal_name=goal_name,
+				aim_tags=aim_tags,
+				map_html=settings["tsp_result"]
+				):
+	# 前処理
 	aim_tags_input = aim_tags
+	startNode = name_index[start_name]
+	goalNode = name_index[goal_name]
+	print(f"{goal_name}:{goalNode}")
+
 	tsp = TSP(node_df=NODE_DF,
 		   adj_matrix_path=ADJACENT_MATRIX,
 		   alpha = 1.0,
@@ -358,18 +368,12 @@ def tsp_execute(index_name=index_name):
 		   patrol=patrol,
 		   start_random=False)
 	
-	startTime = time.time()
-
 	# メイン処理
 	order = tsp.solve(n_agent=n_agent)		# n_agent匹の蟻を歩かせる
 	
 	name_order = [index_name[i] for i in order]
 	spots_original = [name for L in name_order for name in str2list_strings(L)]
 	spots = necessary_spots(spots_original,aim_tags) # これを返す
-	goalTime = time.time()
-	print(f"順番:\n{spots}") # これを返す
-	print(f'実行時間:{goalTime-startTime:.3f}秒')
-	tsp.save(printer=True)
 
 	# ルートの隣り合う同じ値を消す
 	def shrink_route(route):
@@ -402,10 +406,7 @@ def tsp_execute(index_name=index_name):
 	#出力された順番をもとにからノードを辿る
 	route_tsp = shrink_route(list(itertools.chain.from_iterable(pre_route_tsp))) #平坦化
 	edges_tsp = [(route_tsp[i],route_tsp[i+1],0) for i in range(len(route_tsp)-1)]
-	# print(f'symbol_list:{symbol_list}')
-	# print(f'edges_tsp:{edges_tsp}')
 	passed_symbols = list(set(order).intersection(set(route_tsp)))
-	not_passed_symbols = list(set(order).difference(set(passed_symbols)))
 
 	#可視化
 	# Folium マップを作成し、縮尺（ズーム レベル）と方位を設定
@@ -436,19 +437,34 @@ def tsp_execute(index_name=index_name):
 				loc = name_coord[name]
 				folium.Marker(loc, popup=name, icon=folium.Icon(color='red')).add_to(map)
 
-	# # 通っていないシンボル
-	# for i, symbol in enumerate(not_passed_symbols):
-	# 	loc = [G.nodes[symbol]['y'], G.nodes[symbol]['x']]
-	# 	name = G.nodes[symbol]['name']
-	# 	folium.Marker(loc, popup=name, icon=folium.Icon(color='blue')).add_to(map)
-
 	# 縮尺とズームを設定
 	map.fit_bounds(map.get_bounds())
 	map.zoom_start = 15
 
 	# 保存
-	print(f"TSP_RESULT:{TSP_RESULT}")
-	map.save(TSP_RESULT)
+	MAP_PATH = os.path.join(MAP_FOLDER, map_html)
+	map.save(MAP_PATH)
+
+	# 距離と所要時間を計算
+	dist = tsp.cost(tsp.result)
+	time_rq = tsp.cost(tsp.result) / 80.0 # 80m/minで計算
+	if len(spots) > 2:
+		via_spots = spots[1:-1]
+	else:
+		via_spots = []
+
+	info_json = {
+		"name":f'経路{route_index}',
+		"order":spots,
+		"iframe_src":f'{settings["map_folder"]}/{map_html}',
+		"distance":dist,
+		"time":time_rq,
+		"via_spots":via_spots
+			  }
+	print(f"info_json:{info_json}")
+	
+	return info_json
 
 if __name__ == "__main__":
-	tsp_execute()
+	solver = tsp_execute()
+	print(solver)

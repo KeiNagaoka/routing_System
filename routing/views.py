@@ -15,6 +15,7 @@ sys.path.append('..')
 import json
 from routingSystem.backend.data_management import get_spots_data, get_routes_data, filter_tag_added_spot
 from routingSystem.backend.core.utils import str2list_strings
+from routingSystem.backend.tsp_solve import tsp_execute
 
 class IndexView(TemplateView):
     template_name = "index.html"
@@ -68,10 +69,10 @@ class SearchingView(TemplateView):
     template_name = "routesearch.html"
 
     def get(self, request):
-        ids = [1,2,3]
+        ids = [1,2,7]
         routes = [
             {'name': f'経路{id}',
-             'iframe_src': f'data/user_map{id}.html',
+             'iframe_src': f'map/user_map{id}.html',
              'distance':1000,
              'time':14,
              'via_spots': ['セブン-イレブン 調布駅東口店','ティオ・ダンジョウ']
@@ -81,34 +82,26 @@ class SearchingView(TemplateView):
         spot_num = 1
         spot_num_range = [i for i in range(1,spot_num+1)]
         data = {'routes':routes,
-                'spot_num_range':spot_num_range}
+                'spot_num_range':spot_num_range,
+                }
         return render(request, 'routesearch.html', data)
 
     def post(self, request):
         print(f"request.POST:{request.POST}")
         start_spot = request.POST.get('start_spot')
         goal_spot = request.POST.get('goal_spot')
+        user_name = request.user.name
+        aim_tags = {"駅":3}
 
+        route1 = tsp_execute(route_index=0,
+                             start_name=start_spot,
+                             goal_name=goal_spot,
+                             aim_tags=aim_tags,
+                             map_html=f"user_map_{user_name}_0.html")
+                             
         # ここでPOSTされたデータを処理するロジックを記述する
-        ids = [1,2,3]
-        # routes = [
-        #     {'name': f'経路{id}',
-        #      'iframe_src': f'data/user_map{id}.html',
-        #      'distance':1000,
-        #      'time':14,
-        #      'via_spots': ['セブン-イレブン 調布駅東口店','ティオ・ダンジョウ']
-        #      }
-        #     for id in ids
-        # ]
-        routes = [
-            {'name': f'経路{id}',
-             'iframe_src': f'data/user_map{id}.html',
-             'distance':1300,
-             'time':18,
-             'via_spots': ['セブン-イレブン 調布駅北口店','ASIANTAIPEIpresentsResortDiningアジタイ食堂']
-             }
-            for id in ids
-        ]
+        routes = [route1 for _ in range(3)]
+        
         spot_num = 1
         spot_num_range = [i for i in range(1,spot_num+1)]
         data = {'routes':routes,
@@ -221,7 +214,7 @@ class RouteInfoView(View):
         info_json =  {
             'route': route,
             'route_id': route_id,
-            'iframe_src': f'data/user_map{route_id}.html',
+            'iframe_src': f'map/user_map{route_id}.html',
             }
 
         return render(request, template_name, info_json)
