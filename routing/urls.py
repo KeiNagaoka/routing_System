@@ -17,6 +17,8 @@ urlpatterns = [
     path('display/', views.SpotlistView.as_view(), name='display'),
     path('update_tag/', views.UpdateTagView.as_view(), name='update_tag'), # タグ更新
     path('route_display/', views.RouteInfoView.as_view(), name='route_display'), # 経路詳細表示
+    path('all_spot/', views.AllSpotView.as_view(), name='all_spot'),
+    path('all_spot_only/', views.AllSpotOnlyView.as_view(), name='all_spot_only'),
 ]
 
 # 静的ファイルの設定

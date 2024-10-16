@@ -5,8 +5,8 @@ import ujson
 import pickle
 import ast
 import pandas as pd
-import time
 import folium
+from folium.plugins import MeasureControl  # 追加
 import osmnx as ox
 import itertools
 import numpy as np
@@ -373,7 +373,7 @@ def tsp_execute(
 	
 	name_order = [index_name[i] for i in order]
 	spots_original = [name for L in name_order for name in str2list_strings(L)]
-	spots = necessary_spots(spots_original,aim_tags) # これを返す
+	spots = necessary_spots(spots_original, aim_tags_input) # これを返す
 
 	# ルートの隣り合う同じ値を消す
 	def shrink_route(route):
@@ -411,7 +411,7 @@ def tsp_execute(
 	#可視化
 	# Folium マップを作成し、縮尺（ズーム レベル）と方位を設定
 	# 最短経路を地図にプロット
-	map = folium.Map()
+	map = folium.Map(control_scale=True)
 	# エッジだけを持つ部分グラフを取得
 	route_G = G.edge_subgraph(edges_tsp)
 
@@ -440,6 +440,7 @@ def tsp_execute(
 	# 縮尺とズームを設定
 	map.fit_bounds(map.get_bounds())
 	map.zoom_start = 15
+
 
 	# 保存
 	MAP_PATH = os.path.join(MAP_FOLDER, map_html)

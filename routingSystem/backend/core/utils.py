@@ -35,3 +35,11 @@ def str2list_strings(string):
         return string
     else:
         return string.replace('"','').replace("'","").strip('[]').split(', ')
+    
+def organize_aim_tags(request, via_spots_num):
+    aim_tags = dict({})
+    for i in range(1, int(via_spots_num)+1):
+        spot_name = request.POST.get(f'spot{i}')
+        num = request.POST.get(f'number{i}')
+        aim_tags[spot_name] = int(num)
+    return aim_tags

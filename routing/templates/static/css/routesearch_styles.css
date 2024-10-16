@@ -13,7 +13,7 @@ form {
     display: flex;
     align-items: center; /* 垂直方向の中央揃え */
     gap: 10px; /* ラベルと入力フィールドの間隔 */
-    margin-bottom: 10px; /* form-group同士の間隔 */
+    margin-bottom: 0px; /* form-group同士の間隔 */
     align-items: flex-start;
 }
 
@@ -59,6 +59,46 @@ select, input[type="number"] {
 
 .routemap-container {
     flex: 6;  /* 地図コンテナも同様にサイズ調整 */
+}
+
+/* サジェストボックスのスタイル */
+.suggest {
+    z-index: 1000;
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-height: 300px; /* 必要に応じて高さを制限 */
+    overflow-y: auto; /* 多すぎる候補をスクロール可能に */
+    margin-top: 0px; /* 位置調整 */
+    font-size: 90%;
+}
+
+/* サジェストアイテムのスタイルを大きくする */
+.suggest div {
+    margin-top: 0px; /* 位置調整 */
+    padding: 8px; /* 内側の余白を広げてアイテムを大きく見せる */
+    font-size: 18px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.suggest div.select{ /* キー上下で選択した場合のスタイル */
+    background-color: #f1f1f1;
+}
+.suggest div.over{ /* マウスオーバ時のスタイル */
+    background-color: #f1f1f1;
+}
+
+/* サジェストボックスが空の場合の非表示（display: none; を使わない場合） */
+.suggest:empty {
+    display: none;
+}
+
+.hide {
+    display: none;
 }
 
 

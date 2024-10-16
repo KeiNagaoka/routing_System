@@ -9,12 +9,12 @@ from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .forms import SignUpForm, LoginFrom
-from .models import Spot, AddedTag
+from .models import Spot, AddedTag, User
 import sys
 sys.path.append('..')
 import json
 from routingSystem.backend.data_management import get_spots_data, get_routes_data, filter_tag_added_spot
-from routingSystem.backend.core.utils import str2list_strings
+from routingSystem.backend.core.utils import str2list_strings, get_spot_info, organize_aim_tags
 from routingSystem.backend.tsp_solve import tsp_execute
 
 class IndexView(TemplateView):
@@ -81,8 +81,11 @@ class SearchingView(TemplateView):
         ]
         spot_num = 1
         spot_num_range = [i for i in range(1,spot_num+1)]
+
+        range10 = list(range(1,11))
         data = {'routes':routes,
                 'spot_num_range':spot_num_range,
+                'range10':range10,
                 }
         return render(request, 'routesearch.html', data)
 
@@ -91,7 +94,10 @@ class SearchingView(TemplateView):
         start_spot = request.POST.get('start_spot')
         goal_spot = request.POST.get('goal_spot')
         user_name = request.user.name
-        aim_tags = {"駅":3}
+        via_spots_num = request.POST.get('number_spot')
+
+        aim_tags = organize_aim_tags(request, via_spots_num)
+        print(f"aim_tags:{aim_tags}")
 
         route1 = tsp_execute(route_index=0,
                              start_name=start_spot,
@@ -104,10 +110,14 @@ class SearchingView(TemplateView):
         
         spot_num = 1
         spot_num_range = [i for i in range(1,spot_num+1)]
+
+        range10 = list(range(1,11))
         data = {'routes':routes,
                 'start_spot':start_spot,
                 'goal_spot':goal_spot,
-                'spot_num_range':spot_num_range}
+                'spot_num_range':spot_num_range,
+                'range10':range10,
+                }
         return render(request, 'routesearch.html', data)
 
 class ChangeSpotNum(View):
@@ -218,3 +228,34 @@ class RouteInfoView(View):
             }
 
         return render(request, template_name, info_json)
+
+# 全てのスポットとタグを取得するAPI
+class AllSpotView(View):
+  def get(self, request, *args, **kwargs):
+    user_name = request.user.name
+    user = User.objects.get(name=user_name)  # 'user'を実際のユーザー名に置き換える
+    user_tags = AddedTag.objects.filter(user=user)
+    added_tags = [tag.tag for tag in user_tags]
+
+    spots = Spot.objects.all()
+    tags = [tag for spot in spots for tag in str2list_strings(spot.tags)]
+
+    combined_tags = added_tags + tags
+    
+    spot_df = get_spot_info()
+    spot_names = spot_df["name"].tolist()
+
+    name_and_tags = list(set(spot_names + combined_tags))
+
+    data = {"all_spot":name_and_tags}
+    return JsonResponse(data, safe=False)
+
+# 全てのスポットのみを返すAPI
+class AllSpotOnlyView(View):
+  def get(self, request, *args, **kwargs):
+    
+    spot_df = get_spot_info()
+    spot_names = list(set(spot_df["name"].tolist()))
+
+    data = {"all_spot":spot_names}
+    return JsonResponse(data, safe=False)

@@ -15,35 +15,37 @@
     <!-- 入力欄 -->
     <form action="/routesearch/" method="post">
         {% csrf_token %}
-        <div class="form-group">
+            
+        <div class="form-group"> 
             <label for="start_spot">出発地点:</label>
-            <select id="start_spot" name="start_spot">
-                <option value="調布駅">調布駅</option>
-                <option value="西調布駅">西調布駅</option>
-            </select>
+            <input type="text" id="start_spot" name="start_spot" placeholder="出発地点を入力"
+            value="" autocomplete="off" class="input-wide" required/>
         </div>
+        <div id="suggest_start" class="suggest"></div>
+
 
         <div class="form-group">
             <label for="spot_num">経由地点数:</label>
             <input type="number" id="number_spot" name="number_spot" min="0" max="10" value="0" onchange="ChangeSpotNum()">
         </div>
 
-        <div id="spots_container"></div>
+        {% for i in range10 %}
+            <div class="form-group hide" id="spot-group{{ i }}"> 
+                <label for="spot{{ i }}">経由地点{{ i }}:</label>
+                <input type="text" id="spot{{ i }}" name="spot{{ i }}" placeholder="経由地点を入力"
+                value="" autocomplete="off" class="input-wide" />
+                <label for="number{{ i }}">箇所数{{ i }}:</label>
+                <input type="number" id="number{{ i }}" name="number{{ i }}" min="1" value="1" class="input-wide" />
+            </div>
+            <div id="suggest{{ i }}" class="suggest"></div>
+        {% endfor %}
         
-        <div class="form-group">
-            <label for="spot11">経由地点11:</label>
-            <input type="text" id="spot11" name="spot11" placeholder="経由地点を入力" value="{{ spot_name11 }}" class="input-wide" />
-            <label for="number11">箇所数11:</label>
-            <input type="number" id="number11" name="number11" min="1" value="1" class="input-wide" />
-        </div>
-        
-        <div class="form-group">
+        <div class="form-group"> 
             <label for="goal_spot">到着地点:</label>
-            <select id="goal_spot" name="goal_spot">
-                <option value="電気通信大学正門">電気通信大学正門</option>
-                <option value="つつじヶ丘駅">つつじヶ丘駅</option>
-            </select>
-        </div>    
+            <input type="text" id="goal_spot" name="goal_spot" placeholder="到着地点を入力"
+            value="" autocomplete="off" class="input-wide" required/>
+        </div>
+        <div id="suggest_goal" class="suggest"></div>
 
         <div id="submit-btn">
             <input type="submit" value="探索">
@@ -90,6 +92,7 @@
 
 
 <!-- JavaScriptの追加 -->
+<script src="{% static 'scripts/suggest.js' %}"></script>
 <script src="{% static 'scripts/routesearch_scripts.js' %}"></script>
 
 {% endblock %}

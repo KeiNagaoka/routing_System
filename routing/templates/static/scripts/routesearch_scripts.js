@@ -20,31 +20,85 @@
 
 
 function ChangeSpotNum() {
-    // spots_containerを取得
-    const container = document.getElementById('spots_container');
-    
-    // 現在の内容をクリア
-    container.innerHTML = '';
+    // 現在の経由地点数を取得
+    const numberSpotInput = document.getElementById("number_spot");
+    const currentCount = parseInt(numberSpotInput.value, 10);
+    console.log(`numberSpotInput:${numberSpotInput} currentCount:${currentCount}`);
 
-    // number_spotの値を取得
-    const numberOfSpots = parseInt(document.getElementById('number_spot').value);
-
-    // 指定された数だけform-groupを生成
-    for (let i = 1; i <= numberOfSpots; i++) {
-        container.innerHTML += `
-            <div class="form-group">
-                <label for="spot${i}">経由地点${i}:</label>
-                <select id="spot${i}" name="spot${i}">
-                    <option value="セブンイレブン">セブンイレブン</option>
-                    <option value="ファミリーマート">ファミリーマート</option>
-                    <option value="ローソン">ローソン</option>
-                    <option value="レストラン">レストラン</option>
-                    <option value="駅">駅</option>
-                </select>
-                
-                <label for="number${i}">箇所数${i}:</label>
-                <input type="number" id="number${i}" name="number${i}" min="1" value="1">
-            </div>
-        `;
+    // 1から10の範囲で表示・非表示を制御
+    for (let i = 1; i < 11; i++) {
+        const spotGroup = document.getElementById(`spot-group${i}`);
+        if (i <= currentCount) {
+            spotGroup.classList.remove('hide'); // 表示
+        } else {
+            spotGroup.classList.add('hide'); // 非表示
+        }
     }
 }
+
+// 外部APIからデータを取得してリストにセットする関数
+async function fetchSpotList(end_point) {
+    try {
+        const response = await fetch(`/${end_point}/`);
+        const data = await response.json();
+        console.log(data);
+
+        return data.all_spot;
+    } catch (error) {
+        console.error('Error fetching spot list:', error);
+        return [];
+    }
+}
+
+// サジェスト機能を開始する関数
+async function startSuggest() {
+    const list = await fetchSpotList('all_spot'); // APIからデータを取得
+    const spot_list = await fetchSpotList('all_spot_only'); // APIからデータを取得
+    // const list = ['セブンイレブン', 'ファミリーマート', 'ローソン', 'レストラン', '駅']; // テスト用のリスト
+    console.log(list);
+
+    // 複数の入力フィールドに対してサジェスト機能を適用
+    for (let i = 1; i < 10; i++) {
+        new Suggest.Local(
+            `spot${i}`,    // 入力フィールドのID
+            `suggest${i}`, // サジェスト表示エリアのID
+            list,          // サジェスト候補のリスト
+            {
+                dispMax: 0,
+                interval: 500,
+                ignoreCase: false,
+                highlight: true,
+            }
+        );
+    }
+    
+    // 出発地点のサジェスト機能を適用
+    new Suggest.Local(
+        `start_spot`,    // 入力フィールドのID
+        `suggest_start`, // サジェスト表示エリアのID
+        spot_list,          // サジェスト候補のリスト
+        {
+            dispMax: 0,
+            interval: 500,
+            ignoreCase: false,
+            highlight: true,
+        }
+    );
+    
+    // 出発地点のサジェスト機能を適用
+    new Suggest.Local(
+        `goal_spot`,    // 入力フィールドのID
+        `suggest_goal`, // サジェスト表示エリアのID
+        spot_list,          // サジェスト候補のリスト
+        {
+            dispMax: 0,
+            interval: 500,
+            ignoreCase: false,
+            highlight: true,
+        }
+    );
+}
+
+window.addEventListener ?
+  window.addEventListener('load', startSuggest, false) :
+  window.attachEvent('onload', startSuggest);
