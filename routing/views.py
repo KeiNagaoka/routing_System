@@ -9,12 +9,12 @@ from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .forms import SignUpForm, LoginFrom
-from .models import Spot, AddedTag, User
+from .models import Spot, AddedTag, User, Tag
 import sys
 sys.path.append('..')
 import json
-from routingSystem.backend.data_management import get_spots_data, get_routes_data, filter_tag_added_spot
-from routingSystem.backend.core.utils import str2list_strings, get_spot_info_from_csv, get_node_df, organize_aim_tags
+from routingSystem.backend.data_management import get_spots_data, get_routes_data, filter_tag_added_spot, get_node_df, get_spot_df
+from routingSystem.backend.core.utils import str2list_strings, get_spot_info_from_csv, organize_aim_tags
 from routingSystem.backend.tsp_solve import tsp_execute
 
 class IndexView(TemplateView):
@@ -26,10 +26,9 @@ class IndexView(TemplateView):
         if not request.user.is_authenticated:
             info_json = {}
         else:
-            user_name = request.user.name
-            spots_data = get_spots_data(user_name)
+            user = request.user
+            spots_data, all_tags = get_spots_data(user)
             spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
-            all_tags = {"コンビニ","レストラン","公園","お気に入りスポット1"}
             
             paginator = Paginator(spots_data, 12)  # 12個ずつ表示
             page_number = request.GET.get('page')
@@ -69,6 +68,7 @@ class SearchingView(TemplateView):
     template_name = "routesearch.html"
 
     def get(self, request):
+        text = ""
         routes = []
         spot_num = 1
         spot_num_range = [i for i in range(1,spot_num+1)]
@@ -81,28 +81,36 @@ class SearchingView(TemplateView):
         return render(request, 'routesearch.html', data)
 
     def post(self, request):
+        text = ""
         print(f"request.POST:{request.POST}")
-        node_df = get_node_df()
         start_spot = request.POST.get('start_spot')
         goal_spot = request.POST.get('goal_spot')
-        user_name = request.user.name
+        user = request.user
         via_spots_num = request.POST.get('number_spot')
+
+        # node_dfとspot_info_df
+        node_df = get_node_df(user=user)
+        spot_info_df = get_spot_df(user=user)
 
         # 目的地のタグの処理
         aim_tags = organize_aim_tags(request, via_spots_num)
         print(f"aim_tags:{aim_tags}")
 
-        route__list = tsp_execute(node_df=node_df,
-                             start_name=start_spot,
-                             goal_name=goal_spot,
-                             aim_tags=aim_tags,
-                             map_html=f"user_map_{user_name}.html")
-        
+        route_list = tsp_execute(node_df=node_df,
+                                 spot_info_df=spot_info_df,
+                                 start_name=start_spot,
+                                 goal_name=goal_spot,
+                                 aim_tags=aim_tags,
+                                 map_html=f"user_map_{user.name}.html")
+        print(f"route_list:{route_list}")
+        if len(route_list)==0:
+            text = "経路を探索しましたが、条件に合う経路が見つかりませんでした。"
         spot_num = 1
         spot_num_range = [i for i in range(1,spot_num+1)]
 
         range10 = list(range(1,11))
-        data = {'routes':route__list,
+        data = {'routes':route_list,
+                'text':text,
                 'start_spot':start_spot,
                 'goal_spot':goal_spot,
                 'spot_num_range':spot_num_range,
@@ -110,6 +118,96 @@ class SearchingView(TemplateView):
                 }
         return render(request, 'routesearch.html', data)
 
+class AddTagView(TemplateView):
+    template_name = "addtag.html"
+    def get(self, request):
+        user = request.user
+        data = {}
+        return render(request, 'addtag.html', data)
+    
+    def post(self, request):
+        user = request.user
+        tag = request.POST.get('tag')
+        # スポット情報のリストを取得
+        _, all_tags = get_spots_data(user=user)
+        if tag not in all_tags:
+            tag_instance = Tag(
+                user = user,
+                tag = tag
+            )
+            tag_instance.save()
+            text = f"タグ「{tag}」の追加が完了しました"
+        else:
+            text = f"タグ「{tag}」は既に存在します。"
+
+        data = {"text":text}
+
+        return render(request, 'addtag.html', data)
+    
+class DeleteTagView(TemplateView):
+    template_name = "deletetag.html"
+    def get(self, request):
+        text = ""
+        spots = []
+        first_spot_tags = []
+        user = request.user
+        spots_data, all_tags = get_spots_data(user)
+        spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
+        if spots_data:
+            spots = [data["name"] for data in spots_data]
+            spot_addedtag = {data["name"]:data["added_tags"] for data in spots_data}
+            first_spot_tags = spot_addedtag[spots[0]]
+        else:
+            text = "まだタグを追加していません。「スポット情報」よりタグを追加することができます。"
+        data = {'text':text,
+                'spots':spots,
+                'spot_tags':first_spot_tags}
+        return render(request, 'deletetag.html', data)
+    
+    def post(self, request):
+        message = ""
+        spots = []
+        first_spot_tags = []
+
+        user = request.user
+        spot = request.POST.get('spot')
+        tag = request.POST.get('tag')
+        
+        spots_data, all_tags = get_spots_data(user)
+        spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
+        spots = [data["name"] for data in spots_data]
+        spot_addedtag = {data["name"]:data["added_tags"] for data in spots_data}
+        first_spot_tags = spot_addedtag[spots[0]]
+
+        try:
+            spot = Spot.objects.get(name=spot)
+            added_tag = AddedTag.objects.get(user=user, tag=tag, spot=spot)
+            added_tag.delete()
+            message = f"タグ 「{tag}」 がスポット 「{spot.name}」 から削除されました。"
+        except Spot.DoesNotExist:
+            message = "指定されたスポットが見つかりませんでした。"
+        except AddedTag.DoesNotExist:
+            message = "指定されたタグが見つかりませんでした。"
+
+        data = {"text":message,
+                'spots':spots,
+                'spot_tags':first_spot_tags}
+
+        return render(request, 'deletetag.html', data)
+    
+class GetSpotTagView(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        spot_name = request.GET.get('spot')
+        spots_data, all_tags = get_spots_data(user)
+        spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
+        spot_addedtag = {data["name"]:data["added_tags"] for data in spots_data}
+        spot_tags = spot_addedtag[spot_name]
+        data = {"spot_tags":spot_tags}
+
+        # JSON形式で返す
+        return JsonResponse(data)
+    
 class ChangeSpotNum(View):
     def post(self, request, *args, **kwargs):
         # POSTされたデータからspot_numを取得
@@ -136,11 +234,10 @@ class SpotlistView(LoginRequiredMixin, TemplateView):
         # GETリクエストからスポット名とタグ名を取得
         spot_name = request.GET.get('spot_name', "")
         tag_name = request.GET.get('tag_name', "")
-        user_name = request.user.name
+        user = request.user
 
         # スポット情報のリストを取得
-        all_tags = {"コンビニ","レストラン","公園","お気に入りスポット1"}
-        spots_data = get_spots_data(user_name,spot_name=spot_name, tag_name=tag_name)
+        spots_data, all_tags = get_spots_data(user=user,spot_name=spot_name,tag_name=tag_name)
         
         # ページネーション
         paginator = Paginator(spots_data, 12)  # 12個ずつ表示
@@ -160,11 +257,10 @@ class SpotlistView(LoginRequiredMixin, TemplateView):
     def post(self, request, template_name=template_name):
         spot_name = request.POST.get('spot_name')
         tag_name = request.POST.get('tag_name')
-        user_name = request.user.name
+        user = request.user
 
         # スポット情報のリスト (ここでは例としてリストを作成しています)
-        spots_data = get_spots_data(user_name,spot_name=spot_name,tag_name=tag_name)
-        all_tags = {"コンビニ","レストラン","公園","お気に入りスポット1"}
+        spots_data, all_tags = get_spots_data(user=user,spot_name=spot_name,tag_name=tag_name)
         
         paginator = Paginator(spots_data, 10)  # 10個ずつ表示
         page_number = request.GET.get('page')
@@ -180,7 +276,7 @@ class SpotlistView(LoginRequiredMixin, TemplateView):
 
 class UpdateTagView(View):
     def post(self, request, *args, **kwargs):
-        spot_id = request.POST.get('spot_id')
+        spot_id = float(request.POST.get('spot_id'))
         tag = request.POST.get('tag')
 
         if spot_id and tag:

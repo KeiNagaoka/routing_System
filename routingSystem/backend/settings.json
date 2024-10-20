@@ -3,7 +3,7 @@
     "result_folder":"result",
     "static_folder":"routing/templates/static",
     "map_folder":"map",
-    "adjacent_matrix":"adjacent_matrix_chofu.npy",
+    "adjacent_matrix":"adjacent_matrix_chofu2.npy",
     "road_network":"chofu_map.pkl",
     "inputfile":"inputfile_chofu.csv",
     "result_text":"resulttext_tagfill_chofu.txt",

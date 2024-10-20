@@ -69,7 +69,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 # スポットデータ
 class Spot(models.Model):
-    idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデック
+    idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデックス
     name = models.CharField(max_length=64, unique=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
@@ -81,7 +81,7 @@ class Spot(models.Model):
     
 # スポットデータ
 class Node(models.Model):
-    idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデック
+    idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデックス
     node = models.IntegerField(unique=True)
     name = models.TextField()
     latitude = models.FloatField()
@@ -100,6 +100,14 @@ class AddedTag(models.Model):
 
     def __str__(self):
         return f"{self.user.name} added {self.tag} to {self.spot.name} at {self.added_at}"
+    
+class Tag(models.Model):
+    idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデックス
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # Userとの関係
+    tag = models.TextField()  # Tag
+
+    def __str__(self):
+        return f"{self.user.name if self.user else 'Unknown user'} added {self.tag}"
 
 # 保存されているマップデータ
 class Mapdata(models.Model):

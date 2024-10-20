@@ -54,7 +54,7 @@
                         <label for="tags-{{ spot.id }}">タグを選択:</label>
                         <select id="tags-{{ spot.id }}" name="tag">
                             {% for tag in all_tags %}
-                                <option value="{{ tag }}">{{ tag }}</option>
+                                <option value="{{ tag }}" {% if forloop.first %}selected{% endif %}>{{ tag }}</option>
                             {% endfor %}
                         </select>
                         <button type="submit">タグ追加</button>

@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import distance as dis
 from core.utils import fix_coordinates, str2list_strings
+from data_management import get_node_df, get_spot_df
 
 # 設定ファイルを読み込み
 base_path = os.path.dirname(os.path.abspath(__file__))
@@ -31,6 +32,7 @@ NETWORK_VIEW_PNG = NETWORK_VIEW.replace('.html','.png')
 ADJACENT_MATRIX = os.path.join(FOLDER_PATH, settings["adjacent_matrix"])
 NODE_DF = os.path.join(FOLDER_PATH, settings["node_df"])
 SPOT_INFO = os.path.join(FOLDER_PATH, settings["spot_info"])
+INDEX_NODE = os.path.join(FOLDER_PATH, settings["index_to_node"])
 
 # output
 MAP_PATH = os.path.join(RESULT_FOLDER, settings["tsp_result"])
@@ -64,21 +66,23 @@ goal_name = "電気通信大学正門"
 # (nodes_dfのインデックス)
 ver = "tagfill"
 
-node_df = pd.read_csv(NODE_DF)
-spot_info_df = pd.read_csv(SPOT_INFO)
-node_df["tags"] = node_df["tags"].apply(str2list_strings)
-node_df["name"] = node_df["name"].apply(str2list_strings)
+node_df = get_node_df()
+spot_info_df = get_spot_df()
 node_df["tags"] = node_df.apply(lambda row: row["tags"] + row["name"], axis=1)
 spot_info_df["tags"] = spot_info_df["tags"].apply(str2list_strings)
 spot_info_df["tags"] = spot_info_df.apply(lambda row: row["tags"] + [row["name"]], axis=1)
 
-index_spot = {index:row['node'] for index,row in node_df.iterrows()}
-index_name = {index:row['name'] for index,row in node_df.iterrows()}
-index_tags = {index:row['tags'] for index,row in node_df.iterrows()}
-index_spot_rev = {row['node']:index for index,row in node_df.iterrows()}
-name_tags = {row['name']:row['tags'] for _,row in spot_info_df.iterrows()}
-name_node = {spot_name:row['node'] for _,row in node_df.iterrows() for spot_name in str2list_strings(row['name'])}
+with open(INDEX_NODE, 'r') as f:
+    index_node = ujson.load(f)
+index_node = {int(key):int(val) for key,val in index_node.items()}
+index_node_rev = {val:key for key,val in index_node.items()}
+index_name = {index_node_rev[node]:row['name'] for node,row in node_df.iterrows()}
+name_node = {spot_name:idx for idx,row in node_df.iterrows() for spot_name in str2list_strings(row['name'])}
 name_coord = {row['name']:[row['lat'],row['lon']] for _,row in spot_info_df.iterrows()}
+
+# タグ関連（ここはuserによって異なる）
+index_tags = {index_node_rev[node]:row['tags'] for node,row in node_df.iterrows()}
+name_tags = {row['name']:row['tags'] for _,row in spot_info_df.iterrows()}
 
 
 count_tags = {}
@@ -91,9 +95,9 @@ for index,row in node_df.iterrows():
 
 # name_index = {row['name']:index for index,row in node_df.iterrows()}
 name_index = dict({})
-for idx,row in node_df.iterrows():
+for node,row in node_df.iterrows():
 	for name in str2list_strings(row['name']):
-		name_index[name] = idx
+		name_index[name] = index_node_rev[node]
 
 # raise ZeroDivisionError("ここで止める")
 #データのインポート
@@ -305,6 +309,7 @@ class TSP:
 				if self.tag_fill():
 					break
 				elif len(city)==0:
+					return None
 					raise Exception("全ての都市を周りました！")
 				
 			order.append(self.goalNode) #開始点=終了点の場合
@@ -425,6 +430,7 @@ def necessary_spots(order_name,aim_tags,
 
 #実行部分
 def tsp_execute(node_df=node_df,
+				spot_info_df=spot_info_df,
 				start_name=start_name,
 				goal_name=goal_name,
 				aim_tags=aim_tags,
@@ -440,6 +446,8 @@ def tsp_execute(node_df=node_df,
 	aim_tags_input = aim_tags
 	startNode = name_index[start_name]
 	goalNode = name_index[goal_name]
+	index_tags = {index_node_rev[node]:row['tags'] for node,row in node_df.iterrows()}
+	name_tags = {row['name']:row['tags'] for _,row in spot_info_df.iterrows()}
 
 	# 通過済みエッジ
 	passed_edges = []
@@ -468,6 +476,7 @@ def tsp_execute(node_df=node_df,
 				count_tags=count_tags,
 				startNode=startNode,
 				goalNode=goalNode,
+				index_tags=index_tags,
 				patrol_all=False,
 				patrol=patrol,)
 		
@@ -476,8 +485,6 @@ def tsp_execute(node_df=node_df,
 		if order is None:
 			break
 
-		# 出力した経路を保存
-		output_orders.append(order)
 		passed_edges = passed_edges + [(order[i],order[i+1]) for i in range(len(order)-1)] + [(order[i+1],order[i]) for i in range(len(order)-1)]
 
 		# 結果を保存
@@ -486,8 +493,19 @@ def tsp_execute(node_df=node_df,
 	
 		name_order = [index_name[i] for i in order]
 		spots_original = [name for L in name_order for name in str2list_strings(L)]
-		spots = necessary_spots(spots_original,aim_tags_input, passed_spot_names=passed_spot_names,start_name=start_name, goal_name=goal_name) # これを返す
+		spots = necessary_spots(spots_original,
+						  aim_tags_input,
+						  name_tags=name_tags,
+						  passed_spot_names=passed_spot_names,
+						  start_name=start_name,
+						  goal_name=goal_name)
+		
+		# 出力したスポットと経路を保存
 		passed_spot_names = passed_spot_names + spots
+		if order not in output_orders:
+			output_orders.append(order)
+		else:
+			continue
 
 		# for index in G.nodes():
 		# 	G.nodes[index]['tags'] = [] #タグの初期化
@@ -507,7 +525,7 @@ def tsp_execute(node_df=node_df,
 		# timelist.append(time.time())
 		# print(f"symbol_list:{timelist[-1]-timelist[-2]}秒")
 
-		order = shrink_route([index_spot[i] for i in tsp.result])
+		order = shrink_route([index_node[i] for i in tsp.result])
 		order = [name_node[spot_name] for spot_name in spots]
 		print(f"order:{order}")
 

@@ -8,10 +8,21 @@ django.setup()
 import osmnx as ox
 from tqdm import tqdm
 import pandas as pd
-from routing.models import Spot, Node
-from routingSystem.backend.data_management import get_spot_df
-from routingSystem.backend.core.utils import str2list_strings,get_spot_info_from_csv
-from routingSystem.backend.tsp_solve import G
+import networkx as nx
+import numpy as np
+import pickle
+import ujson
+from routing.models import Spot, Node, Tag
+from routingSystem.backend.data_management import get_spot_df, get_node_df, get_spots_data
+from routingSystem.backend.core.utils import base_path, get_setting, str2list_strings,get_spot_info_from_csv
+
+
+settings = get_setting()
+ROAD_NETWORK = os.path.join(base_path,settings["folder_path"],settings["road_network"])
+# Pickleファイルからデータをロード
+with open(ROAD_NETWORK, "rb") as f:
+	G = pickle.load(f)
+
 
 def add_spots():
     spot_info = get_spot_info_from_csv()
@@ -75,12 +86,50 @@ def create_node_df(G=G):
         )
         node.save()
 
+def create_tag():
+    _, all_tags = get_spots_data()
+    for tag in tqdm(all_tags, total=len(all_tags),desc="TAG:"):
+        tag_instance = Tag(
+            user = None,
+            tag = tag
+        )
+        tag_instance.save()
+
+
+
+def create_adjacent_matrix(G=G,settings=settings):
+    node_df = get_node_df()
+    node_list = node_df.index.tolist()
+    distance_dict = dict({})
+    for start_node in tqdm(node_list, total=len(node_list), desc="ADJ MATRIX:"):
+        # 最短距離を計算
+        shortest_paths = nx.single_source_dijkstra_path_length(G, source=start_node, weight="length")
+        distance_dict[start_node] = shortest_paths
+
+    adj_matrix = np.array([[distance_dict[node1][node2] 
+                            for node1 in node_list]
+                            for node2 in node_list])
+    index_node = {index:node for index, node in enumerate(node_list)}
+
+    # 保存機能
+    ADJACENT_MATRIX_PATH = os.path.join(base_path,settings["folder_path"],settings["adjacent_matrix"])
+    INDEX_NODE = os.path.join(base_path,settings["folder_path"],settings["index_to_node"])
+    np.save(ADJACENT_MATRIX_PATH, adj_matrix)  # 'my_array.npy'という名前で保存
+
+    with open(INDEX_NODE, "w", encoding="utf-8") as f:
+        ujson.dump(index_node, f)
+
+
 
 
 if __name__ == "__main__":
     Spot.objects.all().delete()
     Node.objects.all().delete()
+    Tag.objects.all().delete()
     add_spots()
     print("SPOTS added successfully.")
     create_node_df()
     print("NODES added successfully.")
+    create_tag()
+    print("TAG added successfully.")
+    create_adjacent_matrix()

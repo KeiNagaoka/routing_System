@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block header %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/addtag_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- ログインされていればマイページ -->
+    <div class="top-container">
+        <div class="h1">タグ登録ページ</div>
+        <div class="detail_script">このページでは、 {{ user.name }} さんだけのタグを登録することができます。</div>
+    </div>
+
+    <!-- タグ登録フォーム -->
+    <div class="form-container">
+        <form method="POST" action="/add_user_tag/">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="tag">新しいタグを入力してください:</label>
+                <input type="text" id="tag" name="tag" placeholder="タグを入力" required>
+            </div>
+            <button type="submit" class="btn-submit">タグを追加</button>
+        </form>
+    </div>
+    <br>
+
+    <div id="generated" class="h2">{{ text }}</div>
+
+{% endblock %}

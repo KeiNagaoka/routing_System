@@ -2,35 +2,11 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import pandas as pd
+import numpy as np
 from core.utils import get_setting, get_spot_info_from_csv, str2list_strings
-from routing.models import AddedTag, Spot, Node
+from routing.models import AddedTag, Spot, Node, Tag
 
 settings = get_setting()
-
-def get_spots_data(user_name,spot_name=None,tag_name=None):
-    spot_info = get_spot_info_from_csv()
-    spot_info["tag_text"] = spot_info["tags"].apply(lambda tags:', '.join(tags))
-    if spot_name:
-        spot_info = spot_info[spot_info["name"].str.contains(spot_name, case=False, na=False)]
-    if tag_name:
-        spot_info = spot_info[spot_info["tag_text"].str.contains(tag_name, case=False, na=False)]
-
-    # ユーザ依存の追加タグを加える処理
-    spot_info['added_tags'] = [[] for _ in range(len(spot_info))]
-    added_tags = AddedTag.objects.filter(user__name=user_name)
-    for tag in added_tags:
-        spot_info.at[tag.spot.idx,'added_tags'] = tag.tag
-    invalid_spot_info = spot_info[~spot_info['tags'].apply(lambda x: isinstance(x, list))]
-
-    spots_data = [
-        {'id': idx,
-         'name': row["name"],
-         'tags': row["tags"],
-         'added_tags': str2list_strings(row["added_tags"])
-         }
-        for idx, row in spot_info.iterrows()
-    ]
-    return spots_data
 
 
 def get_spot_df(user=None):
@@ -50,8 +26,11 @@ def get_spot_df(user=None):
     # 辞書からDataFrameを作成
     df = pd.DataFrame(data)
     df["tags"] = df["tags"].apply(str2list_strings)
+    df["original_tags"] = df["tags"].copy()
+    df["tags"] = df.apply(lambda row:row["tags"] + [row["name"]],axis=1)
 
     if user:
+        df["added_tags"] = [[] for L in range(len(df))]
         added_tags = AddedTag.objects.filter(user=user)
         for tag in added_tags:
             tag_name = tag.tag
@@ -61,10 +40,49 @@ def get_spot_df(user=None):
             # 各行の"tags"列にtag_nameを追加
             for idx in filtered_rows.index:
                 df.at[idx, 'tags'] = df.at[idx, 'tags'] + [tag_name]
+                df.at[idx, 'added_tags'] = df.at[idx, 'added_tags'] + [tag_name]
 
     df["tags"] = df["tags"].apply(lambda L:list(set(L)))
-    df.to_csv("get_spot_df.csv")    
+
+    # インデックス指定
+    df.set_index('id', inplace=True)
+    
     return df
+
+def get_spots_data(user,spot_name=None,tag_name=None):
+    spot_info = get_spot_df(user=user)
+
+    # ユーザ依存の追加タグを加える処理
+    spot_info['added_tags'] = [[] for _ in range(len(spot_info))]
+    added_tags = AddedTag.objects.filter(user=user)
+    for tag in added_tags:
+        spot_info.at[int(tag.spot.idx),'added_tags'] += str2list_strings(tag.tag)
+
+    # 絞り込み処理
+    spot_info["tag_text"] = spot_info.apply(lambda row:', '.join(row["original_tags"] + row["added_tags"]), axis=1)
+    if spot_name:
+        spot_info = spot_info[spot_info["name"].str.contains(spot_name, case=False, na=False)]
+    if tag_name:
+        spot_info = spot_info[spot_info["tag_text"].str.contains(tag_name, case=False, na=False)]
+
+    spots_data = [
+        {'id': idx,
+         'name': row["name"],
+         'tags': row["original_tags"],
+         'added_tags': row["added_tags"]
+         }
+        for idx, row in spot_info.iterrows()
+    ]
+    
+    # タグの情報
+    all_tags_nested = spot_info["original_tags"].tolist() + spot_info["added_tags"].tolist()
+    cleaned_list = [x for x in all_tags_nested if isinstance(x, list)]
+    flattened_tags = [tag for sublist in cleaned_list for tag in sublist]
+    user_added_tags = [tag.tag for tag in Tag.objects.filter(user=user)]
+    all_tags = sorted(list(set(flattened_tags)) + user_added_tags)
+    all_tags = [tag for tag in all_tags if tag!=""]
+
+    return spots_data, all_tags
 
 def get_node_df(user=None):
     # Spotモデルから全てのデータを取得
@@ -72,7 +90,6 @@ def get_node_df(user=None):
     
     # データを辞書形式に変換
     data = {
-        'id': [node.idx for node in nodes],
         'node': [node.node for node in nodes],
         'name': [node.name for node in nodes],
         'lat': [node.latitude for node in nodes],
@@ -84,6 +101,7 @@ def get_node_df(user=None):
     df = pd.DataFrame(data)
     df["name"] = df["name"].apply(str2list_strings)
     df["tags"] = df["tags"].apply(str2list_strings)
+    df["tags"] = df.apply(lambda row:row["tags"] + row["name"],axis=1)
     
     if user:
         added_tags = AddedTag.objects.filter(user=user)
@@ -95,9 +113,10 @@ def get_node_df(user=None):
             # 各行の"tags"列にtag_nameを追加
             for idx in filtered_rows.index:
                 df.at[idx, 'tags'] = df.at[idx, 'tags'] + [tag_name]
-
+                
     df["tags"] = df["tags"].apply(lambda L:list(set(L)))
-    df.to_csv("get_spot_df.csv")
+    # インデックス指定
+    df.set_index('node', inplace=True)
 
     return df
 

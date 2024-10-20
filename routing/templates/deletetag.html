@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block header %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/deletetag_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- ログインされていればマイページ -->
+<div class="top-container">
+    <div class="h1">タグ削除ページ</div>
+    <div class="detail_script">このページでは、 {{ user.name }} さんのこれまでに追加したタグを削除することができます。</div>
+</div>
+<!-- タグ削除フォーム -->
+<div class="form-container">
+    {% if spots %}
+    <form method="POST" action="/delete_user_tag/">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="spot">スポットを選択:</label>
+            <select id="spot" name="spot" onchange="updateTagOptions()">
+                {% for spot in spots %}
+                    <option value="{{ spot }}" {% if forloop.first %}selected{% endif %}>{{ spot }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="tag">タグを選択:</label>
+            <select id="tag" name="tag">
+                {% for tag in spot_tags %}
+                    <option value="{{ tag }}" {% if forloop.first %}selected{% endif %}>{{ tag }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn-submit">タグを削除</button>
+    </form>
+    {% endif %}
+</div>
+<br>
+<div id="generated" class="h2">{{ text }}</div>
+    
+    <script src="{% static 'scripts/deletetag_scripts.js' %}"></script>
+    
+{% endblock %}
