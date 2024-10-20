@@ -1,0 +1,75 @@
+/* deletetag_styles.css */
+.top-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.h2 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+.detail_script {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    width: 200%;
+}
+
+.form-group label {
+    font-size: 1.2em;
+    margin-right: 10px;
+    flex: 1;
+}
+
+.form-group select {
+    flex: 2;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+
+.form-group select:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+#generated {
+    text-align: center;
+}
+
+.btn-submit {
+    background-color: #4CAF50; /* 元の色に戻す */
+    color: white;
+    padding: 10px 20px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+    background-color: #45a049; /* 元の色に戻す */
+}

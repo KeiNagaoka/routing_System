@@ -101,6 +101,23 @@ select, input[type="number"] {
     display: none;
 }
 
+/* routesearch_styles.css */
+.btn-save {
+    background-color: #4CAF50; /* 緑色 */
+    color: white;
+    padding: 10px 20px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px; /* ボタン間の余白 */
+}
+
+.btn-save:hover {
+    background-color: #45a049; /* 濃い緑色 */
+}
+
 
 /* レスポンシブ対応：画面幅が600px以下のデバイス用 */
 @media (max-width: 600px) {

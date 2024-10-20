@@ -7,7 +7,7 @@ from django.contrib.auth.views import LoginView as BaseLoginView,  LogoutView as
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .forms import SignUpForm, LoginFrom
 from .models import Spot, AddedTag, User, Tag
 import sys
@@ -114,9 +114,35 @@ class SearchingView(TemplateView):
                 'start_spot':start_spot,
                 'goal_spot':goal_spot,
                 'spot_num_range':spot_num_range,
+                'ainm_tags':str(aim_tags),
                 'range10':range10,
                 }
         return render(request, 'routesearch.html', data)
+
+class SaveRouteView(View):
+    def post(self, request, *args, **kwargs):
+        route_name = request.POST.get('route_name')
+        route_distance = request.POST.get('route_distance')
+        route_time = request.POST.get('route_time')
+        start_spot = request.POST.get('start_spot')
+        goal_spot = request.POST.get('goal_spot')
+        aim_tags = request.POST.get('aim_tags')
+        iframe_src = request.POST.get('iframe_src')
+        via_spots = request.POST.get('via_spots').split(',')
+
+        data = {"route_name":route_name,
+                "route_distance":route_distance,
+                "route_time":route_time,
+                "start_spot":start_spot,
+                "goal_spot":goal_spot,
+                "aim_tags":aim_tags,
+                "iframe_src":iframe_src,
+                "via_spots":via_spots,
+                }
+        print(f"data:{data}")
+
+        # JSON形式で返す
+        return HttpResponse("経路が保存されました")
 
 class AddTagView(TemplateView):
     template_name = "addtag.html"
