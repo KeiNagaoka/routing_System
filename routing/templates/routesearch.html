@@ -19,7 +19,7 @@
         <div class="form-group"> 
             <label for="start_spot">出発地点:</label>
             <input type="text" id="start_spot" name="start_spot" placeholder="出発地点を入力"
-            value="" autocomplete="off" class="input-wide" required/>
+            value="調布駅" autocomplete="off" class="input-wide" required/>
         </div>
         <div id="suggest_start" class="suggest"></div>
 
@@ -33,7 +33,7 @@
             <div class="form-group hide" id="spot-group{{ i }}"> 
                 <label for="spot{{ i }}">経由地点{{ i }}:</label>
                 <input type="text" id="spot{{ i }}" name="spot{{ i }}" placeholder="経由地点を入力"
-                value="" autocomplete="off" class="input-wide" />
+                value="コンビニ" autocomplete="off" class="input-wide" />
                 <label for="number{{ i }}">箇所数{{ i }}:</label>
                 <input type="number" id="number{{ i }}" name="number{{ i }}" min="1" value="1" class="input-wide" />
             </div>
@@ -43,7 +43,7 @@
         <div class="form-group"> 
             <label for="goal_spot">到着地点:</label>
             <input type="text" id="goal_spot" name="goal_spot" placeholder="到着地点を入力"
-            value="" autocomplete="off" class="input-wide" required/>
+            value="国領駅" autocomplete="off" class="input-wide" required/>
         </div>
         <div id="suggest_goal" class="suggest"></div>
 

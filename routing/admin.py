@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group# admin.py
-from .models import Spot, User, AddedTag
+from .models import Spot, Node, User, AddedTag
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -25,6 +25,10 @@ admin.site.unregister(Group)
 @admin.register(Spot)
 class SpotAdmin(admin.ModelAdmin):
     list_display = ('name', 'latitude', 'longitude', 'hp', 'tags')  # 存在するフィールドを指定
+    
+@admin.register(Node)
+class NodeAdmin(admin.ModelAdmin):
+    list_display = ('node', 'name', 'latitude', 'longitude', 'tags')  # 存在するフィールドを指定
 
 @admin.register(AddedTag)
 class AddedTagAdmin(admin.ModelAdmin):

@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "routing"
+    'routing',
+    'routingSystem',
 ]
 
 AUTH_USER_MODEL = "routing.User"

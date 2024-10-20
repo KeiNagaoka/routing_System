@@ -70,10 +70,22 @@ class User(AbstractBaseUser, PermissionsMixin):
 # スポットデータ
 class Spot(models.Model):
     idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデック
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, unique=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
     hp = models.TextField()
+    tags = models.TextField()
+
+    def __str__(self):
+        return self.name
+    
+# スポットデータ
+class Node(models.Model):
+    idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデック
+    node = models.IntegerField(unique=True)
+    name = models.TextField()
+    latitude = models.FloatField()
+    longitude = models.FloatField()
     tags = models.TextField()
 
     def __str__(self):
@@ -88,3 +100,18 @@ class AddedTag(models.Model):
 
     def __str__(self):
         return f"{self.user.name} added {self.tag} to {self.spot.name} at {self.added_at}"
+
+# 保存されているマップデータ
+class Mapdata(models.Model):
+    idx = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Userとの関係
+    name = models.CharField(max_length=64)
+    start_spot = models.ForeignKey(Spot, on_delete=models.CASCADE, related_name='start_spot')  # Spotとの関係
+    goal_spot = models.ForeignKey(Spot, on_delete=models.CASCADE, related_name='goal_spot')  # Spotとの関係
+    via_spots = models.ManyToManyField(Spot, related_name='via_spots')  # Spotと
+    aim_tags = models.TextField()  # 検索条件のタグ
+    html = models.TextField()  # マップデータのHTML
+
+
+    def __str__(self):
+        return self.name

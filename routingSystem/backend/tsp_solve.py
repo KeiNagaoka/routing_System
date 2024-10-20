@@ -3,10 +3,9 @@ import sys
 import os
 import ujson
 import pickle
-import ast
+import time
 import pandas as pd
 import folium
-from folium.plugins import MeasureControl  # 追加
 import osmnx as ox
 import itertools
 import numpy as np
@@ -30,7 +29,6 @@ ROAD_NETWORK = os.path.join(FOLDER_PATH, settings["road_network"])
 NETWORK_VIEW = os.path.join(RESULT_FOLDER, settings["network_view"])
 NETWORK_VIEW_PNG = NETWORK_VIEW.replace('.html','.png')
 ADJACENT_MATRIX = os.path.join(FOLDER_PATH, settings["adjacent_matrix"])
-ROAD_NETWORK = os.path.join(FOLDER_PATH, settings["road_network"])
 NODE_DF = os.path.join(FOLDER_PATH, settings["node_df"])
 SPOT_INFO = os.path.join(FOLDER_PATH, settings["spot_info"])
 
@@ -69,7 +67,10 @@ ver = "tagfill"
 node_df = pd.read_csv(NODE_DF)
 spot_info_df = pd.read_csv(SPOT_INFO)
 node_df["tags"] = node_df["tags"].apply(str2list_strings)
+node_df["name"] = node_df["name"].apply(str2list_strings)
+node_df["tags"] = node_df.apply(lambda row: row["tags"] + row["name"], axis=1)
 spot_info_df["tags"] = spot_info_df["tags"].apply(str2list_strings)
+spot_info_df["tags"] = spot_info_df.apply(lambda row: row["tags"] + [row["name"]], axis=1)
 
 index_spot = {index:row['node'] for index,row in node_df.iterrows()}
 index_name = {index:row['name'] for index,row in node_df.iterrows()}
@@ -78,6 +79,7 @@ index_spot_rev = {row['node']:index for index,row in node_df.iterrows()}
 name_tags = {row['name']:row['tags'] for _,row in spot_info_df.iterrows()}
 name_node = {spot_name:row['node'] for _,row in node_df.iterrows() for spot_name in str2list_strings(row['name'])}
 name_coord = {row['name']:[row['lat'],row['lon']] for _,row in spot_info_df.iterrows()}
+
 
 count_tags = {}
 for index,row in node_df.iterrows():
@@ -98,22 +100,35 @@ for idx,row in node_df.iterrows():
 # Pickleファイルからデータをロード
 with open(ROAD_NETWORK, "rb") as f:
 	G = pickle.load(f)
-#ノードの属性（タグ）を更新
-df_sym = pd.read_csv(NODE_DF) #csv読む
+
+
+# ルートの隣り合う同じ値を消す
+def shrink_route(route):
+	if len(route) == 0: return []
+	shrunk_route = [route[0]]  # 最初の要素を追加
+	for i in range(1, len(route)):
+		if route[i] != route[i-1]:
+			shrunk_route.append(route[i])
+	return shrunk_route
 
 #クラス定義
+# vanish_ratio:フェロモンの蒸発率(ρ)
 class TSP:
 	def __init__(self,node_df=None,adj_matrix_path=None,alpha = 1.0,beta_pre = 10.0,beta_after = 1.0,Q = 1.0,vanish_ratio = 0.95,
 			  patrol_all=True,patrol=10,patrol_dict=10,kick_interval=50,kick_start=50,kick_ratio=1.1,
-			  start_random=True,startNode=None,goalNode=None,index_name=index_name,
+			  gamma=0.5,epsilon=0.8,passed_edges=[],output_orders=[],
+			  startNode=None,goalNode=None,index_name=index_name,
 			  index_tags=index_tags,count_tags=count_tags,aim_tags=aim_tags):
 		#ここから初期化処理
 		#パラメータ関係
 		self.alpha = alpha					# フェロモンの優先度
-		self.beta = beta_pre					# ヒューリスティック情報(距離)の優先度
-		self.beta_after = beta_after # 局所解に陥った後のbeta
+		self.beta = beta_pre				# ヒューリスティック情報(距離)の優先度
+		self.beta_after = beta_after		# 局所解に陥った後のbeta
 		self.Q = Q							# フェロモン変化量の係数
 		self.vanish_ratio = vanish_ratio	# 蒸発率
+		self.gamma = gamma					# 通過済みエッジ　フェロモンの塗布量の制限係数
+		self.epsilon = epsilon				# 通過済みエッジ　フェロモンの蒸発率
+		self.passed_edges = passed_edges	# 通過済みエッジ　既に通過したためデバフをかけるエッジ
 		#巡回都市関係
 		self.patrol_dict = patrol_dict #タグごとに巡回するべき都市数
 		self.n_patrol = patrol
@@ -126,7 +141,6 @@ class TSP:
 		self.kick_start = kick_start
 		self.kick_ratio = kick_ratio
 		#スタート地点関係
-		self.start_random = start_random
 		self.startNode = startNode
 		self.goalNode = goalNode
 		#終了条件関係
@@ -136,10 +150,17 @@ class TSP:
 		self.aim_tags = aim_tags #このタグ数満たせばいいよ
 		self.now_tags = {i:0 for i in count_tags.keys()} #今のタグ数
 		self.res_tags = self.now_tags.copy()
-		if node_df is not None:
+
+		if node_df is None:
 			node_df = pd.read_csv(node_df)
-			coord_arr = np.array(node_df[['lon', 'lat']])
-			self.set_loc(coord_arr) #setloc関数を呼び出して、位置座標を設定
+		coord_arr = np.array(node_df[['lon', 'lat']])
+		self.set_loc(coord_arr) #setloc関数を呼び出して、位置座標を設定
+
+		# 蒸発率と通過済みエッジ関連（蒸発率とフェロモン制限係数）
+		self.n_data = len(node_df)
+		self.ourput_orders = output_orders
+		# self.evap_matrix = np.full((self.n_data, self.n_data), self.vanish_ratio) #蒸発行列
+		self.evap_matrix = self.create_evap_matrix()
 		if adj_matrix_path is not None:
 			if '.npy' in adj_matrix_path:
 				self.dist = np.load(ADJACENT_MATRIX)
@@ -148,6 +169,13 @@ class TSP:
 				pd.DataFrame(self.dist).to_csv(ADJACENT_MATRIX,index=False)
 		else:
 			self.dist = dis.squareform(dis.pdist(self.loc))	# 距離の表を作成
+
+	def create_evap_matrix(self):
+		evap_matrix = np.full((self.n_data, self.n_data), self.vanish_ratio)
+		print(f"self.passed_edges:{self.passed_edges[:10]}...")
+		for coord in self.passed_edges:
+			evap_matrix[coord] = self.epsilon
+		return evap_matrix
 	
 	def set_loc(self,locations): #locationsは位置を表す２次元配列
 		#位置座標を設定する関数
@@ -190,6 +218,13 @@ class TSP:
 				return False
 		return True
 	
+	# 既に出力した経路と同じ経路ならTrue
+	def passed_route(self,order):
+		for route in self.ourput_orders:
+			if set(order) >= set(route):
+				return True
+		return False
+	
 	# 局所解脱出
 	def two_opt(self,route):
 		improved = False
@@ -223,15 +258,15 @@ class TSP:
 		self.n_agent = n_agent
 		delta = np.zeros((self.n_data,self.n_data))	#フェロモン変化量
 		
-		if self.start_random: self.startNode = np.random.randint(self.n_data)	# 現在居る都市番号　現在地
-		elif self.startNode==None: raise Exception("エラー：スタートノードを設定するか、start_randomをTrueに設定してください")
+		if self.startNode==None: raise Exception("エラー：スタートノードを設定してください。")
 
 		for k in range(n_agent):
 			city = np.arange(self.n_data)
 			
 			now_city = self.startNode
-			firsttags = self.index_tags[self.startNode]
-			self.now_tags = {tag:1  if tag in firsttags else 0 for tag in self.count_tags.keys()} #今のタグ数
+			# firsttags = self.index_tags[self.startNode]
+			# self.now_tags = {tag:1  if tag in firsttags else 0 for tag in self.count_tags.keys()} #今のタグ数
+			self.now_tags = {tag:0 for tag in self.count_tags.keys()} #今のタグ数
 			order = [self.startNode] 		# 巡回経路
 
 			
@@ -241,7 +276,7 @@ class TSP:
 			
 			#for j in range(1,self.n_patrol):
 			j = 0
-			while True:
+			while city:
 				# フェロモン濃度^α × 距離の逆数^(-β)
 				upper = np.power(self.weight[now_city,city],self.alpha) * np.power(self.dist[now_city,city],-self.beta)
 				upper = np.where(np.isinf(upper), 0, upper) # infを0にする
@@ -255,11 +290,11 @@ class TSP:
 				# city = [key for key,val in index_tags.items() if len(set(val) & aim_list) > 0 and key!=now_city]
 				order.append(now_city)
 				city = self.proposed_cities(order)
+				# print(f"order:{order}")
+				# print(f"city:{city}")
 				
 				j+=1
-				if len(city)==0:
-					raise Exception("全ての都市を周りました！")
-				
+					
 				#タグの更新
 				for tag in self.index_tags[now_city]:
 					if tag in self.now_tags.keys():
@@ -269,19 +304,27 @@ class TSP:
 				#タグが条件を満たしていれば終了
 				if self.tag_fill():
 					break
+				elif len(city)==0:
+					raise Exception("全ての都市を周りました！")
 				
 			order.append(self.goalNode) #開始点=終了点の場合
 			cost_order = self.cost(order) # 経路のコストを計算(L)
 			
 			# フェロモンの変化量を計算
 			delta[:,:] = 0.0
-			c = self.Q / cost_order
+			c = self.Q / cost_order # フェロモンの変化量
 			for j in range(len(order)-1):
-				delta[order[j],order[j+1]] = c
-				delta[order[j+1],order[j]] = c
+				# 過去に巡回した通過済みエッジのフェロモンの蒸発
+				if (order[j],order[j+1]) in self.passed_edges:
+					delta[order[j],order[j+1]] = c * self.gamma
+					delta[order[j+1],order[j]] = c * self.gamma
+				# 過去に巡回した通過済みエッジのフェロモンの蒸発
+				else:
+					delta[order[j],order[j+1]] = c
+					delta[order[j+1],order[j]] = c
 			
 			# フェロモン更新
-			self.weight *= self.vanish_ratio 
+			self.weight *= self.evap_matrix	# 蒸発
 			self.weight += delta
 
 			# 局所解脱出の処理
@@ -302,13 +345,16 @@ class TSP:
 			# 今までで最も良ければ結果を更新
 			if self.cost(self.result) > cost_order:
 				order = self.two_opt(order)
-				self.result = order.copy()
-				self.res_tags = self.now_tags.copy()
+				if not self.passed_route(order):
+					self.result = order.copy()
+					self.res_tags = self.now_tags.copy()
 
 			# デバッグ用
 			# print("Agent ... %d , Cost ... %lf" % (k,self.cost(self.result)))
 			# print(f'距離:{cost_order}\norder:{order}')
 
+		if self.result is None:
+			return None
 		return self.result
 
 	
@@ -324,148 +370,232 @@ class TSP:
 			
 
 # 必要最低限のスポットに絞る
-def necessary_spots(order_name,aim_tags,name_tags=name_tags):
+def necessary_spots(order_name,aim_tags,
+					name_tags=name_tags,
+					passed_spot_names = [],
+					start_name=start_name,
+					goal_name=goal_name):
+	print(f"order_name:{order_name[:10]}...")
 	tags_dict = {name:name_tags[name] for name in order_name}
 	aim_tags_processed = {key:val for key,val in aim_tags.items() if val > 0}
 	necessary_tags = set(aim_tags_processed.keys())
-	# start_and_goal = set([order_name[0],order_name[-1]])
-	start_and_goal = set(["電気通信大学正門","調布駅"])
+	necessary_list = [key for key, val in aim_tags_processed.items() for _ in range(val)]
+	via_spots = [spot for spot in order_name if spot not in [start_name, goal_name]]
+
 	# tagsがnecessary_tagsに含まれるものだけを抽出
-	
-	result_order = [name for name, tags in tags_dict.items() if set(tags) & necessary_tags or name in start_and_goal]
+	result_order = []
+	# スタートとゴールだけ先に見る
+	for spot in [start_name, goal_name]:
+		tags = tags_dict[spot]
+		result_order.append(spot)
+		print(f"spot:{spot}")
+		for tag in tags:
+			if tag in necessary_tags:
+				necessary_tags.remove(tag)
+				print(f"tag:{tag}")
+				print(f"necessary_list:{necessary_list}")
+	# 経由地点を選別
+	# 先に通過していない経由地点を優先
+	via_spots_priority = [spot for spot in via_spots if spot not in passed_spot_names]
+	via_spots_subord = [spot for spot in via_spots if spot in passed_spot_names]
+	via_spots = via_spots_priority + via_spots_subord
+	print(f"via_spots_priority:{via_spots_priority}")
+	print(f"via_spots_subord:{via_spots_subord}")
+	print(f"via_spots:{via_spots}")
+	# 経由地点を選別
+	for spot in via_spots:
+		tags = tags_dict[spot]
+		if set(tags) & set(necessary_list):
+			result_order.append(spot)
+			print(f"spot:{spot}")
+			for tag in tags:
+				if tag in necessary_list:
+					necessary_list.remove(tag)
+					print(f"tag:{tag}")
+					print(f"necessary_list:{necessary_list}")
+
+	# start_name, goal_nameが含まれていたら削除して最初と最後にくっつける
+	if start_name in result_order:
+		result_order.remove(start_name)
+	if goal_name in result_order:
+		result_order.remove(goal_name)
+	result_order = [start_name] + result_order + [goal_name]
 	
 	return result_order
 
 #実行部分
-def tsp_execute(
-				route_index=0,
+def tsp_execute(node_df=node_df,
 				start_name=start_name,
 				goal_name=goal_name,
 				aim_tags=aim_tags,
 				map_html=settings["tsp_result"]
 				):
+	timelist = []
+	timelist.append(time.time())
+	print("TSP EXECUTE!!!")
+	print(f"start_name:{start_name}")
+	print(f"goal_name:{goal_name}")
+	print(f"aim_tags:{aim_tags}")
 	# 前処理
 	aim_tags_input = aim_tags
 	startNode = name_index[start_name]
 	goalNode = name_index[goal_name]
-	print(f"{goal_name}:{goalNode}")
 
-	tsp = TSP(node_df=NODE_DF,
-		   adj_matrix_path=ADJACENT_MATRIX,
-		   alpha = 1.0,
-		   beta_pre=1.0, 
-		   beta_after = 1.0, 
-		   Q = 1.0,
-		   vanish_ratio = 0.8,
-		   aim_tags=aim_tags_input,
-		   kick_ratio=1.1,
-		   kick_start=100,
-		   kick_interval=10,
-		   count_tags=count_tags,
-		   startNode=startNode,
-		   goalNode=goalNode,
-		   patrol_all=False,
-		   patrol=patrol,
-		   start_random=False)
+	# 通過済みエッジ
+	passed_edges = []
+	output_orders = [] # 出力した経路
+	passed_spot_names = []
+	# 結果を格納するリスト
+	info_json_list = []
+	# 3回巡回経路探索を繰り返す
+	for route_index in range(5):
+		print(f"route_index:{route_index+1}回目の経路探索")
+		tsp = TSP(node_df=node_df,
+				adj_matrix_path=ADJACENT_MATRIX,
+				alpha = 1.0,
+				beta_pre=1.0, 
+				beta_after = 1.0, 
+				Q = 1.0,
+				gamma=0.5,
+				epsilon=0.8,
+				passed_edges=passed_edges,
+				output_orders=output_orders,
+				vanish_ratio = 0.8,
+				aim_tags=aim_tags_input,
+				kick_ratio=1.1,
+				kick_start=100,
+				kick_interval=10,
+				count_tags=count_tags,
+				startNode=startNode,
+				goalNode=goalNode,
+				patrol_all=False,
+				patrol=patrol,)
+		
+		# メイン処理
+		order = tsp.solve(n_agent=n_agent)		# n_agent匹の蟻を歩かせる
+		if order is None:
+			break
+
+		# 出力した経路を保存
+		output_orders.append(order)
+		passed_edges = passed_edges + [(order[i],order[i+1]) for i in range(len(order)-1)] + [(order[i+1],order[i]) for i in range(len(order)-1)]
+
+		# 結果を保存
+		timelist.append(time.time())
+		print(f"巡回経路探索:{timelist[-1]-timelist[-2]}秒")
 	
-	# メイン処理
-	order = tsp.solve(n_agent=n_agent)		# n_agent匹の蟻を歩かせる
-	
-	name_order = [index_name[i] for i in order]
-	spots_original = [name for L in name_order for name in str2list_strings(L)]
-	spots = necessary_spots(spots_original, aim_tags_input) # これを返す
+		name_order = [index_name[i] for i in order]
+		spots_original = [name for L in name_order for name in str2list_strings(L)]
+		spots = necessary_spots(spots_original,aim_tags_input, passed_spot_names=passed_spot_names,start_name=start_name, goal_name=goal_name) # これを返す
+		passed_spot_names = passed_spot_names + spots
 
-	# ルートの隣り合う同じ値を消す
-	def shrink_route(route):
-		if len(route) == 0: return []
-		shrunk_route = [route[0]]  # 最初の要素を追加
-		for i in range(1, len(route)):
-			if route[i] != route[i-1]:
-				shrunk_route.append(route[i])
-		return shrunk_route
+		# for index in G.nodes():
+		# 	G.nodes[index]['tags'] = [] #タグの初期化
+		# 	G.nodes[index]['name'] = '' #名前の初期化
+		# symbol_list = []
 
-	for index in G.nodes():
-		G.nodes[index]['tags'] = [] #タグの初期化
-		G.nodes[index]['name'] = '' #名前の初期化
-	symbol_list = []
-	for _,row in df_sym.iterrows():
-		symbol_list.append(ox.nearest_nodes(G,row['lon'],row['lat']))
-		G.nodes[symbol_list[-1]]['tags'] += ast.literal_eval(row['tags']) #タグ追加
-		if G.nodes[symbol_list[-1]]['name']=='':
-			G.nodes[symbol_list[-1]]['name'] = row['name']
+		# for _,row in node_df.iterrows():
+		# 	symbol_list.append(ox.nearest_nodes(G,row['lon'],row['lat']))
+		# 	G.nodes[symbol_list[-1]]['tags'] += str2list_strings(row['tags']) #タグ追加
+		# 	if G.nodes[symbol_list[-1]]['name']=='':
+		# 		G.nodes[symbol_list[-1]]['name'] = row['name']
+		# 	else:
+		# 		G.nodes[symbol_list[-1]]['name'] += ",%s"%row['name'] #名前の追加
+		# symbol_list = list(set(symbol_list))
+		# print(f"symbol_list:{symbol_list}")
+
+		# timelist.append(time.time())
+		# print(f"symbol_list:{timelist[-1]-timelist[-2]}秒")
+
+		order = shrink_route([index_spot[i] for i in tsp.result])
+		order = [name_node[spot_name] for spot_name in spots]
+		print(f"order:{order}")
+
+		#ルート
+		pre_route_tsp = [ox.shortest_path(G,s1,s2,weight='length', cpus=1) for s1,s2 in zip(order[:-1],order[1:])]
+		#出力された順番をもとにからノードを辿る
+		route_tsp = shrink_route(list(itertools.chain.from_iterable(pre_route_tsp))) #平坦化
+		edges_tsp = [(route_tsp[i],route_tsp[i+1],0) for i in range(len(route_tsp)-1)]
+		passed_symbols = [spot for spot in order if spot in route_tsp]
+
+		timelist.append(time.time())
+		print(f"passed_symbols:{timelist[-1]-timelist[-2]}秒")
+
+		# 可視化
+		# Folium マップを作成し、縮尺（ズーム レベル）を設定
+		# 最短経路を地図にプロット
+		map = folium.Map(control_scale=True)
+		# エッジだけを持つ部分グラフを取得
+		route_G = G.edge_subgraph(edges_tsp)
+
+		timelist.append(time.time())
+		print(f"部分グラフ:{timelist[-1]-timelist[-2]}秒")
+
+		# エッジのジオメトリ情報を含むGeoDataFrameを取得
+		gdf_edges = ox.graph_to_gdfs(route_G, nodes=False)
+		# geometry列の座標情報を修正
+		gdf_edges['geometry'] = gdf_edges.apply(fix_coordinates, axis=1)
+		timelist.append(time.time())
+		print(f"gdf_edges:{timelist[-1]-timelist[-2]}秒")
+
+		# ジオメトリ情報を地図に追加
+		for _, row in gdf_edges.iterrows():
+			folium.PolyLine(locations=row['geometry'].coords, weight=5, color='red').add_to(map)  # weightを設定
+
+		timelist.append(time.time())
+		print(f"ジオメトリ情報を地図に追加:{timelist[-1]-timelist[-2]}秒")
+		# マーカーを追加
+		j = 0
+		for i, symbol in enumerate(passed_symbols):
+			print(f"{i+1:03d}:{G.nodes[symbol]['name']}")
+			# loc = [G.nodes[symbol]['y'], G.nodes[symbol]['x']]
+			name_list = str2list_strings(G.nodes[symbol]['name'])
+			for name in name_list:
+				if name in spots:
+					loc = name_coord[name]
+					pop_name = f"{name}"
+					j += 1
+					folium.Marker(loc, popup=pop_name, icon=folium.Icon(color='red')).add_to(map)
+
+		# 縮尺とズームを設定
+		map.fit_bounds(map.get_bounds())
+		map.zoom_start = 15
+
+		timelist.append(time.time())
+		print(f"マーカーを追加・縮尺ズーム:{timelist[-1]-timelist[-2]}秒")
+
+		# 保存
+		map_html_index = map_html.replace('.html',f'_{route_index+1}.html')
+		MAP_PATH = os.path.join(MAP_FOLDER, map_html_index)
+		map.save(MAP_PATH)
+		timelist.append(time.time())
+		print(f"mapを保存:{timelist[-1]-timelist[-2]}秒")
+
+		# 距離と所要時間を計算
+		dist = int(tsp.cost(tsp.result))
+		time_rq = int(tsp.cost(tsp.result) / 80.0) # 80m/minで計算
+		if len(spots) > 2:
+			via_spots = spots[1:-1]
 		else:
-			G.nodes[symbol_list[-1]]['name'] += ",%s"%row['name'] #名前の追加
-	symbol_list = list(set(symbol_list))
+			via_spots = []
 
-	order = shrink_route([index_spot[i] for i in tsp.result])
-	order = [name_node[spot_name] for spot_name in spots]
-	print(f"order:{order}")
-
-	#ルート
-	pre_route_tsp = [ox.shortest_path(G,s1,s2,weight='length', cpus=1) for s1,s2 in zip(order[:-1],order[1:])]
-	#出力された順番をもとにからノードを辿る
-	route_tsp = shrink_route(list(itertools.chain.from_iterable(pre_route_tsp))) #平坦化
-	edges_tsp = [(route_tsp[i],route_tsp[i+1],0) for i in range(len(route_tsp)-1)]
-	passed_symbols = list(set(order).intersection(set(route_tsp)))
-
-	#可視化
-	# Folium マップを作成し、縮尺（ズーム レベル）と方位を設定
-	# 最短経路を地図にプロット
-	map = folium.Map(control_scale=True)
-	# エッジだけを持つ部分グラフを取得
-	route_G = G.edge_subgraph(edges_tsp)
-
-	# エッジのジオメトリ情報を含むGeoDataFrameを取得
-	gdf_edges = ox.graph_to_gdfs(route_G, nodes=False)
-	# geometry列の座標情報を修正
-
-	gdf_edges['geometry'] = gdf_edges.apply(fix_coordinates, axis=1)
-	gdf_edges.to_csv('edges.csv', index=False)
+		info_json = {
+			"name":f'経路{route_index+1}',
+			"order":spots,
+			"iframe_src":f'{settings["map_folder"]}/{map_html_index}',
+			"distance":dist,
+			"time":time_rq,
+			"via_spots":via_spots
+				}
+		info_json_list.append(info_json)
+		print(f"info_json:{info_json}")
+		timelist.append(time.time())
+		print(f"info_json生成:{timelist[-1]-timelist[-2]}秒")
 	
-
-	# ジオメトリ情報を地図に追加
-	for _, row in gdf_edges.iterrows():
-		folium.PolyLine(locations=row['geometry'].coords, weight=5, color='red').add_to(map)  # weightを設定
-
-	# マーカーを追加
-	for i, symbol in enumerate(passed_symbols):
-		print(f"{i+1:03d}:{G.nodes[symbol]['name']}")
-		# loc = [G.nodes[symbol]['y'], G.nodes[symbol]['x']]
-		name_list = str2list_strings(G.nodes[symbol]['name'])
-		for name in name_list:
-			if name in spots:
-				loc = name_coord[name]
-				folium.Marker(loc, popup=name, icon=folium.Icon(color='red')).add_to(map)
-
-	# 縮尺とズームを設定
-	map.fit_bounds(map.get_bounds())
-	map.zoom_start = 15
-
-
-	# 保存
-	MAP_PATH = os.path.join(MAP_FOLDER, map_html)
-	map.save(MAP_PATH)
-
-	# 距離と所要時間を計算
-	dist = tsp.cost(tsp.result)
-	time_rq = tsp.cost(tsp.result) / 80.0 # 80m/minで計算
-	if len(spots) > 2:
-		via_spots = spots[1:-1]
-	else:
-		via_spots = []
-
-	info_json = {
-		"name":f'経路{route_index}',
-		"order":spots,
-		"iframe_src":f'{settings["map_folder"]}/{map_html}',
-		"distance":dist,
-		"time":time_rq,
-		"via_spots":via_spots
-			  }
-	print(f"info_json:{info_json}")
-	
-	return info_json
+	print(f"info_json_list:{info_json_list}")
+	return info_json_list
 
 if __name__ == "__main__":
-	solver = tsp_execute()
-	print(solver)
+	info_json_list = tsp_execute()
+	with open('output.json', 'w', encoding='utf-8') as f:
+		ujson.dump(info_json_list, f, ensure_ascii=False, indent=4)	

@@ -6,6 +6,9 @@ import sys
 sys.path.append('..')
 abs_path = os.path.dirname(os.path.abspath(__file__))
 base_path = os.path.join(abs_path,'..')
+SYSTEM_PATH = os.path.join(base_path, '..', '..')
+sys.path.append(SYSTEM_PATH)
+from routing.models import Spot
 
 def fix_coordinates(row):
     coords = row['geometry'].coords
@@ -22,7 +25,7 @@ def get_setting(base_path=base_path):
 
 settings = get_setting()
 
-def get_spot_info(base_path=base_path):
+def get_spot_info_from_csv(base_path=base_path):
     print(f"get_spot_info:{base_path}")
     SPOT_INFO_PATH = os.path.join(base_path,settings["folder_path"],settings["spot_info"])
     spot_info = pd.read_csv(SPOT_INFO_PATH)
@@ -30,11 +33,43 @@ def get_spot_info(base_path=base_path):
     spot_info["tags"] = spot_info["tags"].apply(lambda L:[i for i in L if i!=''])
     return spot_info
 
+def get_node_df(base_path=base_path):
+    NODE_DF_PATH = os.path.join(base_path,settings["folder_path"],settings["node_df"])
+    node_df = pd.read_csv(NODE_DF_PATH)
+    node_df["tags"] = node_df["tags"].apply(str2list_strings)
+    node_df["name"] = node_df["name"].apply(str2list_strings)
+    node_df["tags"] = node_df.apply(lambda row: row["tags"] + row["name"], axis=1)
+    return node_df
+
+# def get_node_df():
+#     # Spotモデルからすべてのデータを取得
+#     spots = Spot.objects.all()
+
+#     # データをリストに変換
+#     data = []
+#     for spot in spots:
+#         data.append({
+#             'idx': spot.idx,
+#             'name': spot.name,
+#             'lat': spot.latitude,
+#             'lon': spot.longitude,
+#             'hp': spot.hp,
+#             'tags': str2list_strings(spot.tags)
+#         })
+
+#     # リストをデータフレームに変換
+#     node_df = pd.DataFrame(data)
+#     print(f"node_df:{node_df}")
+
+#     return node_df
+
 def str2list_strings(string):
     if isinstance(string, list):
         return string
     else:
-        return string.replace('"','').replace("'","").strip('[]').split(', ')
+        string_list = string.strip('[]').split(', ')
+        string_list = [s.strip('"').strip("'") for s in string_list]
+        return string_list
     
 def organize_aim_tags(request, via_spots_num):
     aim_tags = dict({})

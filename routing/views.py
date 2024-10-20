@@ -14,7 +14,7 @@ import sys
 sys.path.append('..')
 import json
 from routingSystem.backend.data_management import get_spots_data, get_routes_data, filter_tag_added_spot
-from routingSystem.backend.core.utils import str2list_strings, get_spot_info, organize_aim_tags
+from routingSystem.backend.core.utils import str2list_strings, get_spot_info_from_csv, get_node_df, organize_aim_tags
 from routingSystem.backend.tsp_solve import tsp_execute
 
 class IndexView(TemplateView):
@@ -69,16 +69,7 @@ class SearchingView(TemplateView):
     template_name = "routesearch.html"
 
     def get(self, request):
-        ids = [1,2,7]
-        routes = [
-            {'name': f'経路{id}',
-             'iframe_src': f'map/user_map{id}.html',
-             'distance':1000,
-             'time':14,
-             'via_spots': ['セブン-イレブン 調布駅東口店','ティオ・ダンジョウ']
-             }
-            for id in ids
-        ]
+        routes = []
         spot_num = 1
         spot_num_range = [i for i in range(1,spot_num+1)]
 
@@ -91,28 +82,27 @@ class SearchingView(TemplateView):
 
     def post(self, request):
         print(f"request.POST:{request.POST}")
+        node_df = get_node_df()
         start_spot = request.POST.get('start_spot')
         goal_spot = request.POST.get('goal_spot')
         user_name = request.user.name
         via_spots_num = request.POST.get('number_spot')
 
+        # 目的地のタグの処理
         aim_tags = organize_aim_tags(request, via_spots_num)
         print(f"aim_tags:{aim_tags}")
 
-        route1 = tsp_execute(route_index=0,
+        route__list = tsp_execute(node_df=node_df,
                              start_name=start_spot,
                              goal_name=goal_spot,
                              aim_tags=aim_tags,
-                             map_html=f"user_map_{user_name}_0.html")
-                             
-        # ここでPOSTされたデータを処理するロジックを記述する
-        routes = [route1 for _ in range(3)]
+                             map_html=f"user_map_{user_name}.html")
         
         spot_num = 1
         spot_num_range = [i for i in range(1,spot_num+1)]
 
         range10 = list(range(1,11))
-        data = {'routes':routes,
+        data = {'routes':route__list,
                 'start_spot':start_spot,
                 'goal_spot':goal_spot,
                 'spot_num_range':spot_num_range,
@@ -242,7 +232,7 @@ class AllSpotView(View):
 
     combined_tags = added_tags + tags
     
-    spot_df = get_spot_info()
+    spot_df = get_spot_info_from_csv()
     spot_names = spot_df["name"].tolist()
 
     name_and_tags = list(set(spot_names + combined_tags))
@@ -254,7 +244,7 @@ class AllSpotView(View):
 class AllSpotOnlyView(View):
   def get(self, request, *args, **kwargs):
     
-    spot_df = get_spot_info()
+    spot_df = get_spot_info_from_csv()
     spot_names = list(set(spot_df["name"].tolist()))
 
     data = {"all_spot":spot_names}
