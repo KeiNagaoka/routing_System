@@ -1,22 +1,25 @@
-// document.getElementById('number_spot').addEventListener('input', function() {
-//     console.log('number_spot');
-//     const spotNum = this.value;
+document.getElementById('save-route-form').addEventListener('submit', function(event) {
+    event.preventDefault();  // フォームのデフォルトの送信を防ぐ
 
-//     // POSTリクエストを送信する
-//     fetch('/routesearch/change_spot_num/', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-CSRFToken': getCookie('csrftoken') // CSRFトークンを動的に取得
-//         },
-//         body: JSON.stringify({ spot_num: spotNum }) // 送信データ
-//     })
-//     .then(response => response.json()) // レスポンスをJSONとして処理
-//     .then(data => {
-//         console.log(data); // サーバーからのデータを確認 (後で必要な処理を追加)
-//     })
-//     .catch(error => console.error('Error:', error)); // エラーハンドリング
-// });
+    const formData = new FormData(this);
+    const csrfToken = formData.get('csrfmiddlewaretoken');
+    const route_name = formData.get('route_name');
+
+    fetch('/save_route/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById(`route-message-${route_name}`).innerText = data.message;  // メッセージを表示
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
 
 
 function ChangeSpotNum() {

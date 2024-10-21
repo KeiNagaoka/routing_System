@@ -603,7 +603,7 @@ def tsp_execute(node_df=node_df,
 			"iframe_src":f'{settings["map_folder"]}/{map_html_index}',
 			"distance":dist,
 			"time":time_rq,
-			"via_spots":via_spots
+			"via_spots":via_spots,
 				}
 		info_json_list.append(info_json)
 		print(f"info_json:{info_json}")

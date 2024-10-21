@@ -114,12 +114,15 @@ class Mapdata(models.Model):
     idx = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Userとの関係
     name = models.CharField(max_length=64)
+    distance = models.IntegerField()
+    time = models.IntegerField()
     start_spot = models.ForeignKey(Spot, on_delete=models.CASCADE, related_name='start_spot')  # Spotとの関係
     goal_spot = models.ForeignKey(Spot, on_delete=models.CASCADE, related_name='goal_spot')  # Spotとの関係
     via_spots = models.ManyToManyField(Spot, related_name='via_spots')  # Spotと
     aim_tags = models.TextField()  # 検索条件のタグ
-    html = models.TextField()  # マップデータのHTML
-
+    html = models.TextField(null=True, blank=True)  # マップデータのHTML
+    created_at = models.DateTimeField(auto_now_add=True)  # 作成日時
+ 
 
     def __str__(self):
-        return self.name
+        return f"{self.name} saved map no.{self.idx}"

@@ -4,7 +4,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import pandas as pd
 import numpy as np
 from core.utils import get_setting, get_spot_info_from_csv, str2list_strings
-from routing.models import AddedTag, Spot, Node, Tag
+from routing.models import AddedTag, Spot, Node, Tag, Mapdata
 
 settings = get_setting()
 
@@ -129,20 +129,26 @@ def filter_tag_added_spot(spots_data):
     return new_spots_data
     
 
-def get_routes_data():
-    spots_data = [
-        {
-            'id': idx,
-            'title': 'サンプル経路1',
-            'start_spot': '調布駅',
-            'goal_spot': '電気通信大学正門',
-            'time': '2024年09月24日17時50分',
-            'via_num': 2,
-            'distance': 417,
+def get_routes_data(user):
+    if user:
+        mapdata = Mapdata.objects.filter(user=user)
+
+    route_list = []
+    for map in mapdata:
+        route = {
+            'id': map.idx,
+            'title': map.name,
+            'created_at': map.created_at,
+            'start_spot': map.start_spot.name,
+            'goal_spot': map.goal_spot.name,
+            'time': map.time,
+            'via_spots': [spot.name for spot in map.via_spots.all()],
+            'via_num': map.via_spots.count(),
+            'distance': map.distance,
+            'inframe_src': map.html,
         }
-        for idx in range(10)
-    ]
-    return spots_data
+        route_list.append(route)
+    return route_list
 
 if __name__=="__main__":
     spots = get_spots_data()

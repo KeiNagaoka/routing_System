@@ -43,7 +43,7 @@
                 <div class="route-details">
                     <p>
                         <span>検索時刻:</span>
-                        <span class="time">{{ route.time }}</span>
+                        <span class="created_at">{{ route.created_at }}</span>
                     </p>
                 
                     <p>
@@ -53,10 +53,15 @@
                 
                     <p>
                         <span>距離:</span>
-                        <span class="time">{{ route.distance }} m</span>
+                        <span class="distance">{{ route.distance }} m</span>
+                    </p>
+
+                    <p>
+                        <span>時間:</span>
+                        <span class="time">{{ route.time }} 分</span>
                     </p>
                     
-                    <a href="{% url 'accounts:route_display' %}" class="btn btn-primary">詳細を表示</a> 
+                    <a href="{% url 'accounts:route_display' %}?title={{ route.title }}" class="btn btn-primary">詳細を表示</a> 
                 </div>
 
             </div>

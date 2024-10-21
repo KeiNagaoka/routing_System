@@ -9,13 +9,19 @@ from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from .forms import SignUpForm, LoginFrom
-from .models import Spot, AddedTag, User, Tag
+from .models import Spot, AddedTag, User, Tag, Mapdata
+import os
 import sys
 sys.path.append('..')
 import json
+import shutil
 from routingSystem.backend.data_management import get_spots_data, get_routes_data, filter_tag_added_spot, get_node_df, get_spot_df
-from routingSystem.backend.core.utils import str2list_strings, get_spot_info_from_csv, organize_aim_tags
+from routingSystem.backend.core.utils import str2list_strings, get_spot_info_from_csv, organize_aim_tags, get_setting
 from routingSystem.backend.tsp_solve import tsp_execute
+
+# base_pathとsettingsを取得
+base_path = os.path.dirname(os.path.abspath(__file__))
+settings = get_setting()
 
 class IndexView(TemplateView):
     template_name = "index.html"
@@ -33,7 +39,7 @@ class IndexView(TemplateView):
             paginator = Paginator(spots_data, 12)  # 12個ずつ表示
             page_number = request.GET.get('page')
             spots = paginator.get_page(page_number)
-            routes = get_routes_data()
+            routes = get_routes_data(user)
             info_json = {'spots': spots,
                         'routes':routes,
                         'all_tags':all_tags}
@@ -71,11 +77,9 @@ class SearchingView(TemplateView):
         text = ""
         routes = []
         spot_num = 1
-        spot_num_range = [i for i in range(1,spot_num+1)]
 
         range10 = list(range(1,11))
         data = {'routes':routes,
-                'spot_num_range':spot_num_range,
                 'range10':range10,
                 }
         return render(request, 'routesearch.html', data)
@@ -106,14 +110,12 @@ class SearchingView(TemplateView):
         if len(route_list)==0:
             text = "経路を探索しましたが、条件に合う経路が見つかりませんでした。"
         spot_num = 1
-        spot_num_range = [i for i in range(1,spot_num+1)]
 
         range10 = list(range(1,11))
         data = {'routes':route_list,
                 'text':text,
                 'start_spot':start_spot,
                 'goal_spot':goal_spot,
-                'spot_num_range':spot_num_range,
                 'ainm_tags':str(aim_tags),
                 'range10':range10,
                 }
@@ -121,28 +123,65 @@ class SearchingView(TemplateView):
 
 class SaveRouteView(View):
     def post(self, request, *args, **kwargs):
+        # 受け取ったデータを読み取り
+        user = request.user
         route_name = request.POST.get('route_name')
         route_distance = request.POST.get('route_distance')
         route_time = request.POST.get('route_time')
-        start_spot = request.POST.get('start_spot')
-        goal_spot = request.POST.get('goal_spot')
+        start_spot_name = request.POST.get('start_spot')
+        goal_spot_name = request.POST.get('goal_spot')
+        got_route_name = request.POST.get('got_route_name')
         aim_tags = request.POST.get('aim_tags')
         iframe_src = request.POST.get('iframe_src')
-        via_spots = request.POST.get('via_spots').split(',')
+        via_spot_names = request.POST.get('via_spots').split(',')
+        new_iframe_src = f"{user.name}_{route_name}.html"
+        
+        MAP_HTML_PATH = os.path.join(base_path, "..", settings["static_folder"], iframe_src)
+        MAP_HTML_SAVED_PATH = os.path.join(base_path, "..", settings["static_folder"], new_iframe_src)
 
-        data = {"route_name":route_name,
-                "route_distance":route_distance,
-                "route_time":route_time,
-                "start_spot":start_spot,
-                "goal_spot":goal_spot,
-                "aim_tags":aim_tags,
-                "iframe_src":iframe_src,
-                "via_spots":via_spots,
-                }
-        print(f"data:{data}")
+        try:
+            shutil.copyfile(MAP_HTML_PATH, MAP_HTML_SAVED_PATH)
+            print(f"ファイルが {MAP_HTML_PATH} から {MAP_HTML_SAVED_PATH} に正常にコピーされました。")
+        except Exception as e:
+            print(f"ファイルのコピー中にエラーが発生しました: {e}")
 
-        # JSON形式で返す
-        return HttpResponse("経路が保存されました")
+        
+        # Spotを参照してオブジェクトを取得
+        message = ""
+        try:
+            start_spot = Spot.objects.get(name=start_spot_name)
+            goal_spot = Spot.objects.get(name=goal_spot_name)
+            via_spots = [Spot.objects.get(name=name) for name in via_spot_names]
+
+            # userとnameの組み合わせが既に存在するか確認
+            if Mapdata.objects.filter(user=user, name=got_route_name).exists():
+                print(f"user:{user}, name:{got_route_name} の組み合わせは既に存在します。")
+                message = "同じ名前の経路が既に存在します。"
+                data = {"message": message}
+                return JsonResponse(data, status=400)
+
+            mapdata = Mapdata.objects.create(
+                user=user,
+                name = got_route_name,
+                distance=route_distance,
+                time=route_time,
+                start_spot=start_spot,
+                goal_spot=goal_spot,
+                aim_tags=aim_tags,
+                html=new_iframe_src,
+            )
+            
+            # via_spotsを設定
+            mapdata.via_spots.set(via_spots)
+            mapdata.save()
+            message = "経路情報の保存が完了しました。"
+            data = {"message": message}
+            return JsonResponse(data, status=202)
+        except:
+            message = "経路情報の保存が完了しました。"
+            data = {"message": message}
+            return JsonResponse(data, status=400)
+
 
 class AddTagView(TemplateView):
     template_name = "addtag.html"
@@ -331,12 +370,15 @@ class UpdateTagView(View):
 class RouteInfoView(View):
     template_name  = "route_display.html"
     def get(self, request, template_name=template_name):
-        route = get_routes_data()[0]
-        route_id = 1
+        user = request.user
+        title = request.GET.get('title')
+        route_list = get_routes_data(user)
+        route_dict = {route["title"]:route for route in route_list}
+        route = route_dict[title]
         info_json =  {
             'route': route,
-            'route_id': route_id,
-            'iframe_src': f'map/user_map{route_id}.html',
+            'route_id': route["id"],
+            'iframe_src': route["inframe_src"],
             }
 
         return render(request, template_name, info_json)

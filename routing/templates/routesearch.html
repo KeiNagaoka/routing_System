@@ -73,8 +73,7 @@
                         </ol>
                     </p>
                     <p>出発: {{ goal_spot }}</p>    <!-- 到着地点 -->
-
-                    <form method="POST" action="/save_route/" class="save-route-form">
+                    <form method="POST" class="save-route-form" id="save-route-form">
                         {% csrf_token %}
                         <input type="hidden" name="route_name" value="{{ route.name }}">
                         <input type="hidden" name="route_distance" value="{{ route.distance }}">
@@ -84,7 +83,12 @@
                         <input type="hidden" name="aim_tags" value="{{ aim_tags }}">
                         <input type="hidden" name="iframe_src" value="{{ route.iframe_src }}">
                         <input type="hidden" name="via_spots" value="{{ route.via_spots|join:',' }}">
+                        <label for="got_route_name">経路の名前:</label>
+                        <input type="text" id="got_route_name" name="got_route_name" placeholder="経路の名前を入力"
+                        value="" autocomplete="off" class="input-wide" required/>
                         <button type="submit" class="btn-save">経路を保存</button>
+                        <br>
+                        <div class="h2" id="route-message-{{ route.name }}"></div>
                     </form>
                     
                 </div>

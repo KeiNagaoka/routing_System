@@ -24,17 +24,30 @@
             <div class="route-details">
                 <p>
                     <span>検索時刻:</span>
-                    <span class="time">{{ route.time }}</span>
+                    <span class="created_at">{{ route.created_at }}</span>
+                </p>
+                
+                <p>
+                    <span>距離:</span>
+                    <span class="distance">{{ route.distance }} m</span>
+                </p>
+
+                <p>
+                    <span>時間:</span>
+                    <span class="time">{{ route.time }} 分</span>
                 </p>
             
                 <p>
                     <span>経由地点数:</span>
-                    <span class="time">{{ route.via_num }} 箇所</span>
+                    <span class="via_num">{{ route.via_num }} 箇所</span>
                 </p>
-            
-                <p>
-                    <span>距離:</span>
-                    <span class="time">{{ route.distance }} m</span>
+                
+                <p>経由地点:
+                    <ol>
+                        {% for via_spot in route.via_spots %}
+                            <li>{{ via_spot }}</li>  <!-- 経由地点をリスト項目として表示 -->
+                        {% endfor %}
+                    </ol>
                 </p>
                 
             </div>

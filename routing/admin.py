@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group# admin.py
-from .models import Spot, Node, User, AddedTag
+from .models import Spot, Node, User, AddedTag, Mapdata, Tag
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -33,3 +33,13 @@ class NodeAdmin(admin.ModelAdmin):
 @admin.register(AddedTag)
 class AddedTagAdmin(admin.ModelAdmin):
     list_display = ('user', 'tag', 'spot', 'added_at')
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('user', 'tag')
+    
+
+@admin.register(Mapdata)
+class MapdataAdmin(admin.ModelAdmin):
+    list_display = ('user', 'name', 'distance', 'time', 'start_spot', 'goal_spot',
+                    'aim_tags', 'html')
