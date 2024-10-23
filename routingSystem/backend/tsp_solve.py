@@ -38,20 +38,6 @@ INDEX_NODE = os.path.join(FOLDER_PATH, settings["index_to_node"])
 MAP_PATH = os.path.join(RESULT_FOLDER, settings["tsp_result"])
 RESULT_TEXT = os.path.join(FOLDER_PATH, settings["result_text"])
 
-#コマンドライン引数を取得
-args = sys.argv
-aim_tags = {}
-# printで確認
-for i,arg in enumerate(args):
-	print(f"{i}:{arg}")
-for i in range(1,len(args)-1,2):
-	print(f"{args[i]}->{args[i+1]}")
-	if args[i] not in aim_tags.keys() and int(args[i+1]) > 0:
-		aim_tags[args[i]] = int(args[i+1])
-	elif aim_tags[args[i]] < int(args[i+1]):
-		aim_tags[args[i]] = int(args[i+1])
-print(f'aim_tags:{aim_tags}')
-
 # 下準備
 query = settings["area"]
 city = query.split(',')[0].lower()
@@ -122,7 +108,7 @@ class TSP:
 			  patrol_all=True,patrol=10,patrol_dict=10,kick_interval=50,kick_start=50,kick_ratio=1.1,
 			  gamma=0.5,epsilon=0.8,passed_edges=[],output_orders=[],
 			  startNode=None,goalNode=None,index_name=index_name,
-			  index_tags=index_tags,count_tags=count_tags,aim_tags=aim_tags):
+			  index_tags=index_tags,count_tags=count_tags,aim_tags=dict({})):
 		#ここから初期化処理
 		#パラメータ関係
 		self.alpha = alpha					# フェロモンの優先度
@@ -435,7 +421,7 @@ def tsp_execute(node_df=node_df,
 				spot_info_df=spot_info_df,
 				start_name=start_name,
 				goal_name=goal_name,
-				aim_tags=aim_tags,
+				aim_tags=dict({}),
 				map_html=settings["tsp_result"]
 				):
 	timelist = []
@@ -605,6 +591,19 @@ def tsp_execute(node_df=node_df,
 	return info_json_list
 
 if __name__ == "__main__":
-	info_json_list = tsp_execute()
+	#コマンドライン引数を取得
+	args = sys.argv
+	aim_tags = {}
+	# printで確認
+	for i,arg in enumerate(args):
+		print(f"{i}:{arg}")
+	for i in range(1,len(args)-1,2):
+		print(f"{args[i]}->{args[i+1]}")
+		if args[i] not in aim_tags.keys() and int(args[i+1]) > 0:
+			aim_tags[args[i]] = int(args[i+1])
+		elif aim_tags[args[i]] < int(args[i+1]):
+			aim_tags[args[i]] = int(args[i+1])
+	print(f'aim_tags:{aim_tags}')
+	info_json_list = tsp_execute(aim_tags=aim_tags)
 	with open('output.json', 'w', encoding='utf-8') as f:
 		ujson.dump(info_json_list, f, ensure_ascii=False, indent=4)	
