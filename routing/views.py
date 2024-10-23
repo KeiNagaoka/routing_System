@@ -7,7 +7,7 @@ from django.contrib.auth.views import LoginView as BaseLoginView,  LogoutView as
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from .forms import SignUpForm, LoginFrom
 from .models import Spot, AddedTag, User, Tag, Mapdata
 import os
@@ -15,9 +15,12 @@ import sys
 sys.path.append('..')
 import json
 import shutil
+import logging
 from routingSystem.backend.data_management import get_spots_data, get_routes_data, filter_tag_added_spot, get_node_df, get_spot_df
 from routingSystem.backend.core.utils import str2list_strings, get_spot_info_from_csv, organize_aim_tags, get_setting
 from routingSystem.backend.tsp_solve import tsp_execute
+
+logger = logging.getLogger(__name__)
 
 # base_pathとsettingsを取得
 base_path = os.path.dirname(os.path.abspath(__file__))
@@ -91,16 +94,21 @@ class SearchingView(TemplateView):
         goal_spot = request.POST.get('goal_spot')
         user = request.user
         via_spots_num = request.POST.get('number_spot')
+        print(f"via_spots_num:{via_spots_num}/{type(via_spots_num)}")
 
         # node_dfとspot_info_df
         node_df = get_node_df(user=user)
         spot_info_df = get_spot_df(user=user)
+        _, all_tags = get_spots_data(user)
+        print(f"node_df:{node_df.columns}")
+        added_tag_node_df = node_df[node_df['added_tags'].apply(lambda L: len(L)>0)]
 
         # 目的地のタグの処理
-        aim_tags = organize_aim_tags(request, via_spots_num)
+        aim_tags = organize_aim_tags(request, via_spots_num, all_tags)
         print(f"aim_tags:{aim_tags}")
 
         route_list = tsp_execute(node_df=node_df,
+                                 added_tag_node_df=added_tag_node_df,
                                  spot_info_df=spot_info_df,
                                  start_name=start_spot,
                                  goal_name=goal_spot,
@@ -125,7 +133,6 @@ class SaveRouteView(View):
     def post(self, request, *args, **kwargs):
         # 受け取ったデータを読み取り
         user = request.user
-        route_name = request.POST.get('route_name')
         route_distance = request.POST.get('route_distance')
         route_time = request.POST.get('route_time')
         start_spot_name = request.POST.get('start_spot')
@@ -134,17 +141,20 @@ class SaveRouteView(View):
         aim_tags = request.POST.get('aim_tags')
         iframe_src = request.POST.get('iframe_src')
         via_spot_names = request.POST.get('via_spots').split(',')
-        new_iframe_src = f"{user.name}_{route_name}.html"
+        new_iframe_src = os.path.join(settings["map_folder"], f"{user.name}_{got_route_name}.html")
         
         MAP_HTML_PATH = os.path.join(base_path, "..", settings["static_folder"], iframe_src)
         MAP_HTML_SAVED_PATH = os.path.join(base_path, "..", settings["static_folder"], new_iframe_src)
 
         try:
-            shutil.copyfile(MAP_HTML_PATH, MAP_HTML_SAVED_PATH)
-            print(f"ファイルが {MAP_HTML_PATH} から {MAP_HTML_SAVED_PATH} に正常にコピーされました。")
+            shutil.copy(MAP_HTML_PATH, MAP_HTML_SAVED_PATH)
+            logger.info(f"ファイルが {MAP_HTML_PATH} から {MAP_HTML_SAVED_PATH} に正常にコピーされました。")
         except Exception as e:
-            print(f"ファイルのコピー中にエラーが発生しました: {e}")
-
+            logger.error(f"ファイルのコピー中にエラーが発生しました: {e}")
+        if os.path.exists(MAP_HTML_SAVED_PATH):
+            print("正しく生成されています！")
+        else:
+            print("生成されていません")
         
         # Spotを参照してオブジェクトを取得
         message = ""

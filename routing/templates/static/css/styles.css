@@ -10,6 +10,7 @@ body {
 }
 
 header {
+    height: 70px;
     position: fixed;
     top: 0;
     left: 0;
@@ -144,14 +145,21 @@ main {
     overflow: hidden; /* コンテンツエリアからはみ出るのを防ぐため */
 }
 
-h1 {
+h3 {
     font-size: 24px; /* デフォルトの文字サイズ */
     margin: 0; /* h1の余白をリセット */
     flex: 1; /* テキストをボタンとスペースに合わせて調整 */
     text-align: center; /* テキストを中央揃え */
 }
 
+h1 {
+    font-size: 24px;
+    margin: 0;
+    font-weight: normal;
+}
+
 h2 {
+    font-size: 18px;
     margin: 0;
     font-weight: normal;
 }
@@ -237,15 +245,35 @@ input[type="submit"]:active {
 
 /* スマートフォンなど小さいデバイス用のスタイル */
 @media (max-width: 600px) {
-    h1 {
-        font-size: 18px; /* デバイス幅が600px以下の場合に文字サイズを縮小 */
-    }
     
     header {
+        height: 30px;
         padding: 10px 10px; /* パディングを調整して、スペースを確保 */
     }
     
     .toggle-btn {
         font-size: 20px; /* ボタンのサイズも調整 */
     }
+    
+    .sidebar {
+        top: 30px; /* headerの下に配置 */
+        height: calc(100% - 30px); /* headerを除いた高さ */
+    }
+
+    main {
+        margin-top: 30px; /* headerの高さに合わせて調整 */
+    }
+
+    .container {
+        margin-top: 30px; /* headerの高さに合わせて調整 */
+    }
+
+    header .toggle-btn {
+        left: 5px;
+    }
+        
+    h3 {
+        font-size: 14px; /* デフォルトの文字サイズ */
+    }
+
 }

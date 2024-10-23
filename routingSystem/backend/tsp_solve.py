@@ -215,8 +215,6 @@ class TSP:
 				# if printer: print(text) #プリントしたい場合は情報を出す
 
 	def tag_fill(self): #tagごとに巡回が終わってるか調べる
-		if not (self.aim_tags.keys() <= self.now_tags.keys()):
-			raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags:{self.now_tags.keys()}に含まれないよ！")
 		for key_aim,val_aim in self.aim_tags.items():
 			if self.now_tags[key_aim] < val_aim:
 				return False
@@ -306,6 +304,9 @@ class TSP:
 					else:
 						self.now_tags[tag] = 1
 				#タグが条件を満たしていれば終了
+				if not (self.aim_tags.keys() <= self.now_tags.keys()):
+					return None
+					raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags:{self.now_tags.keys()}に含まれないよ！")
 				if self.tag_fill():
 					break
 				elif len(city)==0:
@@ -430,6 +431,7 @@ def necessary_spots(order_name,aim_tags,
 
 #実行部分
 def tsp_execute(node_df=node_df,
+				added_tag_node_df=node_df,
 				spot_info_df=spot_info_df,
 				start_name=start_name,
 				goal_name=goal_name,
@@ -460,12 +462,12 @@ def tsp_execute(node_df=node_df,
 		print(f"route_index:{route_index+1}回目の経路探索")
 		tsp = TSP(node_df=node_df,
 				adj_matrix_path=ADJACENT_MATRIX,
-				alpha = 1.0,
-				beta_pre=1.0, 
-				beta_after = 1.0, 
+				alpha = 0.5,
+				beta_pre=0.1, 
+				beta_after = 0.1, 
 				Q = 1.0,
-				gamma=0.5,
-				epsilon=0.8,
+				gamma=0.3,
+				epsilon=0.6,
 				passed_edges=passed_edges,
 				output_orders=output_orders,
 				vanish_ratio = 0.8,
@@ -507,23 +509,12 @@ def tsp_execute(node_df=node_df,
 		else:
 			continue
 
-		# for index in G.nodes():
-		# 	G.nodes[index]['tags'] = [] #タグの初期化
-		# 	G.nodes[index]['name'] = '' #名前の初期化
-		# symbol_list = []
-
-		# for _,row in node_df.iterrows():
-		# 	symbol_list.append(ox.nearest_nodes(G,row['lon'],row['lat']))
-		# 	G.nodes[symbol_list[-1]]['tags'] += str2list_strings(row['tags']) #タグ追加
-		# 	if G.nodes[symbol_list[-1]]['name']=='':
-		# 		G.nodes[symbol_list[-1]]['name'] = row['name']
-		# 	else:
-		# 		G.nodes[symbol_list[-1]]['name'] += ",%s"%row['name'] #名前の追加
-		# symbol_list = list(set(symbol_list))
-		# print(f"symbol_list:{symbol_list}")
-
-		# timelist.append(time.time())
-		# print(f"symbol_list:{timelist[-1]-timelist[-2]}秒")
+		symbol_list = []
+		for _,row in added_tag_node_df.iterrows():
+			symbol_list.append(ox.nearest_nodes(G,row['lon'],row['lat']))
+			G.nodes[symbol_list[-1]]['tags'] += row['tags'] #タグ追加
+		symbol_list = list(set(symbol_list))
+		print(f"symbol_list:{symbol_list}")
 
 		order = shrink_route([index_node[i] for i in tsp.result])
 		order = [name_node[spot_name] for spot_name in spots]

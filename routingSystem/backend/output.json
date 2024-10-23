@@ -1,0 +1,72 @@
+[
+    {
+        "name": "経路1",
+        "order": [
+            "調布駅",
+            "ローソン 調布布田四丁目店",
+            "電気通信大学正門"
+        ],
+        "iframe_src": "map\/sample_map_1.html",
+        "distance": 654,
+        "time": 8,
+        "via_spots": [
+            "ローソン 調布布田四丁目店"
+        ]
+    },
+    {
+        "name": "経路2",
+        "order": [
+            "調布駅",
+            "セブン-イレブン 京王調布駅店",
+            "電気通信大学正門"
+        ],
+        "iframe_src": "map\/sample_map_2.html",
+        "distance": 659,
+        "time": 8,
+        "via_spots": [
+            "セブン-イレブン 京王調布駅店"
+        ]
+    },
+    {
+        "name": "経路3",
+        "order": [
+            "調布駅",
+            "セブン-イレブン 調布駅北口店",
+            "電気通信大学正門"
+        ],
+        "iframe_src": "map\/sample_map_3.html",
+        "distance": 661,
+        "time": 8,
+        "via_spots": [
+            "セブン-イレブン 調布駅北口店"
+        ]
+    },
+    {
+        "name": "経路4",
+        "order": [
+            "調布駅",
+            "ファミリーマート 調布駅北店",
+            "電気通信大学正門"
+        ],
+        "iframe_src": "map\/sample_map_4.html",
+        "distance": 736,
+        "time": 9,
+        "via_spots": [
+            "ファミリーマート 調布駅北店"
+        ]
+    },
+    {
+        "name": "経路5",
+        "order": [
+            "調布駅",
+            "セブン-イレブン 調布駅東口店",
+            "電気通信大学正門"
+        ],
+        "iframe_src": "map\/sample_map_5.html",
+        "distance": 759,
+        "time": 9,
+        "via_spots": [
+            "セブン-イレブン 調布駅東口店"
+        ]
+    }
+]

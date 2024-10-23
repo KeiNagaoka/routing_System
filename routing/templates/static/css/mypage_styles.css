@@ -117,12 +117,16 @@
 /* スマートフォンなど小さいデバイス用のスタイル */
 @media (max-width: 600px) {
     .btn-group {
+        width: 100%;
         flex-direction: column; /* モバイルではボタンを縦並びに */
         gap: 10px;
+        display: flex;
+        justify-content: center;
     }
 
     .btn {
         width: 100%; /* ボタンを幅いっぱいに */
         padding: 12px 0;
     }
+
 }

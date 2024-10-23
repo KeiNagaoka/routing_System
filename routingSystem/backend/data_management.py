@@ -101,7 +101,9 @@ def get_node_df(user=None):
     df = pd.DataFrame(data)
     df["name"] = df["name"].apply(str2list_strings)
     df["tags"] = df["tags"].apply(str2list_strings)
-    df["tags"] = df.apply(lambda row:row["tags"] + row["name"],axis=1)
+    print(f"node_df: {df.head()}")
+    df['tags'] = df.apply(lambda row: row['tags'] + row['name'], axis=1)
+    df["added_tags"] = [[] for L in range(len(df))]
     
     if user:
         added_tags = AddedTag.objects.filter(user=user)
@@ -112,7 +114,8 @@ def get_node_df(user=None):
             filtered_rows = df[df['name'].apply(lambda x: tag_spot in x)]
             # 各行の"tags"列にtag_nameを追加
             for idx in filtered_rows.index:
-                df.at[idx, 'tags'] = df.at[idx, 'tags'] + [tag_name]
+                df.at[idx, 'tgas'] = df.at[idx, 'tags'] + [tag_name]
+                df.at[idx, 'added_tags'] = df.at[idx, 'added_tags'] + [tag_name]
                 
     df["tags"] = df["tags"].apply(lambda L:list(set(L)))
     # インデックス指定

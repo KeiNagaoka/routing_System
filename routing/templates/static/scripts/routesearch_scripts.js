@@ -57,7 +57,6 @@ async function fetchSpotList(end_point) {
 async function startSuggest() {
     const list = await fetchSpotList('all_spot'); // APIからデータを取得
     const spot_list = await fetchSpotList('all_spot_only'); // APIからデータを取得
-    // const list = ['セブンイレブン', 'ファミリーマート', 'ローソン', 'レストラン', '駅']; // テスト用のリスト
     console.log(list);
 
     // 複数の入力フィールドに対してサジェスト機能を適用

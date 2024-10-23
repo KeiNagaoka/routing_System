@@ -23,6 +23,21 @@
             <a href="{% url 'accounts:logout' %}" class="btn btn-primary">ログアウト</a> 
         </div>
 
+        <!-- Add media query for wider width -->
+        <style>
+            @media (min-width: 768px) {
+            .btn-group {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+            }
+            .btn-group .btn {
+                flex: 1;
+                margin: 0 10px;
+            }
+            }
+        </style>
+
         <div class="detail_script">このページでは、 {{ user.name }} さんの保存した経路の情報・追加したタグの情報を閲覧することができます。</div>
     </div>
     

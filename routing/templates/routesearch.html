@@ -26,7 +26,7 @@
 
         <div class="form-group">
             <label for="spot_num">経由地点数:</label>
-            <input type="number" id="number_spot" name="number_spot" min="0" max="10" value="0" onchange="ChangeSpotNum()">
+            <input type="number" id="number_spot" name="number_spot" min="0" max="10" value="0" onchange="ChangeSpotNum()" required>
         </div>
 
         {% for i in range10 %}
@@ -34,8 +34,6 @@
                 <label for="spot{{ i }}">経由地点{{ i }}:</label>
                 <input type="text" id="spot{{ i }}" name="spot{{ i }}" placeholder="経由地点を入力"
                 value="コンビニ" autocomplete="off" class="input-wide" />
-                <label for="number{{ i }}">箇所数{{ i }}:</label>
-                <input type="number" id="number{{ i }}" name="number{{ i }}" min="1" value="1" class="input-wide" />
             </div>
             <div id="suggest{{ i }}" class="suggest"></div>
         {% endfor %}
@@ -73,7 +71,7 @@
                         </ol>
                     </p>
                     <p>出発: {{ goal_spot }}</p>    <!-- 到着地点 -->
-                    <form method="POST" class="save-route-form" id="save-route-form">
+                    <form method="POST" class="save-route-form" id="save-route-form" action="/save_route/">
                         {% csrf_token %}
                         <input type="hidden" name="route_name" value="{{ route.name }}">
                         <input type="hidden" name="route_distance" value="{{ route.distance }}">

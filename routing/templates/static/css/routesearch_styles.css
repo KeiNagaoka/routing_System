@@ -146,4 +146,9 @@ select, input[type="number"] {
         margin-right: 0;  /* スマホではマージンをリセット */
         margin-bottom: 10px;  /* 縦並びの場合の間隔 */
     }
+    .btn-save {
+        padding: 8px 16px;
+        font-size: 0.9em;
+        margin-top: 8px;
+    }
 }

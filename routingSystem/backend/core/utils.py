@@ -8,7 +8,7 @@ abs_path = os.path.dirname(os.path.abspath(__file__))
 base_path = os.path.join(abs_path,'..')
 SYSTEM_PATH = os.path.join(base_path, '..', '..')
 sys.path.append(SYSTEM_PATH)
-from routing.models import Spot
+from collections import Counter
 
 def fix_coordinates(row):
     coords = row['geometry'].coords
@@ -71,10 +71,12 @@ def str2list_strings(string):
         string_list = [s.strip('"').strip("'") for s in string_list]
         return string_list
     
-def organize_aim_tags(request, via_spots_num):
+def organize_aim_tags(request, via_spots_num, all_tags):
     aim_tags = dict({})
+    aim_list = []
     for i in range(1, int(via_spots_num)+1):
         spot_name = request.POST.get(f'spot{i}')
-        num = request.POST.get(f'number{i}')
-        aim_tags[spot_name] = int(num)
+        if spot_name in all_tags:
+            aim_list.append(spot_name)
+    aim_tags = dict(Counter(aim_list))
     return aim_tags
