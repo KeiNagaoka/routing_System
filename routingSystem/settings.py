@@ -129,7 +129,7 @@ import os
 
 STATIC_URL = 'routing/templates/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, STATIC_URL)]
-STATIC_ROOT = os.path.join(BASE_DIR, STATIC_URL)
+STATIC_ROOT = os.path.join(BASE_DIR, 'routing/templates/staticfiles/')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
