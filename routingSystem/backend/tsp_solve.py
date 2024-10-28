@@ -343,6 +343,7 @@ class TSP:
 			if self.cost(self.result) > cost_order:
 				print("導出した経路の方が短い")
 				order = self.two_opt(order)
+				print(f"two_opt後 order:{order}")
 				if not self.passed_route(order):
 					print("更新")
 					self.result = order.copy()
@@ -351,7 +352,6 @@ class TSP:
 			# デバッグ用
 			print("Agent ... %d , Cost ... %lf" % (k,self.cost(self.result)))
 			print(f'距離:{cost_order}\norder:{order}')
-			print(f"self.result:{self.result}")
 
 		if self.result is None:
 			return None
