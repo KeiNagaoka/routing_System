@@ -148,7 +148,7 @@ class TSP:
 
 		# 蒸発率と通過済みエッジ関連（蒸発率とフェロモン制限係数）
 		self.n_data = len(node_df)
-		self.ourput_orders = output_orders
+		self.output_orders = output_orders
 		# self.evap_matrix = np.full((self.n_data, self.n_data), self.vanish_ratio) #蒸発行列
 		self.evap_matrix = self.create_evap_matrix()
 		if adj_matrix_path is not None:
@@ -209,8 +209,8 @@ class TSP:
 	
 	# 既に出力した経路と同じ経路ならTrue
 	def passed_route(self,order):
-		for route in self.ourput_orders:
-			if set(order) >= set(route):
+		for route in self.output_orders:
+			if set(order) <= set(route):
 				return True
 		return False
 	
@@ -250,7 +250,7 @@ class TSP:
 		if self.startNode==None: raise Exception("エラー：スタートノードを設定してください。")
 
 		for k in range(n_agent):
-			city = np.arange(self.n_data)
+			city = [self.startNode] + [i for i in np.arange(self.n_data) if i != self.startNode and i != self.goalNode] + [self.goalNode] #巡回都市
 			
 			now_city = self.startNode
 			# firsttags = self.index_tags[self.startNode]
@@ -336,16 +336,9 @@ class TSP:
 			self.cost_list.append(self.cost(order))
 
 			# 今までで最も良ければ結果を更新
-			print("デバッグ0")
-			print(f"cost_result{self.cost(self.result)}")
-			print(f"cost_order:{cost_order}")	
-			print(f"resultの方が大きいcost:{self.cost(self.result) > cost_order}")	
 			if self.cost(self.result) > cost_order:
-				print("導出した経路の方が短い")
 				order = self.two_opt(order)
-				print(f"two_opt後 order:{order}")
 				if not self.passed_route(order):
-					print("更新")
 					self.result = order.copy()
 					self.res_tags = self.now_tags.copy()
 

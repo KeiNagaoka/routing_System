@@ -101,7 +101,6 @@ def get_node_df(user=None):
     df = pd.DataFrame(data)
     df["name"] = df["name"].apply(str2list_strings)
     df["tags"] = df["tags"].apply(str2list_strings)
-    print(f"node_df: {df.head()}")
     df['tags'] = df.apply(lambda row: row['tags'] + row['name'], axis=1)
     df["added_tags"] = [[] for L in range(len(df))]
     
