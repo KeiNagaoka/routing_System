@@ -566,6 +566,18 @@ def tsp_execute(node_df=node_df,
 		timelist.append(time.time())
 		print(f"mapを保存:{timelist[-1]-timelist[-2]}秒")
 
+		# デバッグのためのスクリプト
+		if os.path.exists(MAP_PATH):
+			print(f"mapを保存しました:{MAP_PATH}")
+			# MAP_FOLDERの内容を表示
+			map_folder_contents = os.listdir(MAP_FOLDER)
+			print("MAP_FOLDERの内容:")
+			for item in map_folder_contents:
+				print(item)
+		else:
+			raise FileNotFoundError(f"MAP_PATHが存在しませんでした:{MAP_PATH}")
+
+
 		# 距離と所要時間を計算
 		dist = int(tsp.cost(tsp.result))
 		time_rq = int(tsp.cost(tsp.result) / 80.0) # 80m/minで計算
@@ -605,5 +617,5 @@ if __name__ == "__main__":
 			aim_tags[args[i]] = int(args[i+1])
 	print(f'aim_tags:{aim_tags}')
 	info_json_list = tsp_execute(aim_tags=aim_tags)
-	with open('output.json', 'w', encoding='utf-8') as f:
-		ujson.dump(info_json_list, f, ensure_ascii=False, indent=4)	
+	# with open('output.json', 'w', encoding='utf-8') as f:
+	# 	ujson.dump(info_json_list, f, ensure_ascii=False, indent=4)	

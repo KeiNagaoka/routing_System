@@ -16,7 +16,6 @@ def fix_coordinates(row):
     return LineString(fixed_coords)
 
 def get_setting(base_path=base_path):
-    print(f"settings:{base_path}")
     # 設定ファイルを読み込み
     SETTING_PATH = os.path.join(base_path, "settings.json")
     with open(SETTING_PATH, "r", encoding="utf-8") as json_file:
