@@ -181,6 +181,7 @@ class TSP:
 		#指定された順序のコスト計算関数
 		n_order = len(order)
 		sum_cost = np.sum( [ self.dist[order[i],order[(i+1)%n_order]] for i in np.arange(len(order)-1) ] )
+		print(f"order:{order[:10]}...sum_cost:{sum_cost}")
 		return sum_cost
 	
 	def plot(self,order=None):
@@ -201,15 +202,9 @@ class TSP:
 				# if printer: print(text) #プリントしたい場合は情報を出す
 
 	def tag_fill(self): #tagごとに巡回が終わってるか調べる
-		print("tag_fill")
-		print(f"self.aim_tags:{self.aim_tags}")
-		D = {key:val for key,val in self.now_tags.items() if val > 0}
-		print(f"self.now_tags:{D}")
 		# aim_tagsのkeyとvalを取り出し
 		for key_aim,val_aim in self.aim_tags.items():
 			if self.now_tags[key_aim] < val_aim:
-				print(f"key_aim:{key_aim}")
-				print(f"val_aim:{val_aim}")
 				return False
 		return True
 	
@@ -303,7 +298,6 @@ class TSP:
 					# return None
 					raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags:{self.now_tags.keys()}に含まれないよ！")
 				if self.tag_fill():
-					print("tagfillなのでbreak")
 					break
 				elif len(city)==0:
 					# return None
@@ -390,31 +384,22 @@ def necessary_spots(order_name,aim_tags,
 	for spot in [start_name, goal_name]:
 		tags = tags_dict[spot]
 		result_order.append(spot)
-		print(f"spot:{spot}")
 		for tag in tags:
 			if tag in necessary_tags:
 				necessary_tags.remove(tag)
-				print(f"tag:{tag}")
-				print(f"necessary_list:{necessary_list}")
 	# 経由地点を選別
 	# 先に通過していない経由地点を優先
 	via_spots_priority = [spot for spot in via_spots if spot not in passed_spot_names]
 	via_spots_subord = [spot for spot in via_spots if spot in passed_spot_names]
 	via_spots = via_spots_priority + via_spots_subord
-	print(f"via_spots_priority:{via_spots_priority}")
-	print(f"via_spots_subord:{via_spots_subord}")
-	print(f"via_spots:{via_spots}")
 	# 経由地点を選別
 	for spot in via_spots:
 		tags = tags_dict[spot]
 		if set(tags) & set(necessary_list):
 			result_order.append(spot)
-			print(f"spot:{spot}")
 			for tag in tags:
 				if tag in necessary_list:
 					necessary_list.remove(tag)
-					print(f"tag:{tag}")
-					print(f"necessary_list:{necessary_list}")
 
 	# start_name, goal_nameが含まれていたら削除して最初と最後にくっつける
 	if start_name in result_order:
@@ -500,9 +485,6 @@ def tsp_execute(node_df=node_df,
 		
 		# 出力したスポットと経路を保存
 		passed_spot_names = passed_spot_names + spots
-		print("デバッグ1")
-		print(f"output_orders:{output_orders}")
-		print(f"order:{order}")
 		if order not in output_orders:
 			output_orders.append(order)
 		else:
@@ -513,11 +495,9 @@ def tsp_execute(node_df=node_df,
 			symbol_list.append(ox.nearest_nodes(G,row['lon'],row['lat']))
 			G.nodes[symbol_list[-1]]['tags'] += row['tags'] #タグ追加
 		symbol_list = list(set(symbol_list))
-		print(f"symbol_list:{symbol_list}")
 
 		order = shrink_route([index_node[i] for i in tsp.result])
 		order = [name_node[spot_name] for spot_name in spots]
-		print(f"order:{order}")
 
 		#ルート
 		pre_route_tsp = [ox.shortest_path(G,s1,s2,weight='length', cpus=1) for s1,s2 in zip(order[:-1],order[1:])]
@@ -527,7 +507,6 @@ def tsp_execute(node_df=node_df,
 		passed_symbols = [spot for spot in order if spot in route_tsp]
 
 		timelist.append(time.time())
-		print(f"passed_symbols:{timelist[-1]-timelist[-2]}秒")
 
 		# 可視化
 		# Folium マップを作成し、縮尺（ズーム レベル）を設定
