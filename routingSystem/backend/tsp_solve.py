@@ -239,7 +239,6 @@ class TSP:
 			if self.now_tags[key_aim] < val_aim:
 				candidate_tags.append(key_aim)
 		city = [idx for idx,tags in self.index_tags.items() if len(set(tags) & set(candidate_tags)) > 0 and idx not in now_order]
-		print(f"city:{len(city)}{city}")
 		return city
 
 	
@@ -267,7 +266,6 @@ class TSP:
 			#for j in range(1,self.n_patrol):
 			j = 0
 			while city:
-				print("while city")
 				# フェロモン濃度^α × 距離の逆数^(-β)
 				upper = np.power(self.weight[now_city,city],self.alpha) * np.power(self.dist[now_city,city],-self.beta)
 				upper = np.where(np.isinf(upper), 0, upper) # infを0にする
@@ -281,8 +279,6 @@ class TSP:
 				# city = [key for key,val in index_tags.items() if len(set(val) & aim_list) > 0 and key!=now_city]
 				order.append(now_city)
 				city = self.proposed_cities(order)
-				# print(f"order:{order}")
-				# print(f"city:{city}")
 				
 				j+=1
 					
@@ -340,6 +336,10 @@ class TSP:
 			self.cost_list.append(self.cost(order))
 
 			# 今までで最も良ければ結果を更新
+			print("デバッグ0")
+			print(f"cost_result{self.cost(self.result)}")
+			print(f"cost_order:{cost_order}")	
+			print(f"resultの方が大きいcost:{self.cost(self.result) > cost_order}")	
 			if self.cost(self.result) > cost_order:
 				print("導出した経路の方が短い")
 				order = self.two_opt(order)
