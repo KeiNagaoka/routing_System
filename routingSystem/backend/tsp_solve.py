@@ -293,7 +293,6 @@ class TSP:
 					# return None
 					raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags:{self.now_tags.keys()}に含まれないよ！")
 				if self.tag_fill():
-					print("tagfillなのでbreak")
 					break
 				elif len(city)==0:
 					# return None
@@ -343,8 +342,8 @@ class TSP:
 					self.res_tags = self.now_tags.copy()
 
 			# デバッグ用
-			print("Agent ... %d , Cost ... %lf" % (k,self.cost(self.result)))
-			print(f'距離:{cost_order}\norder:{order}')
+			# print("Agent ... %d , Cost ... %lf" % (k,self.cost(self.result)))
+			# print(f'距離:{cost_order}, order:{order}')
 
 		if self.result is None:
 			return None
@@ -485,7 +484,7 @@ def tsp_execute(node_df=node_df,
 		print("デバッグ")
 		print(f"order:{order}")
 		print(f"output_orders:{output_orders}")
-		if order not in output_orders:
+		if is_passed_order(order,output_orders):
 			output_orders.append(order)
 		else:
 			continue

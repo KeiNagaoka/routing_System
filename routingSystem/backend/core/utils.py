@@ -79,3 +79,9 @@ def organize_aim_tags(request, via_spots_num, all_tags):
             aim_list.append(spot_name)
     aim_tags = dict(Counter(aim_list))
     return aim_tags
+
+def is_passed_order(order, passed_orders):
+    for passed_order in passed_orders:
+        if set(order) <= set(passed_order):
+            return True
+    return False
