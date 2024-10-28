@@ -490,6 +490,9 @@ def tsp_execute(node_df=node_df,
 		
 		# 出力したスポットと経路を保存
 		passed_spot_names = passed_spot_names + spots
+		print("デバッグ1")
+		print(f"output_orders:{output_orders}")
+		print(f"order:{order}")
 		if order not in output_orders:
 			output_orders.append(order)
 		else:
@@ -567,6 +570,7 @@ def tsp_execute(node_df=node_df,
 		print(f"mapを保存:{timelist[-1]-timelist[-2]}秒")
 
 		# デバッグのためのスクリプト
+		print("デバッグ2")
 		if os.path.exists(MAP_PATH):
 			print(f"mapを保存しました:{MAP_PATH}")
 			# MAP_FOLDERの内容を表示
