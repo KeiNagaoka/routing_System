@@ -181,7 +181,6 @@ class TSP:
 		#指定された順序のコスト計算関数
 		n_order = len(order)
 		sum_cost = np.sum( [ self.dist[order[i],order[(i+1)%n_order]] for i in np.arange(len(order)-1) ] )
-		print(f"order:{order[:10]}...sum_cost:{sum_cost}")
 		return sum_cost
 	
 	def plot(self,order=None):
@@ -298,6 +297,7 @@ class TSP:
 					# return None
 					raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags:{self.now_tags.keys()}に含まれないよ！")
 				if self.tag_fill():
+					print("tagfillなのでbreak")
 					break
 				elif len(city)==0:
 					# return None
@@ -485,6 +485,9 @@ def tsp_execute(node_df=node_df,
 		
 		# 出力したスポットと経路を保存
 		passed_spot_names = passed_spot_names + spots
+		print("デバッグ")
+		print(f"order:{order}")
+		print(f"output_orders:{output_orders}")
 		if order not in output_orders:
 			output_orders.append(order)
 		else:
