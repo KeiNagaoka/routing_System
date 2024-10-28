@@ -11,7 +11,7 @@ import itertools
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import distance as dis
-from core.utils import fix_coordinates, str2list_strings
+from core.utils import fix_coordinates, str2list_strings, is_passed_order
 from data_management import get_node_df, get_spot_df
 
 # 設定ファイルを読み込み
@@ -210,7 +210,7 @@ class TSP:
 	# 既に出力した経路と同じ経路ならTrue
 	def passed_route(self,order):
 		for route in self.output_orders:
-			if set(order) <= set(route):
+			if set(order) == set(route):
 				return True
 		return False
 	
@@ -484,7 +484,7 @@ def tsp_execute(node_df=node_df,
 		print("デバッグ")
 		print(f"order:{order}")
 		print(f"output_orders:{output_orders}")
-		if is_passed_order(order,output_orders):
+		if not is_passed_order(order,output_orders):
 			output_orders.append(order)
 		else:
 			continue

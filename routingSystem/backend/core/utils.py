@@ -25,7 +25,6 @@ def get_setting(base_path=base_path):
 settings = get_setting()
 
 def get_spot_info_from_csv(base_path=base_path):
-    print(f"get_spot_info:{base_path}")
     SPOT_INFO_PATH = os.path.join(base_path,settings["folder_path"],settings["spot_info"])
     spot_info = pd.read_csv(SPOT_INFO_PATH)
     spot_info["tags"] = spot_info["tags"].apply(str2list_strings)
@@ -82,6 +81,6 @@ def organize_aim_tags(request, via_spots_num, all_tags):
 
 def is_passed_order(order, passed_orders):
     for passed_order in passed_orders:
-        if set(order) <= set(passed_order):
+        if set(order) == set(passed_order):
             return True
     return False
