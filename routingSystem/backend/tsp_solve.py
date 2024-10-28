@@ -201,8 +201,15 @@ class TSP:
 				# if printer: print(text) #プリントしたい場合は情報を出す
 
 	def tag_fill(self): #tagごとに巡回が終わってるか調べる
+		print("tag_fill")
+		print(f"self.aim_tags:{self.aim_tags}")
+		D = {key:val for key,val in self.now_tags.items() if val > 0}
+		print(f"self.now_tags:{D}")
+		# aim_tagsのkeyとvalを取り出し
 		for key_aim,val_aim in self.aim_tags.items():
 			if self.now_tags[key_aim] < val_aim:
+				print(f"key_aim:{key_aim}")
+				print(f"val_aim:{val_aim}")
 				return False
 		return True
 	
@@ -238,6 +245,7 @@ class TSP:
 			if self.now_tags[key_aim] < val_aim:
 				candidate_tags.append(key_aim)
 		city = [idx for idx,tags in self.index_tags.items() if len(set(tags) & set(candidate_tags)) > 0 and idx not in now_order]
+		print(f"city:{len(city)}{city}")
 		return city
 
 	
@@ -265,6 +273,7 @@ class TSP:
 			#for j in range(1,self.n_patrol):
 			j = 0
 			while city:
+				print("while city")
 				# フェロモン濃度^α × 距離の逆数^(-β)
 				upper = np.power(self.weight[now_city,city],self.alpha) * np.power(self.dist[now_city,city],-self.beta)
 				upper = np.where(np.isinf(upper), 0, upper) # infを0にする
@@ -291,12 +300,13 @@ class TSP:
 						self.now_tags[tag] = 1
 				#タグが条件を満たしていれば終了
 				if not (self.aim_tags.keys() <= self.now_tags.keys()):
-					return None
+					# return None
 					raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags:{self.now_tags.keys()}に含まれないよ！")
 				if self.tag_fill():
+					print("tagfillなのでbreak")
 					break
 				elif len(city)==0:
-					return None
+					# return None
 					raise Exception("全ての都市を周りました！")
 				
 			order.append(self.goalNode) #開始点=終了点の場合
@@ -342,8 +352,8 @@ class TSP:
 					self.res_tags = self.now_tags.copy()
 
 			# デバッグ用
-			# print("Agent ... %d , Cost ... %lf" % (k,self.cost(self.result)))
-			# print(f'距離:{cost_order}\norder:{order}')
+			print("Agent ... %d , Cost ... %lf" % (k,self.cost(self.result)))
+			print(f'距離:{cost_order}\norder:{order}')
 
 		if self.result is None:
 			return None
