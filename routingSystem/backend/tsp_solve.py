@@ -303,9 +303,10 @@ class TSP:
 					# return None
 					raise Exception("全ての都市を周りました！")
 				
+			# ゴールノードに移動
 			order.append(self.goalNode) #開始点=終了点の場合
 			cost_order = self.cost(order) # 経路のコストを計算(L)
-			
+
 			# フェロモンの変化量を計算
 			delta[:,:] = 0.0
 			c = self.Q / cost_order # フェロモンの変化量
@@ -340,14 +341,17 @@ class TSP:
 
 			# 今までで最も良ければ結果を更新
 			if self.cost(self.result) > cost_order:
+				print("導出した経路の方が短い")
 				order = self.two_opt(order)
 				if not self.passed_route(order):
+					print("更新")
 					self.result = order.copy()
 					self.res_tags = self.now_tags.copy()
 
 			# デバッグ用
 			print("Agent ... %d , Cost ... %lf" % (k,self.cost(self.result)))
 			print(f'距離:{cost_order}\norder:{order}')
+			print(f"self.result:{self.result}")
 
 		if self.result is None:
 			return None
