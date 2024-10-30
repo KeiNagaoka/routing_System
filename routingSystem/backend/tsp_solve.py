@@ -175,14 +175,17 @@ class TSP:
 		if self.patrol_all or self.n_data<self.n_patrol: self.n_patrol = self.n_data   # 全て巡回する場合　初期化済みなので
 		self.weight = np.random.random_sample((self.n_data,self.n_data))	# フェロモンの量をランダムに決める
 		#フェロモンの行列　(i,j)を入れるとi×jの0~1のランダムな値が入った２次元配列
-		self.result = np.arange(self.n_data)			# もっともよかった順序を保存する
+		self.result = []			# もっともよかった順序を保存する
 		#経路をインデックスで格納　とりあえず都市0→都市1→都市2→...と通るもので初期化
 		
 	def cost(self,order):
-		#指定された順序のコスト計算関数
+		# 指定された順序のコスト計算関数
 		n_order = len(order)
-		sum_cost = np.sum( [ self.dist[order[i],order[(i+1)%n_order]] for i in np.arange(len(order)-1) ] )
-		return sum_cost
+		if n_order > 0:
+			sum_cost = np.sum( [ self.dist[order[i],order[(i+1)%n_order]] for i in np.arange(len(order)-1) ] )
+			return sum_cost
+		else:
+			return 524280
 	
 	def plot(self,order=None):
 		#指定された順序でプロットする関数
@@ -414,7 +417,7 @@ def tsp_execute(node_df=node_df,
 				start_name=start_name,
 				goal_name=goal_name,
 				aim_tags=dict({}),
-				map_html=settings["tsp_result"]
+				# map_html=settings["tsp_result"]
 				):
 	timelist = []
 	timelist.append(time.time())
@@ -436,7 +439,12 @@ def tsp_execute(node_df=node_df,
 	# 結果を格納するリスト
 	info_json_list = []
 	# 3回巡回経路探索を繰り返す
-	for route_index in range(5):
+	if len(aim_tags) == 0:
+		iter_num = 1
+	else:
+		iter_num = 5
+
+	for route_index in range(iter_num):
 		print(f"route_index:{route_index+1}回目の経路探索")
 		tsp = TSP(node_df=node_df,
 				adj_matrix_path=ADJACENT_MATRIX,
@@ -463,6 +471,8 @@ def tsp_execute(node_df=node_df,
 		# メイン処理
 		order = tsp.solve(n_agent=n_agent)		# n_agent匹の蟻を歩かせる
 		if order is None:
+			break
+		elif len(order) == 0:
 			break
 
 		passed_edges = passed_edges + [(order[i],order[i+1]) for i in range(len(order)-1)] + [(order[i+1],order[i]) for i in range(len(order)-1)]
@@ -553,25 +563,25 @@ def tsp_execute(node_df=node_df,
 
 		# 保存
 		map_html_str = map._repr_html_()
-		map_html_index = map_html.replace('.html',f'_{route_index+1}.html')
-		MAP_PATH = os.path.join(d_settings.STATIC_ROOT, map_html_index)
-		map.save(MAP_PATH)
-		# HTMLの文字列データを取得
-		map_html_str = map._repr_html_()
-		timelist.append(time.time())
-		print(f"mapを保存:{timelist[-1]-timelist[-2]}秒")
+		# map_html_index = map_html.replace('.html',f'_{route_index+1}.html')
+		# MAP_PATH = os.path.join(d_settings.STATIC_ROOT, map_html_index)
+		# map.save(MAP_PATH)
+		# # HTMLの文字列データを取得
+		# map_html_str = map._repr_html_()
+		# timelist.append(time.time())
+		# print(f"mapを保存:{timelist[-1]-timelist[-2]}秒")
 
-		# デバッグのためのスクリプト
-		print("デバッグ2")
-		if os.path.exists(MAP_PATH):
-			print(f"mapを保存しました:{MAP_PATH}")
-			# MAP_FOLDERの内容を表示
-			map_folder_contents = os.listdir(d_settings.STATIC_ROOT)
-			print("MAP_FOLDERの内容:")
-			for item in map_folder_contents:
-				print(item)
-		else:
-			raise FileNotFoundError(f"MAP_PATHが存在しませんでした:{MAP_PATH}")
+		# # デバッグのためのスクリプト
+		# print("デバッグ2")
+		# if os.path.exists(MAP_PATH):
+		# 	print(f"mapを保存しました:{MAP_PATH}")
+		# 	# MAP_FOLDERの内容を表示
+		# 	map_folder_contents = os.listdir(d_settings.STATIC_ROOT)
+		# 	print("MAP_FOLDERの内容:")
+		# 	for item in map_folder_contents:
+		# 		print(item)
+		# else:
+		# 	raise FileNotFoundError(f"MAP_PATHが存在しませんでした:{MAP_PATH}")
 
 
 		# 距離と所要時間を計算
@@ -591,11 +601,11 @@ def tsp_execute(node_df=node_df,
 			"via_spots":via_spots,
 				}
 		info_json_list.append(info_json)
-		print(f"info_json:{info_json}")
 		timelist.append(time.time())
 		print(f"info_json生成:{timelist[-1]-timelist[-2]}秒")
 	
-	print(f"info_json_list:{info_json_list}")
+	info_json_list_shrinked = [{key:val for key,val in info_json.items() if key != "map_html_str"} for info_json in info_json_list]
+	print(f"info_json_list:{info_json_list_shrinked}")
 	return info_json_list
 
 if __name__ == "__main__":

@@ -97,6 +97,7 @@ class SearchingView(TemplateView):
         print(f"via_spots_num:{via_spots_num}/{type(via_spots_num)}")
 
         # node_dfとspot_info_df
+        range10 = list(range(1,11))
         node_df = get_node_df(user=user)
         spot_info_df = get_spot_df(user=user)
         _, all_tags = get_spots_data(user)
@@ -104,29 +105,42 @@ class SearchingView(TemplateView):
         added_tag_node_df = node_df[node_df['added_tags'].apply(lambda L: len(L)>0)]
 
         # 目的地のタグの処理
-        aim_tags = organize_aim_tags(request, via_spots_num, all_tags)
-        print(f"aim_tags:{aim_tags}")
+        all_tags += spot_info_df['name'].tolist()
+        aim_tags, invalid_tags = organize_aim_tags(request, via_spots_num, all_tags)
+        if len(invalid_tags)==0:
+            print(f"aim_tags:{aim_tags}")
 
-        route_list = tsp_execute(node_df=node_df,
-                                 added_tag_node_df=added_tag_node_df,
-                                 spot_info_df=spot_info_df,
-                                 start_name=start_spot,
-                                 goal_name=goal_spot,
-                                 aim_tags=aim_tags,
-                                 map_html=f"user_map_{user.name}.html")
-        print(f"route_list:{route_list}")
-        if len(route_list)==0:
-            text = "経路を探索しましたが、条件に合う経路が見つかりませんでした。"
-        spot_num = 1
+            route_list = tsp_execute(node_df=node_df,
+                                    added_tag_node_df=added_tag_node_df,
+                                    spot_info_df=spot_info_df,
+                                    start_name=start_spot,
+                                    goal_name=goal_spot,
+                                    aim_tags=aim_tags,)
+            if len(route_list)==0:
+                text = "経路を探索しましたが、条件に合う経路が見つかりませんでした。"
 
-        range10 = list(range(1,11))
-        data = {'routes':route_list,
-                'text':text,
-                'start_spot':start_spot,
-                'goal_spot':goal_spot,
-                'ainm_tags':str(aim_tags),
-                'range10':range10,
-                }
+            data = {'routes':route_list,
+                    'text':text,
+                    'start_spot':start_spot,
+                    'goal_spot':goal_spot,
+                    'ainm_tags':str(aim_tags),
+                    'range10':range10,
+                    }
+        else:
+            # 無効なタグが入力された場合
+            route_list = []
+            invalid_tags = [f"「{string}」" for string in invalid_tags]
+            invalid_tags_str = '、'.join(invalid_tags)
+            text = f"{invalid_tags_str} は登録されていないスポット/タグです。"
+            
+            data = {'routes':route_list,
+                    'text':text,
+                    'start_spot':start_spot,
+                    'goal_spot':goal_spot,
+                    'ainm_tags':str(aim_tags),
+                    'range10':range10,
+                    }
+        
         return render(request, 'routesearch.html', data)
 
 class SaveRouteView(View):
@@ -139,22 +153,21 @@ class SaveRouteView(View):
         goal_spot_name = request.POST.get('goal_spot')
         got_route_name = request.POST.get('got_route_name')
         aim_tags = request.POST.get('aim_tags')
-        iframe_src = request.POST.get('iframe_src')
+        map_html_str = request.POST.get('map_html_str')
         via_spot_names = request.POST.get('via_spots').split(',')
-        new_iframe_src = os.path.join(settings["map_folder"], f"{user.name}_{got_route_name}.html")
         
-        MAP_HTML_PATH = os.path.join(base_path, "..", settings["static_folder"], iframe_src)
-        MAP_HTML_SAVED_PATH = os.path.join(base_path, "..", settings["static_folder"], new_iframe_src)
+        # MAP_HTML_PATH = os.path.join(base_path, "..", settings["static_folder"], iframe_src)
+        # MAP_HTML_SAVED_PATH = os.path.join(base_path, "..", settings["static_folder"], new_iframe_src)
 
-        try:
-            shutil.copy(MAP_HTML_PATH, MAP_HTML_SAVED_PATH)
-            logger.info(f"ファイルが {MAP_HTML_PATH} から {MAP_HTML_SAVED_PATH} に正常にコピーされました。")
-        except Exception as e:
-            logger.error(f"ファイルのコピー中にエラーが発生しました: {e}")
-        if os.path.exists(MAP_HTML_SAVED_PATH):
-            print("正しく生成されています！")
-        else:
-            print("生成されていません")
+        # try:
+        #     shutil.copy(MAP_HTML_PATH, MAP_HTML_SAVED_PATH)
+        #     logger.info(f"ファイルが {MAP_HTML_PATH} から {MAP_HTML_SAVED_PATH} に正常にコピーされました。")
+        # except Exception as e:
+        #     logger.error(f"ファイルのコピー中にエラーが発生しました: {e}")
+        # if os.path.exists(MAP_HTML_SAVED_PATH):
+        #     print("正しく生成されています！")
+        # else:
+        #     print("生成されていません")
         
         # Spotを参照してオブジェクトを取得
         message = ""
@@ -178,7 +191,7 @@ class SaveRouteView(View):
                 start_spot=start_spot,
                 goal_spot=goal_spot,
                 aim_tags=aim_tags,
-                html=new_iframe_src,
+                html=map_html_str,
             )
             
             # via_spotsを設定
@@ -388,7 +401,7 @@ class RouteInfoView(View):
         info_json =  {
             'route': route,
             'route_id': route["id"],
-            'iframe_src': route["inframe_src"],
+            'map_html_str': route["map_html_str"],
             }
 
         return render(request, template_name, info_json)

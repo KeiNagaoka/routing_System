@@ -156,5 +156,3 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-print(f"BASE_DIR: {BASE_DIR}")

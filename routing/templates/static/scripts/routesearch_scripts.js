@@ -1,24 +1,29 @@
-document.getElementById('save-route-form').addEventListener('submit', function(event) {
-    event.preventDefault();  // フォームのデフォルトの送信を防ぐ
+document.addEventListener('DOMContentLoaded', function() {
+    const saveRouteForm = document.getElementById('save-route-form');
+    if (saveRouteForm) {
+        saveRouteForm.addEventListener('submit', function(event) {
+            event.preventDefault();  // フォームのデフォルトの送信を防ぐ
 
-    const formData = new FormData(this);
-    const csrfToken = formData.get('csrfmiddlewaretoken');
-    const route_name = formData.get('route_name');
+            const formData = new FormData(this);
+            const csrfToken = formData.get('csrfmiddlewaretoken');
+            const route_name = formData.get('route_name');
 
-    fetch('/save_route/', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrfToken
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById(`route-message-${route_name}`).innerText = data.message;  // メッセージを表示
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+            fetch('/save_route/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById(`route-message-${route_name}`).innerText = data.message;  // メッセージを表示
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    }
 });
 
 
@@ -55,16 +60,17 @@ async function fetchSpotList(end_point) {
 
 // サジェスト機能を開始する関数
 async function startSuggest() {
-    const list = await fetchSpotList('all_spot'); // APIからデータを取得
+    console.log(`startSuggest`);
+    const spot_tag_list = await fetchSpotList('all_spot'); // APIからデータを取得
     const spot_list = await fetchSpotList('all_spot_only'); // APIからデータを取得
-    console.log(list);
+    console.log(`list:${spot_tag_list}`);
 
     // 複数の入力フィールドに対してサジェスト機能を適用
     for (let i = 1; i < 10; i++) {
         new Suggest.Local(
             `spot${i}`,    // 入力フィールドのID
             `suggest${i}`, // サジェスト表示エリアのID
-            list,          // サジェスト候補のリスト
+            spot_tag_list,          // サジェスト候補のリスト
             {
                 dispMax: 0,
                 interval: 500,

@@ -8,7 +8,7 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-<main class="content">
+<div class="content">
     <h2>経路検索</h2>
     <p>検索条件を入力してください</p>
 
@@ -49,8 +49,8 @@
             <input type="submit" value="探索">
         </div>
     </form>
+    <br>
 
-    <hr>
     <div id="log_text">
         {{ text }}
     </div>
@@ -79,7 +79,7 @@
                         <input type="hidden" name="start_spot" value="{{ start_spot }}">
                         <input type="hidden" name="goal_spot" value="{{ goal_spot }}">
                         <input type="hidden" name="aim_tags" value="{{ aim_tags }}">
-                        <input type="hidden" name="iframe_src" value="{{ route.iframe_src }}">
+                        <input type="hidden" name="map_html_str" value="{{ route.map_html_str }}">
                         <input type="hidden" name="via_spots" value="{{ route.via_spots|join:',' }}">
                         <label for="got_route_name">経路の名前:</label>
                         <input type="text" id="got_route_name" name="got_route_name" placeholder="経路の名前を入力"
@@ -94,11 +94,12 @@
                  {% load static %}
                 <div id="routemap-{{ forloop.counter }}" class="routemap-container">
                     {{ route.map_html_str|safe }}
-                    <iframe src="{% static route.iframe_src %}" width="100%" height="600px" frameborder="0" style="float: right;"></iframe>
                 </div>
             </div>
         {% endfor %}
     </div>
+
+</div>
     
 {% else %}
 <div class="h1">

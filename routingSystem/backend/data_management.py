@@ -147,7 +147,7 @@ def get_routes_data(user):
             'via_spots': [spot.name for spot in map.via_spots.all()],
             'via_num': map.via_spots.count(),
             'distance': map.distance,
-            'inframe_src': map.html,
+            'map_html_str': map.html,
         }
         route_list.append(route)
     return route_list

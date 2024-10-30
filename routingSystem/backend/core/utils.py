@@ -72,12 +72,15 @@ def str2list_strings(string):
 def organize_aim_tags(request, via_spots_num, all_tags):
     aim_tags = dict({})
     aim_list = []
+    invalid_tags = set({})
     for i in range(1, int(via_spots_num)+1):
         spot_name = request.POST.get(f'spot{i}')
         if spot_name in all_tags:
             aim_list.append(spot_name)
+        else:
+            invalid_tags.add(spot_name)
     aim_tags = dict(Counter(aim_list))
-    return aim_tags
+    return aim_tags, invalid_tags
 
 def is_passed_order(order, passed_orders):
     for passed_order in passed_orders:

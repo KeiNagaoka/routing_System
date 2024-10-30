@@ -120,9 +120,9 @@ class Mapdata(models.Model):
     goal_spot = models.ForeignKey(Spot, on_delete=models.CASCADE, related_name='goal_spot')  # Spotとの関係
     via_spots = models.ManyToManyField(Spot, related_name='via_spots')  # Spotと
     aim_tags = models.TextField()  # 検索条件のタグ
-    html = models.TextField(null=True, blank=True)  # マップデータのHTML
+    html = models.TextField(null=True, blank=True)  # マップデータのHTML文字列
     created_at = models.DateTimeField(auto_now_add=True)  # 作成日時
  
 
     def __str__(self):
-        return f"{self.name} saved map no.{self.idx}"
+        return f"{self.name} saved map as name:{self.name}"
