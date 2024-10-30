@@ -566,7 +566,7 @@ def tsp_execute(node_df=node_df,
 		if os.path.exists(MAP_PATH):
 			print(f"mapを保存しました:{MAP_PATH}")
 			# MAP_FOLDERの内容を表示
-			map_folder_contents = os.listdir(MAP_FOLDER)
+			map_folder_contents = os.listdir(d_settings.STATIC_ROOT)
 			print("MAP_FOLDERの内容:")
 			for item in map_folder_contents:
 				print(item)
