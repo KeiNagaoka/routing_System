@@ -554,6 +554,8 @@ def tsp_execute(node_df=node_df,
 		map_html_index = map_html.replace('.html',f'_{route_index+1}.html')
 		MAP_PATH = os.path.join(MAP_FOLDER, map_html_index)
 		map.save(MAP_PATH)
+		# HTMLの文字列データを取得
+		map_html_str = map._repr_html_()
 		timelist.append(time.time())
 		print(f"mapを保存:{timelist[-1]-timelist[-2]}秒")
 
@@ -582,6 +584,7 @@ def tsp_execute(node_df=node_df,
 			"name":f'経路{route_index+1}',
 			"order":spots,
 			"iframe_src":f'{settings["map_folder"]}/{map_html_index}',
+			"map_html_str":map_html_str,
 			"distance":dist,
 			"time":time_rq,
 			"via_spots":via_spots,
