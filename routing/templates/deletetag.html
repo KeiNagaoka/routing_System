@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+{% if user.is_authenticated %}
 <!-- ログインされていればマイページ -->
 <div class="top-container">
     <div class="h1">タグ削除ページ</div>
@@ -39,6 +40,20 @@
 <br>
 <div id="generated" class="h2">{{ text }}</div>
     
-    <script src="{% static 'scripts/deletetag_scripts.js' %}"></script>
-    
+<script src="{% static 'scripts/deletetag_scripts.js' %}"></script>
+
+
+{% else %}
+    <div class="for_login">
+        <div class="h2">
+            アカウントを登録してください。アカウントをお持ちの方は、ログインしてください。
+        </div>
+
+        <div class="btn-group">
+            <a href="{% url 'accounts:signup' %}" class="btn btn-primary">アカウント登録</a>
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+        </div>
+    </div>
+{% endif %}
+
 {% endblock %}

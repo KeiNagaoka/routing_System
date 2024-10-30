@@ -75,6 +75,7 @@ class LogoutView(BaseLogoutView):
 
 class SearchingView(TemplateView):
     template_name = "routesearch.html"
+    login_url = 'accounts:index'  # ログインページのURLを指定
 
     def get(self, request):
         text = ""
@@ -218,6 +219,7 @@ class SaveRouteView(View):
 
 class AddTagView(TemplateView):
     template_name = "addtag.html"
+
     def get(self, request):
         user = request.user
         data = {}
@@ -244,6 +246,7 @@ class AddTagView(TemplateView):
     
 class DeleteTagView(TemplateView):
     template_name = "deletetag.html"
+
     def get(self, request):
         text = ""
         spots = []
@@ -260,7 +263,7 @@ class DeleteTagView(TemplateView):
         data = {'text':text,
                 'spots':spots,
                 'spot_tags':first_spot_tags}
-        return render(request, 'deletetag.html', data)
+        return render(request, "deletetag.html", data)
     
     def post(self, request):
         message = ""
@@ -271,11 +274,6 @@ class DeleteTagView(TemplateView):
         spot = request.POST.get('spot')
         tag = request.POST.get('tag')
         
-        spots_data, all_tags = get_spots_data(user)
-        spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
-        spots = [data["name"] for data in spots_data]
-        spot_addedtag = {data["name"]:data["added_tags"] for data in spots_data}
-        first_spot_tags = spot_addedtag[spots[0]]
 
         try:
             spot = Spot.objects.get(name=spot)
@@ -287,11 +285,18 @@ class DeleteTagView(TemplateView):
         except AddedTag.DoesNotExist:
             message = "指定されたタグが見つかりませんでした。"
 
+        # spots_dataを取得
+        spots_data, all_tags = get_spots_data(user)
+        spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
+        spots = [data["name"] for data in spots_data if data["name"] != spot]
+        spot_addedtag = {data["name"]:data["added_tags"] for data in spots_data}
+        first_spot_tags = spot_addedtag[spots[0]]
+
         data = {"text":message,
                 'spots':spots,
                 'spot_tags':first_spot_tags}
 
-        return render(request, 'deletetag.html', data)
+        return render(request, "deletetag.html", data)
     
 class GetSpotTagView(View):
     def get(self, request, *args, **kwargs):
@@ -402,6 +407,8 @@ class UpdateTagView(View):
 # 経路の詳細情報ページ表示
 class RouteInfoView(View):
     template_name  = "route_display.html"
+    login_url = 'accounts:index'  # ログインページのURLを指定
+
     def get(self, request, template_name=template_name):
         user = request.user
         title = request.GET.get('title')

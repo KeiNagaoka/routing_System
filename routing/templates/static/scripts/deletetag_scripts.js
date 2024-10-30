@@ -1,4 +1,3 @@
-
 // spotが変更されたときtagを変更
 function updateTagOptions() {
     const spot = document.getElementById('spot').value;

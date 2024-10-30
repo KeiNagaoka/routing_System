@@ -102,14 +102,18 @@
     </div>
 
 </div>
-    
+
 {% else %}
-<div class="h1">
-    アカウントを登録してください。アカウントをお持ちの方は、ログインしてください。
-</div>
-<!-- ログインされていなければログインページ表示 -->
-<a href="{% url 'accounts:signup' %}" class="btn btn-primary">アカウント登録</a>
-<a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+    <div class="for_login">
+        <div class="h2">
+            アカウントを登録してください。アカウントをお持ちの方は、ログインしてください。
+        </div>
+
+        <div class="btn-group">
+            <a href="{% url 'accounts:signup' %}" class="btn btn-primary">アカウント登録</a>
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+        </div>
+    </div>
 {% endif %}
 
 

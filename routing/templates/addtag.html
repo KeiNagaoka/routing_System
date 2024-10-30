@@ -6,25 +6,40 @@
 {% endblock %}
 
 {% block content %}
-<!-- ログインされていればマイページ -->
-    <div class="top-container">
-        <div class="h1">タグ登録ページ</div>
-        <div class="detail_script">このページでは、 {{ user.name }} さんだけのタグを登録することができます。</div>
+{% if user.is_authenticated %}
+<div class="top-container">
+    <div class="h1">タグ登録ページ</div>
+    <div class="detail_script">このページでは、 {{ user.name }} さんだけのタグを登録することができます。</div>
+</div>
+
+<!-- タグ登録フォーム -->
+<div class="form-container">
+    <form method="POST" action="/add_user_tag/">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="tag">新しいタグを入力してください:</label>
+            <input type="text" id="tag" name="tag" placeholder="タグを入力" required>
+        </div>
+        <button type="submit" class="btn-submit">タグを追加</button>
+    </form>
+</div>
+<br>
+
+<div id="generated" class="h2">{{ text }}</div>
+
+    
+{% else %}
+<div class="for_login">
+    <div class="h2">
+        アカウントを登録してください。アカウントをお持ちの方は、ログインしてください。
     </div>
 
-    <!-- タグ登録フォーム -->
-    <div class="form-container">
-        <form method="POST" action="/add_user_tag/">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="tag">新しいタグを入力してください:</label>
-                <input type="text" id="tag" name="tag" placeholder="タグを入力" required>
-            </div>
-            <button type="submit" class="btn-submit">タグを追加</button>
-        </form>
+    <div class="btn-group">
+        <a href="{% url 'accounts:signup' %}" class="btn btn-primary">アカウント登録</a>
+        <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
     </div>
-    <br>
+</div>
+{% endif %}
 
-    <div id="generated" class="h2">{{ text }}</div>
 
 {% endblock %}

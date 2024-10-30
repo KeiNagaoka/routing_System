@@ -63,7 +63,6 @@ async function startSuggest() {
     console.log(`startSuggest`);
     const spot_tag_list = await fetchSpotList('all_spot'); // APIからデータを取得
     const spot_list = await fetchSpotList('all_spot_only'); // APIからデータを取得
-    console.log(`list:${spot_tag_list}`);
 
     // 複数の入力フィールドに対してサジェスト機能を適用
     for (let i = 1; i < 10; i++) {

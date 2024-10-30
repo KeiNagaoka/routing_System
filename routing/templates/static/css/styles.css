@@ -158,10 +158,10 @@ h1 {
     font-weight: normal;
 }
 
-h2 {
-    font-size: 18px;
-    margin: 0;
-    font-weight: normal;
+.h2 {
+    font-size: 1.5em;  /* フォントサイズ */
+    color: #555;       /* 色をグレーに */
+    margin: 5px 0;    /* 上下のマージン */
 }
 
 .route-container {
@@ -243,8 +243,40 @@ input[type="submit"]:active {
 }
 
 
+/* ボタンを横並びに配置するコンテナ */
+.btn-group {
+    display: flex;
+    gap: 15px; /* ボタン同士の間隔 */
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.for_login {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    text-align: center; /* Center text within the div */
+    margin: 2rem; /* Optional: Add margin around the element */
+}
+
+
+
 /* スマートフォンなど小さいデバイス用のスタイル */
 @media (max-width: 600px) {
+    .btn-group {
+        width: 100%;
+        gap: 10px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn {
+        width: 100%; /* ボタンを幅いっぱいに */
+        padding: 12px 0;
+    }
+
     
     header {
         height: 30px;
@@ -277,3 +309,4 @@ input[type="submit"]:active {
     }
 
 }
+

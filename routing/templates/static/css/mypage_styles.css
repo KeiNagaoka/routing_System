@@ -99,38 +99,3 @@
 .route-details p span:last-child {
     flex-grow: 1; /* 値の部分が左詰めで広がる */
 }
-
-.for_login {
-    display: flex;
-    flex-direction: column; /* Stack items vertically */
-    justify-content: center; /* Center vertically */
-    align-items: center; /* Center horizontally */
-    text-align: center; /* Center text within the div */
-    margin: 2rem; /* Optional: Add margin around the element */
-}
-
-/* ボタンを横並びに配置するコンテナ */
-.btn-group {
-    display: flex;
-    gap: 15px; /* ボタン同士の間隔 */
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-}
-
-/* スマートフォンなど小さいデバイス用のスタイル */
-@media (max-width: 600px) {
-    .btn-group {
-        width: 100%;
-        flex-direction: column; /* モバイルではボタンを縦並びに */
-        gap: 10px;
-        display: flex;
-        justify-content: center;
-    }
-
-    .btn {
-        width: 100%; /* ボタンを幅いっぱいに */
-        padding: 12px 0;
-    }
-
-}
