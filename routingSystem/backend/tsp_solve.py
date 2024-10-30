@@ -593,7 +593,6 @@ def tsp_execute(node_df=node_df,
 			via_spots = []
 
 		info_json = {
-			"name":f'経路{route_index+1}',
 			"order":spots,
 			"map_html_str":map_html_str,
 			"distance":dist,
@@ -604,6 +603,10 @@ def tsp_execute(node_df=node_df,
 		timelist.append(time.time())
 		print(f"info_json生成:{timelist[-1]-timelist[-2]}秒")
 	
+	# distanceが小さい順に並び替え
+	info_json_list = sorted(info_json_list, key=lambda x: x["distance"])
+	for idx, info_json in enumerate(info_json_list):
+		info_json_list[idx]["name"] = f"経路{idx+1}"
 	info_json_list_shrinked = [{key:val for key,val in info_json.items() if key != "map_html_str"} for info_json in info_json_list]
 	print(f"info_json_list:{info_json_list_shrinked}")
 	return info_json_list

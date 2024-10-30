@@ -80,10 +80,17 @@ class SearchingView(TemplateView):
         text = ""
         routes = []
         spot_num = 1
+        start_spot = ""
+        goal_spot = ""
+        via_spots = [{"idx":i,
+                      "name":""}
+                      for i in range(1,11)]
 
         range10 = list(range(1,11))
         data = {'routes':routes,
-                'range10':range10,
+                'start_spot':start_spot,
+                'goal_spot':goal_spot,
+                'via_spots':via_spots,
                 }
         return render(request, 'routesearch.html', data)
 
@@ -95,6 +102,9 @@ class SearchingView(TemplateView):
         user = request.user
         via_spots_num = request.POST.get('number_spot')
         print(f"via_spots_num:{via_spots_num}/{type(via_spots_num)}")
+        via_spots = [{"idx":i,
+                      "name":""}
+                      for i in range(1,11)]
 
         # node_dfとspot_info_df
         range10 = list(range(1,11))
@@ -124,7 +134,7 @@ class SearchingView(TemplateView):
                     'start_spot':start_spot,
                     'goal_spot':goal_spot,
                     'ainm_tags':str(aim_tags),
-                    'range10':range10,
+                    'via_spots':via_spots,
                     }
         else:
             # 無効なタグが入力された場合
