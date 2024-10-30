@@ -54,7 +54,7 @@ LOGOUT_REDIRECT_URL = "accounts:index"
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR , 'routing' , 'templates')], # templatesディレクトリを設定
+        'DIRS': ['templates'], # templatesディレクトリを設定
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -156,3 +156,5 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+print(f"BASE_DIR: {BASE_DIR}")
