@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from scipy.spatial import distance as dis
 from core.utils import fix_coordinates, str2list_strings, is_passed_order
 from data_management import get_node_df, get_spot_df
+from django.conf import settings as d_settings
 
 # 設定ファイルを読み込み
 base_path = os.path.dirname(os.path.abspath(__file__))
@@ -551,8 +552,9 @@ def tsp_execute(node_df=node_df,
 		print(f"マーカーを追加・縮尺ズーム:{timelist[-1]-timelist[-2]}秒")
 
 		# 保存
+		map_html_str = map._repr_html_()
 		map_html_index = map_html.replace('.html',f'_{route_index+1}.html')
-		MAP_PATH = os.path.join(MAP_FOLDER, map_html_index)
+		MAP_PATH = os.path.join(d_settings.STATIC_ROOT, map_html_index)
 		map.save(MAP_PATH)
 		# HTMLの文字列データを取得
 		map_html_str = map._repr_html_()
@@ -583,7 +585,6 @@ def tsp_execute(node_df=node_df,
 		info_json = {
 			"name":f'経路{route_index+1}',
 			"order":spots,
-			"iframe_src":f'{settings["map_folder"]}/{map_html_index}',
 			"map_html_str":map_html_str,
 			"distance":dist,
 			"time":time_rq,
