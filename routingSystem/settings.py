@@ -24,7 +24,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+h!dopmje_!nwkzv@6sq@tc#q$*t(%(5kwq$g!b95q51y)c@u3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = ['routing-system-b99f58cf3915.herokuapp.com','localhost','127.0.0.1']
 # ALLOWED_HOSTS = ['*']
@@ -120,8 +119,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'routing/templates/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, STATIC_URL)]
-STATIC_ROOT = os.path.join(BASE_DIR, 'routing/templates/static/')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'routing/templates/static/')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'routing/templates/staticfiles/')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

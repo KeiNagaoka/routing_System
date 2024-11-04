@@ -5,4 +5,5 @@ routing/__pycache__/
 ../routingSystem/backend/__pycache__/
 ../routingSystem/backend/core/__pycache__/
 routing/templates/static/
+routing/templates/dev_static/
 app.log
