@@ -79,9 +79,7 @@ WSGI_APPLICATION = 'routingSystem.wsgi.application'
 import dj_database_url
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://USER:PASSWORD@HOST:PORT/NAME'
-    )
+    'default': dj_database_url.config()
 }
 
 # DATABASES = {
