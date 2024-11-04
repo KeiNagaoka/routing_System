@@ -8,100 +8,103 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-<div class="content">
-    <h2>経路検索</h2>
-    <p>検索条件を入力してください</p>
+<h2>経路検索</h2>
+<p>検索条件を入力してください</p>
 
-    <!-- 入力欄 -->
-    <form action="/routesearch/" method="post">
-        {% csrf_token %}
-            
-        <div class="form-group"> 
-            <label for="start_spot">出発地点:</label>
-            <input type="text" id="start_spot" name="start_spot" placeholder="出発地点を入力"
-            value="{{ goal_spot }}" autocomplete="off" class="input-wide" required/>
-        </div>
-        <div id="suggest_start" class="suggest"></div>
-
-
-        <div class="form-group">
-            <label for="spot_num">経由地点数:</label>
-            <input type="number" id="number_spot" name="number_spot" min="0" max="10"
-            placeholder="0~10の半角数字を入力"
-            value="0" onchange="ChangeSpotNum()" required>
-        </div>
-
-        {% for via_spot in via_spots %}
-            <div class="form-group hide" id="spot-group{{ via_spot.idx }}"> 
-                <label for="spot{{ via_spot.idx }}">経由地点{{ via_spot.idx }}:</label>
-                <input type="text" id="spot{{ via_spot.idx }}" name="spot{{ via_spot.idx }}" placeholder="経由地点を入力"
-                value="{{ via_spot.name }}" autocomplete="off" class="input-wide" />
-            </div>
-            <div id="suggest{{ via_spot.idx }}" class="suggest"></div>
-        {% endfor %}
+<!-- 入力欄 -->
+<form action="/routesearch/" method="post">
+    {% csrf_token %}
         
-        <div class="form-group"> 
-            <label for="goal_spot">到着地点:</label>
-            <input type="text" id="goal_spot" name="goal_spot" placeholder="到着地点を入力"
-            value="{{ goal_spot }}" autocomplete="off" class="input-wide" required/>
-        </div>
-        <div id="suggest_goal" class="suggest"></div>
-
-        <div id="submit-btn">
-            <input type="submit" value="探索">
-        </div>
-    </form>
-    <br>
-
-    <div id="log_text">
-        {{ text }}
+    <div class="form-group"> 
+        <label for="start_spot">出発地点:</label>
+        <!-- <input type="text" id="start_spot" name="start_spot" placeholder="出発地点を入力"
+        value="{{ goal_spot }}" autocomplete="off" class="input-wide" required/> -->
+        <input type="text" id="start_spot" name="start_spot" placeholder="出発地点を入力"
+        value="調布駅" autocomplete="off" class="input-wide" required/>
     </div>
-    <div class="route-display-area">
-        {% for route in routes %}
-            <div class="route-wrapper">
-                <!-- 経路情報部分 -->
-                <div id="route-{{ forloop.counter }}" class="route-container">
-                    <h4>{{ route.name }}</h4>
-                    <p>距離: {{ route.distance }} m</p>  <!-- 距離の表示 -->
-                    <p>時間: {{ route.time }} 分</p>     <!-- 時間の表示 -->
-                    <p>出発: {{ start_spot }}</p>       <!-- 出発地点 -->
-                    <p>経由地点:
-                        <ol>
-                            {% for via_spot in route.via_spots %}
-                                <li>{{ via_spot }}</li>  <!-- 経由地点をリスト項目として表示 -->
-                            {% endfor %}
-                        </ol>
-                    </p>
-                    <p>出発: {{ goal_spot }}</p>    <!-- 到着地点 -->
-                    <form method="POST" class="save-route-form" id="save-route-form" action="/save_route/">
-                        {% csrf_token %}
-                        <input type="hidden" name="route_name" value="{{ route.name }}">
-                        <input type="hidden" name="route_distance" value="{{ route.distance }}">
-                        <input type="hidden" name="route_time" value="{{ route.time }}">
-                        <input type="hidden" name="start_spot" value="{{ start_spot }}">
-                        <input type="hidden" name="goal_spot" value="{{ goal_spot }}">
-                        <input type="hidden" name="aim_tags" value="{{ aim_tags }}">
-                        <input type="hidden" name="map_html_str" value="{{ route.map_html_str }}">
-                        <input type="hidden" name="via_spots" value="{{ route.via_spots|join:',' }}">
-                        <label for="got_route_name">経路の名前:</label>
-                        <input type="text" id="got_route_name" name="got_route_name" placeholder="経路の名前を入力"
-                        value="" autocomplete="off" class="input-wide" required/>
-                        <button type="submit" class="btn-save">経路を保存</button>
-                        <br>
-                        <div class="h2" id="route-message-{{ route.name }}"></div>
-                    </form>
-                    
-                </div>
-                <!-- 地図部分 -->
-                 {% load static %}
-                <div id="routemap-{{ forloop.counter }}" class="routemap-container">
-                    {{ route.map_html_str|safe }}
-                </div>
-            </div>
-        {% endfor %}
+    <div id="suggest_start" class="suggest"></div>
+
+
+    <div class="form-group">
+        <label for="spot_num">経由地点数:</label>
+        <input type="number" id="number_spot" name="number_spot" min="0" max="10"
+        placeholder="0~10の半角数字を入力"
+        value="0" onchange="ChangeSpotNum()" required>
     </div>
 
+    {% for via_spot in via_spots %}
+        <div class="form-group hide" id="spot-group{{ via_spot.idx }}"> 
+            <label for="spot{{ via_spot.idx }}">経由地点{{ via_spot.idx }}:</label>
+            <input type="text" id="spot{{ via_spot.idx }}" name="spot{{ via_spot.idx }}" placeholder="経由地点を入力"
+            value="{{ via_spot.name }}" autocomplete="off" class="input-wide" />
+        </div>
+        <div id="suggest{{ via_spot.idx }}" class="suggest"></div>
+    {% endfor %}
+    
+    <div class="form-group"> 
+        <label for="goal_spot">到着地点:</label>
+        <!-- <input type="text" id="goal_spot" name="goal_spot" placeholder="到着地点を入力"
+        value="{{ goal_spot }}" autocomplete="off" class="input-wide" required/> -->
+        <input type="text" id="goal_spot" name="goal_spot" placeholder="到着地点を入力"
+        value="飛田給駅" autocomplete="off" class="input-wide" required/>
+    </div>
+    <div id="suggest_goal" class="suggest"></div>
+
+    <div id="submit-btn">
+        <input type="submit" value="探索">
+    </div>
+</form>
+<br>
+
+<div id="log_text">
+    {{ text }}
 </div>
+<div class="route-display-area">
+    {% for route in routes %}
+        <div class="route-wrapper">
+            <!-- 経路情報部分 -->
+            <div id="route-{{ forloop.counter }}" class="route-container">
+                <h4>{{ route.name }}</h4>
+                <p>距離: {{ route.distance }} m</p>  <!-- 距離の表示 -->
+                <p>時間: {{ route.time }} 分</p>     <!-- 時間の表示 -->
+                <p>出発: {{ start_spot }}</p>       <!-- 出発地点 -->
+                <p>経由地点:
+                    <ol>
+                        {% for via_spot in route.via_spots %}
+                            <li>{{ via_spot }}</li>  <!-- 経由地点をリスト項目として表示 -->
+                        {% endfor %}
+                    </ol>
+                </p>
+                <p>到着: {{ goal_spot }}</p>    <!-- 到着地点 -->
+                <form method="POST" class="save-route-form" id="save-route-form" action="/save_route/">
+                    {% csrf_token %}
+                    <input type="hidden" name="route_name" value="{{ route.name }}">
+                    <input type="hidden" name="route_distance" value="{{ route.distance }}">
+                    <input type="hidden" name="route_time" value="{{ route.time }}">
+                    <input type="hidden" name="start_spot" value="{{ start_spot }}">
+                    <input type="hidden" name="goal_spot" value="{{ goal_spot }}">
+                    <input type="hidden" name="aim_tags" value="{{ aim_tags }}">
+                    <input type="hidden" name="map_html_str" value="{{ route.map_html_str }}">
+                    <input type="hidden" name="via_spots" value="{{ route.via_spots|join:',' }}">
+                    <label for="got_route_name">経路の名前:</label>
+                    <input type="text" id="got_route_name" name="got_route_name" placeholder="経路の名前を入力"
+                    value="" autocomplete="off" class="input-wide" required/>
+                    <button type="submit" class="btn-save">経路を保存</button>
+                    <br>
+                    <div class="h2" id="route-message-{{ route.name }}"></div>
+                </form>
+                
+            </div>
+
+            <!-- 地図部分 -->
+                {% load static %}
+            <div id="routemap-{{ forloop.counter }}" class="routemap-container">
+                {{ route.map_html_str|safe }}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
 
 {% else %}
     <div class="for_login">

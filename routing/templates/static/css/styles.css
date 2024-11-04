@@ -41,7 +41,7 @@ header .toggle-btn {
 /* メインコンテンツのスタイル */
 main {
     flex: 1;
-    margin-top: 70px; /* headerの高さに合わせて調整 */
+    margin-top: 60px;
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -50,7 +50,7 @@ main {
 
 .container {
     margin-top: 70px; /* headerの高さに合わせて調整 */
-    padding: 20px;
+    padding: 0px;
     display: flex;
     flex: 1;
 }
@@ -162,12 +162,6 @@ h1 {
     font-size: 1.5em;  /* フォントサイズ */
     color: #555;       /* 色をグレーに */
     margin: 5px 0;    /* 上下のマージン */
-}
-
-.route-container {
-    flex: 1;
-    padding: 20px;
-    overflow: hidden; /* コンテンツエリアからはみ出るのを防ぐため */
 }
 
 /* 入力欄のホバーエフェクト */
@@ -293,7 +287,8 @@ input[type="submit"]:active {
     }
 
     main {
-        margin-top: 30px; /* headerの高さに合わせて調整 */
+        margin-top: 30px;
+        padding: 0px; /* headerの高さに合わせて調整 */
     }
 
     .container {

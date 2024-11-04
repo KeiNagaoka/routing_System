@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-+h!dopmje_!nwkzv@6sq@tc#q$*t(%(5kwq$g!b95q51y)c@u3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['routing-system-b99f58cf3915.herokuapp.com','localhost','127.0.0.1']
+# ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,7 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'routing',
     'routingSystem',
+    'whitenoise.runserver_nostatic',
 ]
+
 
 AUTH_USER_MODEL = "routing.User"
 
@@ -118,7 +121,7 @@ USE_TZ = True
 
 STATIC_URL = 'routing/templates/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, STATIC_URL)]
-STATIC_ROOT = os.path.join(BASE_DIR, 'routing/templates/staticfiles/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'routing/templates/static/')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -155,4 +158,5 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]

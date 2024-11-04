@@ -1,6 +1,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import custom_404_view, custom_500_view
 
 from . import views
 
@@ -27,3 +28,7 @@ urlpatterns = [
 
 # 静的ファイルの設定
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# 404エラーのカスタムページを設定
+handler404 = custom_404_view
+handler500 = custom_500_view

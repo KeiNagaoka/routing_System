@@ -48,17 +48,20 @@ select, input[type="number"] {
 
 .route-wrapper {
     display: flex;  /* フレックスボックスを使用 */
-    flex-direction: row;  /* 横並び */
-    margin-bottom: 50px;  /* 各route-wrapperの下に20pxのマージンを追加 */
+    flex-direction: row;  /* 縦並び */
+    margin-bottom: 25px;  /* 各route-wrapperの下に20pxのマージンを追加 */
 }
 
 .route-container {
-    flex: 1;  /* ルートコンテナのサイズを調整 */
-    margin-right: 10px;  /* 右側に少しマージンを追加 */
+    flex: 1;
+    padding: 5px;
+    overflow: hidden; /* コンテンツエリアからはみ出るのを防ぐため */
 }
 
 .routemap-container {
-    flex: 6;  /* 地図コンテナも同様にサイズ調整 */
+    flex: 3;
+    height: 50vh; /* 画面の上下幅の80%に設定 */
+    margin-bottom: 10px;  /* 下に少しマージンを追加 */
 }
 
 /* サジェストボックスのスタイル */
@@ -124,7 +127,6 @@ select, input[type="number"] {
     form {
         max-width: 100%; /* 画面幅に合わせてフォーム全体を表示 */
     }
-
     .form-group {
         flex-direction: column; /* ラベルと入力欄を縦に並べる */
         align-items: stretch; /* 入力欄を画面いっぱいに伸ばす */
@@ -139,13 +141,24 @@ select, input[type="number"] {
         font-size: 14px; /* フォントサイズを少し小さく */
         padding: 8px;
     }
+    
     .route-wrapper {
-        flex-direction: column;  /* スマホサイズの場合は縦並び */
+        flex-direction: column;
     }
-    .route-container, .routemap-container {
-        margin-right: 0;  /* スマホではマージンをリセット */
-        margin-bottom: 10px;  /* 縦並びの場合の間隔 */
+
+    .route-container{
+        flex: 1;
+        margin-right: 0;
+        margin-bottom: 10px;
     }
+
+    .routemap-container {
+        flex: 2;
+        height: 40vh;
+        min-height: 500px; /* 最低限の高さを設定 */
+        margin-bottom: 10px;
+    }
+
     .btn-save {
         padding: 8px 16px;
         font-size: 0.9em;

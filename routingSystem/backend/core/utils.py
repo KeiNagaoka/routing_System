@@ -87,3 +87,11 @@ def is_passed_order(order, passed_orders):
         if set(order) == set(passed_order):
             return True
     return False
+
+def valid_search(start_spot, goal_spot, aim_tags):
+    via_spots = list(aim_tags.keys())
+    spots = list(set(via_spots + [start_spot, goal_spot]))
+    if len(spots) <= 1:
+        return False
+    else:
+        return True

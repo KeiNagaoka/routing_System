@@ -17,7 +17,7 @@ import json
 import shutil
 import logging
 from routingSystem.backend.data_management import get_spots_data, get_routes_data, filter_tag_added_spot, get_node_df, get_spot_df
-from routingSystem.backend.core.utils import str2list_strings, get_spot_info_from_csv, organize_aim_tags, get_setting
+from routingSystem.backend.core.utils import str2list_strings, get_spot_info_from_csv, organize_aim_tags, get_setting, valid_search
 from routingSystem.backend.tsp_solve import tsp_execute
 
 logger = logging.getLogger(__name__)
@@ -80,7 +80,6 @@ class SearchingView(TemplateView):
     def get(self, request):
         text = ""
         routes = []
-        spot_num = 1
         start_spot = ""
         goal_spot = ""
         via_spots = [{"idx":i,
@@ -118,7 +117,8 @@ class SearchingView(TemplateView):
         # 目的地のタグの処理
         all_tags += spot_info_df['name'].tolist()
         aim_tags, invalid_tags = organize_aim_tags(request, via_spots_num, all_tags)
-        if len(invalid_tags)==0:
+        is_valid = valid_search(start_spot, goal_spot, aim_tags)
+        if len(invalid_tags)==0 and is_valid:
             print(f"aim_tags:{aim_tags}")
 
             route_list = tsp_execute(node_df=node_df,
@@ -136,6 +136,18 @@ class SearchingView(TemplateView):
                     'goal_spot':goal_spot,
                     'ainm_tags':str(aim_tags),
                     'via_spots':via_spots,
+                    }
+        # start goal via全て同じスポットが指定された場合
+        elif not is_valid:
+            route_list = []
+            text = f"{start_spot} しか通らない経路です。"
+            
+            data = {'routes':route_list,
+                    'text':text,
+                    'start_spot':start_spot,
+                    'goal_spot':goal_spot,
+                    'ainm_tags':str(aim_tags),
+                    'range10':range10,
                     }
         else:
             # 無効なタグが入力された場合
@@ -453,3 +465,9 @@ class AllSpotOnlyView(View):
 
     data = {"all_spot":spot_names}
     return JsonResponse(data, safe=False)
+
+def custom_404_view(request, exception):
+    return render(request, '404.html', status=404)
+
+def custom_500_view(request):
+    return render(request, '500.html', status=500)

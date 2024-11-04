@@ -5,6 +5,7 @@ import ujson
 import pickle
 import time
 import pandas as pd
+import re
 import folium
 import osmnx as ox
 import itertools
@@ -563,6 +564,19 @@ def tsp_execute(node_df=node_df,
 
 		# 保存
 		map_html_str = map._repr_html_()
+		# # 正規表現パターン
+		# pattern = r'<iframe\b[^>]*>(.*?)</iframe>'
+
+		# # 正規表現検索
+		# iframe_content = re.search(pattern, map_html_str, re.DOTALL)
+		# # 結果の表示
+		# if iframe_content:
+		# 	html_str = iframe_content.group(0)
+		# 	print(html_str)  # <iframe>タグから</iframe>タグまでの文字列全体
+		# else:
+		# 	print("一致する<iframe>タグが見つかりません")
+		# 	break
+
 		# map_html_index = map_html.replace('.html',f'_{route_index+1}.html')
 		# MAP_PATH = os.path.join(d_settings.STATIC_ROOT, map_html_index)
 		# map.save(MAP_PATH)
