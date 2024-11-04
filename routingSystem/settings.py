@@ -79,7 +79,9 @@ WSGI_APPLICATION = 'routingSystem.wsgi.application'
 import dj_database_url
 
 DATABASES = {
-    'default': dj_database_url.config()
+    'default': dj_database_url.config(
+        default='postgres://kei20000809@gmail.com:OSOKstkr417!!!@routing-system-b99f58cf3915.herokuapp.com'
+    )
 }
 
 # DATABASES = {
