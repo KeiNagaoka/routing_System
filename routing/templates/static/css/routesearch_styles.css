@@ -44,6 +44,7 @@ select, input[type="number"] {
 
 .route-display-area {
     margin-bottom: 10px;
+    position: relative; /* 子要素の位置を調整するために使用 */
 }
 
 .route-wrapper {
@@ -59,9 +60,19 @@ select, input[type="number"] {
 }
 
 .routemap-container {
-    flex: 3;
-    height: 50vh; /* 画面の上下幅の80%に設定 */
+    flex: 2;
+    align-items: stretch;   /* 子要素を親要素の高さいっぱいに引き伸ばす */
+    width: 100%; /* 画面の上下幅の80%に設定 */
+    height: 100%; /* 画面の上下幅の80%に設定 */
     margin-bottom: 10px;  /* 下に少しマージンを追加 */
+    padding: 20px;
+}
+
+.routemap-container > div {
+    flex: 1;               /* 子要素が親要素の高さを100%満たすように設定 */
+    display: flex;
+    width: 100%;
+    height: 100%;
 }
 
 /* サジェストボックスのスタイル */
@@ -143,6 +154,8 @@ select, input[type="number"] {
     }
     
     .route-wrapper {
+        display: flex;  /* フレックスボックスを使用 */
+        margin-bottom: 25px;  /* 各route-wrapperの下に20pxのマージンを追加 */
         flex-direction: column;
     }
 
@@ -153,10 +166,13 @@ select, input[type="number"] {
     }
 
     .routemap-container {
-        flex: 2;
+        flex: 1;
         height: 40vh;
         min-height: 500px; /* 最低限の高さを設定 */
         margin-bottom: 10px;
+        padding: 10px;
+        align-items: center;
+
     }
 
     .btn-save {

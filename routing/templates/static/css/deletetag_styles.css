@@ -29,9 +29,11 @@
 
 .form-group {
     display: flex;
+    flex-direction: row;
     align-items: center;
     margin-bottom: 15px;
-    width: 200%;
+    width: 100%;
+    align-items: flex-start; /* 左端を揃える */
 }
 
 .form-group label {
@@ -72,4 +74,19 @@
 
 .btn-submit:hover {
     background-color: #45a049; /* 元の色に戻す */
+}
+
+/* レスポンシブ対応：画面幅が600px以下のデバイス用 */
+@media (max-width: 600px) {
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: left;
+        margin-bottom: 15px;
+    }
+    
+    .form-container {
+        align-items: left;
+        margin-top: 20px;
+    }
 }

@@ -564,6 +564,7 @@ def tsp_execute(node_df=node_df,
 
 		# 保存
 		map_html_str = map._repr_html_()
+		map_html_str = map_html_str.replace('padding-bottom:60%;', '').replace('height:0;', 'height:80vh;')
 		# # 正規表現パターン
 		# pattern = r'<iframe\b[^>]*>(.*?)</iframe>'
 
@@ -571,8 +572,8 @@ def tsp_execute(node_df=node_df,
 		# iframe_content = re.search(pattern, map_html_str, re.DOTALL)
 		# # 結果の表示
 		# if iframe_content:
-		# 	html_str = iframe_content.group(0)
-		# 	print(html_str)  # <iframe>タグから</iframe>タグまでの文字列全体
+		# 	map_html_str = iframe_content.group(0)
+		# 	print(map_html_str)  # <iframe>タグから</iframe>タグまでの文字列全体
 		# else:
 		# 	print("一致する<iframe>タグが見つかりません")
 		# 	break
