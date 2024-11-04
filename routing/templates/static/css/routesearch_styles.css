@@ -162,16 +162,19 @@ select, input[type="number"] {
     .route-container{
         flex: 1;
         margin-right: 0;
-        margin-bottom: 10px;
     }
 
     .routemap-container {
+        display: flex;
         flex: 1;
-        height: 40vh;
-        min-height: 500px; /* 最低限の高さを設定 */
+        width: 100%; /* 必要に応じて調整 */
+        height: 100%; /* 必要に応じて調整 */
+        min-height: 450px; /* 最低限の高さを設定 */
         margin-bottom: 10px;
         padding: 10px;
         align-items: center;
+        padding: 0;
+        position: relative; /* 絶対位置を設定するために必要 */
 
     }
 
