@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+h!dopmje_!nwkzv@6sq@tc#q$*t(%(5kwq$g!b95q51y)c@u3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['routing-system-b99f58cf3915.herokuapp.com','localhost','127.0.0.1']
 # ALLOWED_HOSTS = ['*']
@@ -78,18 +78,19 @@ WSGI_APPLICATION = 'routingSystem.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 import dj_database_url
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://kei20000809@gmail.com:OSOKstkr417!!!@routing-system-b99f58cf3915.herokuapp.com'
-    )
-}
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+if not DEBUG:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default='postgres://kei20000809@gmail.com:OSOKstkr417!!!@routing-system-b99f58cf3915.herokuapp.com'
+        )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation

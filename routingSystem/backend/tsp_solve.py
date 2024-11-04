@@ -5,7 +5,6 @@ import ujson
 import pickle
 import time
 import pandas as pd
-import re
 import folium
 import osmnx as ox
 import itertools
@@ -14,7 +13,6 @@ import matplotlib.pyplot as plt
 from scipy.spatial import distance as dis
 from core.utils import fix_coordinates, str2list_strings, is_passed_order
 from data_management import get_node_df, get_spot_df
-from django.conf import settings as d_settings
 
 # 設定ファイルを読み込み
 base_path = os.path.dirname(os.path.abspath(__file__))
