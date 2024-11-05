@@ -87,11 +87,11 @@ try:
 			name_index[name] = index_node_rev[node]
 
 	# raise ZeroDivisionError("ここで止める")
-	#データのインポート
+	# データのインポート
 	# Pickleファイルからデータをロード
 	with open(ROAD_NETWORK, "rb") as f:
 		G = pickle.load(f)
-	#コマンドライン引数を取得
+	# コマンドライン引数を取得
 	args = sys.argv
 	aim_tags = {}
 	# printで確認
@@ -380,11 +380,12 @@ class TSP:
 			
 
 # 必要最低限のスポットに絞る
-def necessary_spots(order_name,aim_tags,
-					name_tags=name_tags,
-					passed_spot_names = [],
-					start_name=start_name,
-					goal_name=goal_name):
+def necessary_spots(order_name,
+					aim_tags,
+					name_tags,
+					passed_spot_names,
+					start_name,
+					goal_name):
 	print(f"order_name:{order_name[:10]}...")
 	tags_dict = {name:name_tags[name] for name in order_name}
 	aim_tags_processed = {key:val for key,val in aim_tags.items() if val > 0}
@@ -499,7 +500,7 @@ def tsp_execute(node_df,
 		spots_original = [name for L in name_order for name in str2list_strings(L)]
 		spots = necessary_spots(spots_original,
 						  aim_tags_input,
-						  name_tags=name_tags,
+						  name_tags,
 						  passed_spot_names=passed_spot_names,
 						  start_name=start_name,
 						  goal_name=goal_name)
