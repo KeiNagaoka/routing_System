@@ -89,7 +89,7 @@ class Node(models.Model):
     tags = models.TextField()
 
     def __str__(self):
-        return self.name
+        return self.node
 
 # ユーザが付与した新しいタグ
 class AddedTag(models.Model):
