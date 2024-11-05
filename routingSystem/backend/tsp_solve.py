@@ -479,7 +479,6 @@ def tsp_execute(node_df,
 				count_tags = count_tags,
 				startNode=startNode,
 				goalNode=goalNode,
-				index_tags=index_tags,
 				patrol_all=False,
 				patrol=patrol,)
 		
