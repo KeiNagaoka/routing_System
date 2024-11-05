@@ -78,7 +78,6 @@ WSGI_APPLICATION = 'routingSystem.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 import dj_database_url
 
-print(f"os.environ.get('DATABASE_URL'): {os.environ.get('DATABASE_URL')}")
 if not DEBUG:
     DATABASES = {
         # 'default': dj_database_url.config(
@@ -86,11 +85,11 @@ if not DEBUG:
         # )
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'routing-system',
-            'HOST': 'dedvc1.stackhero-network.com',
-            'PORT': '8673',
-            'USER': 'kei20000809@gmail.com',
-            'PASSWORD': 'sPV62CsdyYNYH0Wv6QkqOS9m0YJlvFs1',
+            'NAME': 'd7tfalknau26bs',
+            'HOST': 'c3gtj1dt5vh48j.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com',
+            'PORT': '5432',
+            'USER': 'u4o7pkl1h99de4',
+            'PASSWORD': 'pff3889a9046d2fe7383874d14182d7cd2a8e1fceaa324ea0f3c5338b901c4634',
         }
     }
 else:
