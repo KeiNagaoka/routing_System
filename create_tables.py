@@ -14,7 +14,7 @@ import pickle
 import ujson
 from routing.models import Spot, Node, Tag
 from routingSystem.backend.data_management import get_spot_df, get_node_df, get_spots_data
-from routingSystem.backend.core.utils import base_path, get_setting, str2list_strings,get_spot_info_from_csv
+from routingSystem.backend.core.utils import base_path, get_setting, str2list_strings, get_spot_info_from_csv
 
 
 settings = get_setting()
