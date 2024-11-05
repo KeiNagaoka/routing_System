@@ -80,10 +80,17 @@ import dj_database_url
 
 if not DEBUG:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL')
+        )
+        # 'default': {
+        #     'ENGINE': 'django.db.backends.postgresql',
+        #     'NAME': 'routing-system',
+        #     'HOST': 'dedvc1.stackhero-network.com',
+        #     'PORT': '8673',
+        #     'USER': '8673',
+        #     'PASSWORD': 'sPV62CsdyYNYH0Wv6QkqOS9m0YJlvFs1',
+        # }
     }
 else:
     DATABASES = {
