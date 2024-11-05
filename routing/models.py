@@ -76,6 +76,9 @@ class Spot(models.Model):
     hp = models.TextField()
     tags = models.TextField()
 
+    class Meta:
+        db_table = 'routing_spot'
+
     def __str__(self):
         return self.name
     
@@ -87,6 +90,9 @@ class Node(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     tags = models.TextField()
+
+    class Meta:
+        db_table = 'routing_node'
 
     def __str__(self):
         return self.name
