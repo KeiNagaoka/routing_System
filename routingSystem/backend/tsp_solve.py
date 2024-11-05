@@ -38,6 +38,74 @@ INDEX_NODE = os.path.join(FOLDER_PATH, settings["index_to_node"])
 MAP_PATH = os.path.join(RESULT_FOLDER, settings["tsp_result"])
 RESULT_TEXT = os.path.join(FOLDER_PATH, settings["result_text"])
 
+try:
+	# 下準備
+	query = settings["area"]
+	city = query.split(',')[0].lower()
+
+	n_agent = 300
+	patrol = 10
+	max_label = 20000 #プロットするときの縦軸の上限
+	start_name = "調布駅"
+	goal_name = "電気通信大学正門"
+	# startNode = 0 #ここから始まる
+	# goalNode = 625 #ここから始まる
+	# (nodes_dfのインデックス)
+	ver = "tagfill"
+
+	node_df = get_node_df()
+	spot_info_df = get_spot_df()
+	node_df["tags"] = node_df.apply(lambda row: row["tags"] + row["name"], axis=1)
+	spot_info_df["tags"] = spot_info_df["tags"].apply(str2list_strings)
+	spot_info_df["tags"] = spot_info_df.apply(lambda row: row["tags"] + [row["name"]], axis=1)
+
+	with open(INDEX_NODE, 'r') as f:
+		index_node = ujson.load(f)
+	index_node = {int(key):int(val) for key,val in index_node.items()}
+	index_node_rev = {val:key for key,val in index_node.items()}
+	index_name = {index_node_rev[node]:row['name'] for node,row in node_df.iterrows()}
+	name_node = {spot_name:idx for idx,row in node_df.iterrows() for spot_name in str2list_strings(row['name'])}
+	name_coord = {row['name']:[row['lat'],row['lon']] for _,row in spot_info_df.iterrows()}
+
+	# タグ関連（ここはuserによって異なる）
+	index_tags = {index_node_rev[node]:row['tags'] for node,row in node_df.iterrows()}
+	name_tags = {row['name']:row['tags'] for _,row in spot_info_df.iterrows()}
+
+
+	count_tags = {}
+	for index,row in node_df.iterrows():
+		for category in row['tags']:
+			if category in count_tags.keys():
+				count_tags[category] += 1
+			else:
+				count_tags[category] = 1
+
+	# name_index = {row['name']:index for index,row in node_df.iterrows()}
+	name_index = dict({})
+	for node,row in node_df.iterrows():
+		for name in str2list_strings(row['name']):
+			name_index[name] = index_node_rev[node]
+
+	# raise ZeroDivisionError("ここで止める")
+	#データのインポート
+	# Pickleファイルからデータをロード
+	with open(ROAD_NETWORK, "rb") as f:
+		G = pickle.load(f)
+	#コマンドライン引数を取得
+	args = sys.argv
+	aim_tags = {}
+	# printで確認
+	for i,arg in enumerate(args):
+		print(f"{i}:{arg}")
+	for i in range(1,len(args)-1,2):
+		print(f"{args[i]}->{args[i+1]}")
+		if args[i] not in aim_tags.keys() and int(args[i+1]) > 0:
+			aim_tags[args[i]] = int(args[i+1])
+		elif aim_tags[args[i]] < int(args[i+1]):
+			aim_tags[args[i]] = int(args[i+1])
+	print(f'aim_tags:{aim_tags}')
+except Exception as e:
+	print(f"エラー:{e}")
 
 # ルートの隣り合う同じ値を消す
 def shrink_route(route):
@@ -573,71 +641,6 @@ def tsp_execute(node_df,
 	return info_json_list
 
 if __name__ == "__main__":
-	# 下準備
-	query = settings["area"]
-	city = query.split(',')[0].lower()
-
-	n_agent = 300
-	patrol = 10
-	max_label = 20000 #プロットするときの縦軸の上限
-	start_name = "調布駅"
-	goal_name = "電気通信大学正門"
-	# startNode = 0 #ここから始まる
-	# goalNode = 625 #ここから始まる
-	# (nodes_dfのインデックス)
-	ver = "tagfill"
-
-	node_df = get_node_df()
-	spot_info_df = get_spot_df()
-	node_df["tags"] = node_df.apply(lambda row: row["tags"] + row["name"], axis=1)
-	spot_info_df["tags"] = spot_info_df["tags"].apply(str2list_strings)
-	spot_info_df["tags"] = spot_info_df.apply(lambda row: row["tags"] + [row["name"]], axis=1)
-
-	with open(INDEX_NODE, 'r') as f:
-		index_node = ujson.load(f)
-	index_node = {int(key):int(val) for key,val in index_node.items()}
-	index_node_rev = {val:key for key,val in index_node.items()}
-	index_name = {index_node_rev[node]:row['name'] for node,row in node_df.iterrows()}
-	name_node = {spot_name:idx for idx,row in node_df.iterrows() for spot_name in str2list_strings(row['name'])}
-	name_coord = {row['name']:[row['lat'],row['lon']] for _,row in spot_info_df.iterrows()}
-
-	# タグ関連（ここはuserによって異なる）
-	index_tags = {index_node_rev[node]:row['tags'] for node,row in node_df.iterrows()}
-	name_tags = {row['name']:row['tags'] for _,row in spot_info_df.iterrows()}
-
-
-	count_tags = {}
-	for index,row in node_df.iterrows():
-		for category in row['tags']:
-			if category in count_tags.keys():
-				count_tags[category] += 1
-			else:
-				count_tags[category] = 1
-
-	# name_index = {row['name']:index for index,row in node_df.iterrows()}
-	name_index = dict({})
-	for node,row in node_df.iterrows():
-		for name in str2list_strings(row['name']):
-			name_index[name] = index_node_rev[node]
-
-	# raise ZeroDivisionError("ここで止める")
-	#データのインポート
-	# Pickleファイルからデータをロード
-	with open(ROAD_NETWORK, "rb") as f:
-		G = pickle.load(f)
-	#コマンドライン引数を取得
-	args = sys.argv
-	aim_tags = {}
-	# printで確認
-	for i,arg in enumerate(args):
-		print(f"{i}:{arg}")
-	for i in range(1,len(args)-1,2):
-		print(f"{args[i]}->{args[i+1]}")
-		if args[i] not in aim_tags.keys() and int(args[i+1]) > 0:
-			aim_tags[args[i]] = int(args[i+1])
-		elif aim_tags[args[i]] < int(args[i+1]):
-			aim_tags[args[i]] = int(args[i+1])
-	print(f'aim_tags:{aim_tags}')
 
 	info_json_list = tsp_execute(node_df=node_df,
 							  added_tag_node_df=node_df,
