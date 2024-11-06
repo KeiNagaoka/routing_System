@@ -12,6 +12,7 @@ import networkx as nx
 import numpy as np
 import pickle
 import ujson
+import logging
 from routing.models import Spot, Node, Tag
 from routingSystem.backend.data_management import get_spot_df, get_node_df, get_spots_data
 from routingSystem.backend.core.utils import base_path, get_setting, str2list_strings, get_spot_info_from_csv
@@ -23,6 +24,7 @@ ROAD_NETWORK = os.path.join(base_path,settings["folder_path"],settings["road_net
 with open(ROAD_NETWORK, "rb") as f:
 	G = pickle.load(f)
 
+logging.basicConfig(filename="logfile.log", encoding="utf-8")
 
 def add_spots():
     spot_info = get_spot_info_from_csv()
@@ -47,7 +49,7 @@ def add_spots():
             hp = spot_data["hp"],
         )
         spot.save()
-
+    
 # node_dfのもととなるNodeモデルを作る
 def create_node_df(G=G):
     spot_info_df = get_spot_df()
@@ -87,7 +89,7 @@ def create_node_df(G=G):
         node.save()
 
 def create_tag():
-    _, all_tags = get_spots_data()
+    _, all_tags = get_spots_data(user=None)
     for tag in tqdm(all_tags, total=len(all_tags),desc="TAG:"):
         tag_instance = Tag(
             user = None,
