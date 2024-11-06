@@ -149,7 +149,7 @@ class SearchingView(TemplateView):
                     'start_spot':start_spot,
                     'goal_spot':goal_spot,
                     'aim_tags':str(aim_tags),
-                    'range10':range10,
+                    'via_spots':via_spots,
                     }
         else:
             # 無効なタグが入力された場合
@@ -163,7 +163,7 @@ class SearchingView(TemplateView):
                     'start_spot':start_spot,
                     'goal_spot':goal_spot,
                     'aim_tags':str(aim_tags),
-                    'range10':range10,
+                    'via_spots':via_spots,
                     }
         
         return render(request, 'routesearch.html', data)
