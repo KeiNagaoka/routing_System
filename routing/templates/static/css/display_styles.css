@@ -202,15 +202,7 @@ form {
     z-index: 1000; /* 最前面に表示 */
     max-width: 300px; /* 必要に応じて調整 */
     box-sizing: border-box;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    opacity: 0;
     transform: translateY(-10px);
-}
-
-.tooltip.show {
-    display: block; /* 表示 */
-    opacity: 1;
-    transform: translateY(0);
 }
 
 .tooltip form {
