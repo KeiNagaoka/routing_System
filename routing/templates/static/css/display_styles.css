@@ -82,6 +82,10 @@ form {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.display_container {
+    margin-bottom: 100px; /* 必要に応じて調整 */
+}
+
 /* スポットリストのスタイル */
 .spot-list {
     display: grid;
