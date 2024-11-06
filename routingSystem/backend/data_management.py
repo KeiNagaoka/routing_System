@@ -15,7 +15,7 @@ def get_spot_df(user=None):
     
     # データを辞書形式に変換
     data = {
-        'id': [spot.id for spot in spots],
+        'id': [spot.idx for spot in spots],
         'name': [spot.name for spot in spots],
         'lat': [spot.latitude for spot in spots],
         'lon': [spot.longitude for spot in spots],
@@ -56,7 +56,7 @@ def get_spots_data(user,spot_name=None,tag_name=None):
     spot_info['added_tags'] = [[] for _ in range(len(spot_info))]
     added_tags = AddedTag.objects.filter(user=user)
     for tag in added_tags:
-        spot_info.at[int(tag.spot.id),'added_tags'] += str2list_strings(tag.tag)
+        spot_info.at[int(tag.spot.idx),'added_tags'] += str2list_strings(tag.tag)
 
     # 絞り込み処理
     spot_info["tag_text"] = spot_info.apply(lambda row:', '.join(row["original_tags"] + row["added_tags"]), axis=1)
@@ -138,7 +138,7 @@ def get_routes_data(user):
     route_list = []
     for map in mapdata:
         route = {
-            'id': map.id,
+            'id': map.idx,
             'title': map.name,
             'created_at': map.created_at,
             'start_spot': map.start_spot.name,

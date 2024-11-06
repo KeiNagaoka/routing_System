@@ -55,32 +55,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'name'  # ログイン時、ユーザー名の代わりにaccount_idを使用
+    USERNAME_FIELD = 'name'  # ログイン時、ユーザー名の代わりにaccount_idxを使用
     REQUIRED_FIELDS = []  # スーパーユーザー作成時にemailも設定する
 
     def __str__(self):
         return self.name
 
-# class Tag(models.Model):
-#     name = models.CharField(max_length=100, unique=True)
-
-#     def __str__(self):
-#         return self.name
-
-# スポットデータ
-class Spot(models.Model):
-    id = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデックス
-    name = models.CharField(max_length=256, unique=True)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
-    hp = models.TextField()
-    tags = models.TextField()
-
-    def __str__(self):
-        return self.name
 
 class Node(models.Model):
-    id = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデックス
+    idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデックス
     node = models.BigIntegerField(unique=True)
     name = models.TextField()
     latitude = models.FloatField()
@@ -89,6 +72,18 @@ class Node(models.Model):
 
     def __str__(self):
         return self.node
+
+# スポットデータ
+class Spot(models.Model):
+    idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデックス
+    name = models.CharField(max_length=256, unique=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    hp = models.TextField()
+    tags = models.TextField()
+
+    def __str__(self):
+        return self.name
 
 # ユーザが付与した新しいタグ
 class AddedTag(models.Model):
@@ -101,7 +96,7 @@ class AddedTag(models.Model):
         return f"{self.user.name} added {self.tag} to {self.spot.name} at {self.added_at}"
     
 class Tag(models.Model):
-    id = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデックス
+    idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデックス
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # Userとの関係
     tag = models.TextField()  # Tag
 
@@ -110,7 +105,7 @@ class Tag(models.Model):
 
 # 保存されているマップデータ
 class Mapdata(models.Model):
-    id = models.AutoField(primary_key=True)
+    idx = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Userとの関係
     name = models.CharField(max_length=64)
     distance = models.BigIntegerField()
