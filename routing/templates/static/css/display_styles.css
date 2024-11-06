@@ -192,36 +192,61 @@ form {
 }
 
 .tooltip {
-    display: none; /* 初期状態で非表示 */
+    display: none; /* 初期状態では非表示 */
     position: absolute;
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-    font-size: 12px;
-    z-index: 999;
-    max-width: 200px;
-    /* 吹き出しの位置調整 */
-    bottom: 100%; /* ボタンの上に表示 */
-    left: 50%;
-    transform: translateX(-50%); /* 中央に配置 */
-    margin-bottom: 10px; /* ボタンとのスペース */
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    z-index: 1000; /* 最前面に表示 */
+    max-width: 300px; /* 必要に応じて調整 */
+    box-sizing: border-box;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
 }
 
-.tooltip-content {
-    white-space: nowrap; /* テキストの折り返しを防ぐ */
-}
-
-.spot-card {
-    position: relative; /* 吹き出しの位置を調整するために相対位置を指定 */
-    margin-bottom: 20px; /* スポットカード間のスペース */
+.tooltip.show {
+    display: block; /* 表示 */
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .tooltip form {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* フォーム要素間のスペース */
+}
+
+.tooltip label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.tooltip select {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.tooltip button {
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.tooltip button:hover {
+    background-color: #0056b3;
+}
+
+.spot-card {
+    position: relative; /* 吹き出しの位置を調整するために相対位置を指定 */
+    margin-bottom: 20px; /* スポットカード間のスペース */
 }
 
 /* display_styles.css */
