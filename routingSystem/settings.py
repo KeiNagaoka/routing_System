@@ -79,22 +79,22 @@ WSGI_APPLICATION = 'routingSystem.wsgi.application'
 
 if not DEBUG:
     DATABASES = {
-        # 'default': {
-        #     'ENGINE': 'django.db.backends.postgresql',
-        #     'NAME': 'd7tfalknau26bs',
-        #     'HOST': 'c3gtj1dt5vh48j.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com',
-        #     'PORT': '5432',
-        #     'USER': 'u4o7pkl1h99de4',
-        #     'PASSWORD': 'pff3889a9046d2fe7383874d14182d7cd2a8e1fceaa324ea0f3c5338b901c4634',
-        # }
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'routedb',
-            'HOST': '127.0.0.1',
+            'NAME': 'd7tfalknau26bs',
+            'HOST': 'c3gtj1dt5vh48j.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com',
             'PORT': '5432',
-            'USER': 'kei',
-            'PASSWORD': 'sunshine0809',
+            'USER': 'u4o7pkl1h99de4',
+            'PASSWORD': 'pff3889a9046d2fe7383874d14182d7cd2a8e1fceaa324ea0f3c5338b901c4634',
         }
+        # 'default': {
+        #     'ENGINE': 'django.db.backends.postgresql',
+        #     'NAME': 'routedb',
+        #     'HOST': '127.0.0.1',
+        #     'PORT': '5432',
+        #     'USER': 'kei',
+        #     'PASSWORD': 'sunshine0809',
+        # }
     }
 else:
     DATABASES = {
