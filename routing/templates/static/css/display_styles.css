@@ -203,7 +203,7 @@ form {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 1rem;
-    z-index: 1000; /* 最前面に表示 */
+    z-index: 999; /* 最前面に表示 */
     max-width: 300px; /* 必要に応じて調整 */
     box-sizing: border-box;
     transform: translateY(-10px);
