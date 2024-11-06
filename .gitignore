@@ -7,3 +7,4 @@ routingSystem/backend/core/__pycache__/
 routing/templates/static/
 routing/templates/staticfiles/
 app.log
+db.sqlite3

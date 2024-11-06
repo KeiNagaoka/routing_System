@@ -24,11 +24,11 @@ admin.site.unregister(Group)
 
 @admin.register(Spot)
 class SpotAdmin(admin.ModelAdmin):
-    list_display = ('idx', 'name', 'latitude', 'longitude', 'hp', 'tags')  # 存在するフィールドを指定
+    list_display = ('id', 'name', 'latitude', 'longitude', 'hp', 'tags')  # 存在するフィールドを指定
     
 @admin.register(Node)
 class NodeAdmin(admin.ModelAdmin):
-    list_display = ('idx', 'node', 'name', 'latitude', 'longitude', 'tags')  # 存在するフィールドを指定
+    list_display = ('id', 'node', 'name', 'latitude', 'longitude', 'tags')  # 存在するフィールドを指定
 
 @admin.register(AddedTag)
 class AddedTagAdmin(admin.ModelAdmin):
