@@ -88,9 +88,6 @@ try:
 
 	# raise ZeroDivisionError("ここで止める")
 	# データのインポート
-	# Pickleファイルからデータをロード
-	with open(ROAD_NETWORK, "rb") as f:
-		G = pickle.load(f)
 	# コマンドライン引数を取得
 	args = sys.argv
 	aim_tags = {}
@@ -252,7 +249,7 @@ class TSP:
 	def proposed_cities(self,now_order):
 		candidate_tags = []
 		if not (self.aim_tags.keys() <= self.now_tags.keys()):
-			raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags:{self.now_tags.keys()}に含まれないよ！")
+			raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags{self.now_tags.keys()}に含まれないよ！")
 		for key_aim,val_aim in self.aim_tags.items():
 			if self.now_tags[key_aim] < val_aim:
 				candidate_tags.append(key_aim)
@@ -427,7 +424,6 @@ def necessary_spots(order_name,
 
 #実行部分
 def tsp_execute(node_df,
-				added_tag_node_df,
 				spot_info_df,
 				start_name,
 				goal_name,
@@ -446,6 +442,15 @@ def tsp_execute(node_df,
 	index_tags = {index_node_rev[node]:row['tags'] for node,row in node_df.iterrows()}
 	name_tags = {row['name']:row['tags'] for _,row in spot_info_df.iterrows()}
 
+	# 入力できるタグの最大値をカウント
+	count_tags = {}
+	for _,row in node_df.iterrows():
+		for tag in row['tags']:
+			if tag in count_tags.keys():
+				count_tags[tag] += 1
+			else:
+				count_tags[tag] = 1
+
 	# 通過済みエッジ
 	passed_edges = []
 	output_orders = [] # 出力した経路
@@ -457,6 +462,17 @@ def tsp_execute(node_df,
 		iter_num = 1
 	else:
 		iter_num = 5
+	# Pickleファイルからデータをロード
+	with open(ROAD_NETWORK, "rb") as f:
+		G = pickle.load(f)
+
+	# added_tagsを道路ネットワークデータに追加
+	symbol_list = []
+	node_df_filtered = node_df[node_df['added_tags'].apply(lambda L: len(L) > 0)]
+	for _,row in node_df_filtered.iterrows():
+		symbol_list.append(ox.nearest_nodes(G,row['lon'],row['lat']))
+		G.nodes[symbol_list[-1]]['tags'] += row['tags'] #タグ追加
+	symbol_list = list(set(symbol_list))
 
 	for route_index in range(iter_num):
 		print(f"route_index:{route_index+1}回目の経路探索")
@@ -490,7 +506,7 @@ def tsp_execute(node_df,
 		elif len(order) == 0:
 			break
 
-		passed_edges = passed_edges + [(order[i],order[i+1]) for i in range(len(order)-1)] + [(order[i+1],order[i]) for i in range(len(order)-1)]
+		passed_edges += [(order[i],order[i+1]) for i in range(len(order)-1)] + [(order[i+1],order[i]) for i in range(len(order)-1)]
 
 		# 結果を保存
 		timelist.append(time.time())
@@ -507,7 +523,6 @@ def tsp_execute(node_df,
 		
 		# 出力したスポットと経路を保存
 		passed_spot_names = passed_spot_names + spots
-		print("デバッグ")
 		print(f"order:{order}")
 		print(f"output_orders:{output_orders}")
 		if not is_passed_order(order,output_orders):
@@ -515,23 +530,23 @@ def tsp_execute(node_df,
 		else:
 			continue
 
-		symbol_list = []
-		for _,row in added_tag_node_df.iterrows():
-			symbol_list.append(ox.nearest_nodes(G,row['lon'],row['lat']))
-			G.nodes[symbol_list[-1]]['tags'] += row['tags'] #タグ追加
-		symbol_list = list(set(symbol_list))
+		timelist.append(time.time())
+		print(f"nearest_nodes:{timelist[-1]-timelist[-2]}秒")
 
 		order = shrink_route([index_node[i] for i in tsp.result])
 		order = [name_node[spot_name] for spot_name in spots]
+		timelist.append(time.time())
+		print(f"ルート抽出:{timelist[-1]-timelist[-2]}秒")
 
 		#ルート
 		pre_route_tsp = [ox.shortest_path(G,s1,s2,weight='length', cpus=1) for s1,s2 in zip(order[:-1],order[1:])]
-		#出力された順番をもとにからノードを辿る
+		# 出力された順番をもとにからノードを辿る
 		route_tsp = shrink_route(list(itertools.chain.from_iterable(pre_route_tsp))) #平坦化
 		edges_tsp = [(route_tsp[i],route_tsp[i+1],0) for i in range(len(route_tsp)-1)]
 		passed_symbols = [spot for spot in order if spot in route_tsp]
 
 		timelist.append(time.time())
+		print(f"最短:{timelist[-1]-timelist[-2]}秒")
 
 		# 可視化
 		# Folium マップを作成し、縮尺（ズーム レベル）を設定
@@ -554,8 +569,6 @@ def tsp_execute(node_df,
 		for _, row in gdf_edges.iterrows():
 			folium.PolyLine(locations=row['geometry'].coords, weight=5, color='red').add_to(map)  # weightを設定
 
-		timelist.append(time.time())
-		print(f"ジオメトリ情報を地図に追加:{timelist[-1]-timelist[-2]}秒")
 		# マーカーを追加
 		j = 0
 		for i, symbol in enumerate(passed_symbols):
@@ -574,7 +587,7 @@ def tsp_execute(node_df,
 		map.zoom_start = 15
 
 		timelist.append(time.time())
-		print(f"マーカーを追加・縮尺ズーム:{timelist[-1]-timelist[-2]}秒")
+		print(f"地図編集:{timelist[-1]-timelist[-2]}秒")
 
 		# 保存
 		map_html_str = map._repr_html_()
@@ -642,8 +655,8 @@ def tsp_execute(node_df,
 
 if __name__ == "__main__":
 
-	info_json_list = tsp_execute(node_df=node_df,
-							  added_tag_node_df=node_df,
+	info_json_list = tsp_execute(
+							  node_df=node_df,
 							  spot_info_df=spot_info_df,
 							  index_name=index_name,
 							  index_tags=index_tags,

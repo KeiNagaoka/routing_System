@@ -1,7 +1,8 @@
+
+
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import custom_404_view, custom_500_view
 
 from . import views
 
@@ -11,7 +12,7 @@ urlpatterns = [
     path("", views.IndexView.as_view(), name="index"),
     path('signup/', views.SignupView.as_view(), name="signup"), # アカウント登録
     path('login/', views.LoginView.as_view(), name="login"), # ログイン
-    path('logout/', views.LogoutView.as_view(), name="logout"), # ログアウト
+    path('logout/', views.CustomLogoutView.as_view(), name="logout"), # ログアウト
     path('routesearch/', views.SearchingView.as_view(), name="routesearch"), # 経路探索
     path('save_route/', views.SaveRouteView.as_view(), name="save_route"), # 経路保存処理
     path('add_user_tag/', views.AddTagView.as_view(), name="add_user_tag"), # タグ登録
@@ -30,5 +31,5 @@ urlpatterns = [
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # 404エラーのカスタムページを設定
-handler404 = custom_404_view
-handler500 = custom_500_view
+handler404 = views.custom_404_view
+handler500 = views.custom_500_view

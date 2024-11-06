@@ -14,7 +14,6 @@ import os
 import sys
 sys.path.append('..')
 import json
-import shutil
 import logging
 from routingSystem.backend.data_management import get_spots_data, get_routes_data, filter_tag_added_spot, get_node_df, get_spot_df
 from routingSystem.backend.core.utils import str2list_strings, get_spot_info_from_csv, organize_aim_tags, get_setting, valid_search
@@ -72,6 +71,12 @@ class LoginView(BaseLoginView):
 class LogoutView(BaseLogoutView):
     success_url = reverse_lazy("accounts:index")
 
+from django.contrib.auth import logout
+class CustomLogoutView(View):
+    success_url = reverse_lazy("accounts:index")
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect('accounts:index')  # ログアウト後にリダイレクトするURLを指定
 
 class SearchingView(TemplateView):
     template_name = "routesearch.html"
@@ -86,17 +91,16 @@ class SearchingView(TemplateView):
                       "name":""}
                       for i in range(1,11)]
 
-        range10 = list(range(1,11))
         data = {'routes':routes,
                 'start_spot':start_spot,
                 'goal_spot':goal_spot,
                 'via_spots':via_spots,
+                'text':text,
                 }
         return render(request, 'routesearch.html', data)
 
     def post(self, request):
         text = ""
-        print(f"request.POST:{request.POST}")
         start_spot = request.POST.get('start_spot')
         goal_spot = request.POST.get('goal_spot')
         user = request.user
@@ -111,8 +115,7 @@ class SearchingView(TemplateView):
         node_df = get_node_df(user=user)
         spot_info_df = get_spot_df(user=user)
         _, all_tags = get_spots_data(user)
-        print(f"node_df:{node_df.columns}")
-        added_tag_node_df = node_df[node_df['added_tags'].apply(lambda L: len(L)>0)]
+
 
         # 目的地のタグの処理
         all_tags += spot_info_df['name'].tolist()
@@ -122,7 +125,6 @@ class SearchingView(TemplateView):
             print(f"aim_tags:{aim_tags}")
 
             route_list = tsp_execute(node_df=node_df,
-                                    added_tag_node_df=added_tag_node_df,
                                     spot_info_df=spot_info_df,
                                     start_name=start_spot,
                                     goal_name=goal_spot,
@@ -134,7 +136,7 @@ class SearchingView(TemplateView):
                     'text':text,
                     'start_spot':start_spot,
                     'goal_spot':goal_spot,
-                    'ainm_tags':str(aim_tags),
+                    'aim_tags':str(aim_tags),
                     'via_spots':via_spots,
                     }
         # start goal via全て同じスポットが指定された場合
@@ -146,7 +148,7 @@ class SearchingView(TemplateView):
                     'text':text,
                     'start_spot':start_spot,
                     'goal_spot':goal_spot,
-                    'ainm_tags':str(aim_tags),
+                    'aim_tags':str(aim_tags),
                     'range10':range10,
                     }
         else:
@@ -160,7 +162,7 @@ class SearchingView(TemplateView):
                     'text':text,
                     'start_spot':start_spot,
                     'goal_spot':goal_spot,
-                    'ainm_tags':str(aim_tags),
+                    'aim_tags':str(aim_tags),
                     'range10':range10,
                     }
         
@@ -289,8 +291,7 @@ class DeleteTagView(TemplateView):
 
         try:
             spot = Spot.objects.get(name=spot)
-            added_tag = AddedTag.objects.get(user=user, tag=tag, spot=spot)
-            added_tag.delete()
+            AddedTag.objects.filter(user=user, tag=tag, spot=spot).delete()
             message = f"タグ 「{tag}」 がスポット 「{spot.name}」 から削除されました。"
         except Spot.DoesNotExist:
             message = "指定されたスポットが見つかりませんでした。"
@@ -302,7 +303,15 @@ class DeleteTagView(TemplateView):
         spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
         spots = [data["name"] for data in spots_data if data["name"] != spot]
         spot_addedtag = {data["name"]:data["added_tags"] for data in spots_data}
-        first_spot_tags = spot_addedtag[spots[0]]
+        if len(spots) > 0:
+            first_spot_tags = spot_addedtag[spots[0]]
+            data = {"text":message,
+                    'spots':spots,
+                    'spot_tags':first_spot_tags}
+        else:
+            spots = []
+            first_spot_tags = []
+            message = "まだタグを追加していません。「スポット情報」よりタグを追加することができます。"
 
         data = {"text":message,
                 'spots':spots,
@@ -400,7 +409,14 @@ class UpdateTagView(View):
                 user = request.user  # ログインユーザーを取得
                 spot_tags = str2list_strings(spot.tags)
 
+                # AddedTagを取得
+                added_tags = AddedTag.objects.filter(user=user, spot=spot)
+                spot_tags += [tag.tag for tag in added_tags]
+    
+
                 # タグがスポットに既に存在するか確認し、存在しない場合のみ追加
+                print(f"tag:{tag}")
+                print(f"spot_tags:{spot_tags}")
                 if tag not in spot_tags:
                     # AddedTagに記録を追加
                     AddedTag.objects.create(user=user, tag=tag, spot=spot)

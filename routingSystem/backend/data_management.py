@@ -3,7 +3,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import pandas as pd
 import numpy as np
-from core.utils import get_setting, get_spot_info_from_csv, str2list_strings
+from core.utils import get_setting, str2list_strings
 from routing.models import AddedTag, Spot, Node, Tag, Mapdata
 
 settings = get_setting()
@@ -34,13 +34,13 @@ def get_spot_df(user=None):
         added_tags = AddedTag.objects.filter(user=user)
         for tag in added_tags:
             tag_name = tag.tag
-            tag_spot = tag.spot
+            tag_spot = tag.spot.name
             # tag_spotを含む行を抽出
             filtered_rows = df[df['name']==tag_spot]
             # 各行の"tags"列にtag_nameを追加
             for idx in filtered_rows.index:
-                df.at[idx, 'tags'] = df.at[idx, 'tags'] + [tag_name]
-                df.at[idx, 'added_tags'] = df.at[idx, 'added_tags'] + [tag_name]
+                df.at[idx, 'tags'].append(tag_name)
+                df.at[idx, 'added_tags'].append(tag_name)
 
     df["tags"] = df["tags"].apply(lambda L:list(set(L)))
 
@@ -79,8 +79,8 @@ def get_spots_data(user,spot_name=None,tag_name=None):
     cleaned_list = [x for x in all_tags_nested if isinstance(x, list)]
     flattened_tags = [tag for sublist in cleaned_list for tag in sublist]
     user_added_tags = [tag.tag for tag in Tag.objects.filter(user=user)]
-    all_tags = sorted(list(set(flattened_tags)) + user_added_tags)
-    all_tags = [tag for tag in all_tags if tag!=""]
+    all_tags = list(set(flattened_tags)) + user_added_tags
+    all_tags = sorted(list({tag for tag in all_tags if tag!=""}))
 
     return spots_data, all_tags
 
@@ -102,21 +102,21 @@ def get_node_df(user=None):
     df["name"] = df["name"].apply(str2list_strings)
     df["tags"] = df["tags"].apply(str2list_strings)
     df['tags'] = df.apply(lambda row: row['tags'] + row['name'], axis=1)
-    df["added_tags"] = [[] for L in range(len(df))]
+    df["added_tags"] = [[] for _ in range(len(df))]
     
     if user:
         added_tags = AddedTag.objects.filter(user=user)
         for tag in added_tags:
             tag_name = tag.tag
-            tag_spot = tag.spot
-            # tag_spotを含む行を抽出
-            filtered_rows = df[df['name'].apply(lambda x: tag_spot in x)]
+            tag_spot = tag.spot.name
+            filtered_rows = df[df['name'].apply(lambda L: tag_spot in L)]
             # 各行の"tags"列にtag_nameを追加
             for idx in filtered_rows.index:
-                df.at[idx, 'tgas'] = df.at[idx, 'tags'] + [tag_name]
-                df.at[idx, 'added_tags'] = df.at[idx, 'added_tags'] + [tag_name]
+                df.at[idx, 'tags'].append(tag_name)
+                df.at[idx, 'added_tags'].append(tag_name)
                 
-    df["tags"] = df["tags"].apply(lambda L:list(set(L)))
+        df["tags"] = df["tags"].apply(lambda L:list(set(L)))
+        df["added_tags"] = df["added_tags"].apply(lambda L:list(set(L)))
     # インデックス指定
     df.set_index('node', inplace=True)
 

@@ -70,7 +70,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 # スポットデータ
 class Spot(models.Model):
     idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデックス
-    name = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=256, unique=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
     hp = models.TextField()
@@ -82,7 +82,7 @@ class Spot(models.Model):
 # スポットデータ
 class Node(models.Model):
     idx = models.AutoField(primary_key=True)  # 自動インクリメントの整数型インデックス
-    node = models.IntegerField(unique=True)
+    node = models.BigIntegerField(unique=True)
     name = models.TextField()
     latitude = models.FloatField()
     longitude = models.FloatField()
@@ -114,8 +114,8 @@ class Mapdata(models.Model):
     idx = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Userとの関係
     name = models.CharField(max_length=64)
-    distance = models.IntegerField()
-    time = models.IntegerField()
+    distance = models.BigIntegerField()
+    time = models.BigIntegerField()
     start_spot = models.ForeignKey(Spot, on_delete=models.CASCADE, related_name='start_spot')  # Spotとの関係
     goal_spot = models.ForeignKey(Spot, on_delete=models.CASCADE, related_name='goal_spot')  # Spotとの関係
     via_spots = models.ManyToManyField(Spot, related_name='via_spots')  # Spotと

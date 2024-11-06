@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'routing',
-    'routingSystem',
+    # 'routingSystem',
     'whitenoise.runserver_nostatic',
 ]
 
@@ -79,9 +79,6 @@ WSGI_APPLICATION = 'routingSystem.wsgi.application'
 
 if not DEBUG:
     DATABASES = {
-        # 'default': dj_database_url.config(
-        #     default=os.environ.get('DATABASE_URL')
-        # )
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'd7tfalknau26bs',
@@ -90,6 +87,14 @@ if not DEBUG:
             'USER': 'u4o7pkl1h99de4',
             'PASSWORD': 'pff3889a9046d2fe7383874d14182d7cd2a8e1fceaa324ea0f3c5338b901c4634',
         }
+        # 'default': {
+        #     'ENGINE': 'django.db.backends.postgresql',
+        #     'NAME': 'routedb',
+        #     'HOST': '127.0.0.1',
+        #     'PORT': '5432',
+        #     'USER': 'kei',
+        #     'PASSWORD': '******',
+        # }
     }
 else:
     DATABASES = {
@@ -153,6 +158,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'app.log',
+            'encoding': 'utf-8',
         },
     },
     'loggers': {
