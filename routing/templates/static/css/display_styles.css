@@ -100,7 +100,7 @@ form {
     transition: transform 0.2s, box-shadow 0.2s;
     margin: 0 auto; /* 中央揃え */
     max-width: 100%; /* 最大幅を100%に設定 */
-    overflow: hidden; /* はみ出しを防ぐ */
+    overflow: visible; /* カードの外側に影を表示 */
 }
 
 .spot-header {
