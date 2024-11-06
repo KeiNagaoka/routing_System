@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // クリックされたボタンに対応する吹き出しを表示する
             const spotId = this.getAttribute('data-spot-id');
             const tooltip = document.getElementById(`tooltip-${spotId}`);
+            console.log(`spotId-${spotId}`);
+            console.log(`tooltip-${tooltip}`);
             if (tooltip) {
                 tooltip.style.display = 'block';
             }

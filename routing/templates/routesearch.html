@@ -76,7 +76,7 @@
                     </ol>
                 </p>
                 <p>到着: {{ goal_spot }}</p>    <!-- 到着地点 -->
-                <form method="POST" class="save-route-form" id="save-route-form" action="/save_route/">
+                <form method="POST" class="save-route-form" id="save-route-form" action="{% url 'accounts:save_route' %}">
                     {% csrf_token %}
                     <input type="hidden" name="route_name" value="{{ route.name }}">
                     <input type="hidden" name="route_distance" value="{{ route.distance }}">
