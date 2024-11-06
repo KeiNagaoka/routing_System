@@ -1,10 +1,12 @@
 // display_scripts.js
 document.addEventListener('DOMContentLoaded', function () {
+    console.log('display_scripts.js loaded');
     const showTooltipButtons = document.querySelectorAll('.show-tooltip-btn');
     const tooltips = document.querySelectorAll('.tooltip');
 
     showTooltipButtons.forEach(button => {
         button.addEventListener('click', function (event) {
+            console.log('show-tooltip-btn clicked');
             event.stopPropagation(); // ボタンクリック時に親要素へのイベント伝播を防ぐ
 
             // 全ての吹き出しを非表示にする
