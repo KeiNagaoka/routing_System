@@ -99,3 +99,46 @@
 .route-details p span:last-child {
     flex-grow: 1; /* 値の部分が左詰めで広がる */
 }
+
+.rounded-box-in {
+    width: 100%; /* 幅を100%に設定して親要素に合わせる */
+    height: auto;
+    background: linear-gradient(0deg, #e3e7b2 50%, #e3e7b2);
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px; /* 余裕を持たせるためのパディング */
+    box-sizing: border-box; /* パディングを含めたボックスサイズ */
+}
+
+.admin-message-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #4169e1;
+    margin-top: 10px;
+    padding: 10px; /* 余裕を持たせるためのパディング */
+    box-sizing: border-box; /* パディングを含めたボックスサイズ */
+    word-wrap: break-word; /* 必要に応じて単語を折り返す */
+}
+
+.admin-message-content {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px; /* 余裕を持たせるためのパディング */
+    box-sizing: border-box; /* パディングを含めたボックスサイズ */
+}
+
+@media (min-width: 768px) {
+    .btn-group {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    .btn-group .btn {
+        flex: 1;
+        margin: 0 10px;
+    }
+}
