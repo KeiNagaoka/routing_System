@@ -85,21 +85,30 @@ form {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.display_container {
+.display-container {
     margin-bottom: 100px; /* 必要に応じて調整 */
+    justify-content: center;
+    align-items: center;
+    margin-left: 0%;
+    margin-right:0%;
 }
 
 /* スポットリストのスタイル */
 .spot-list {
     display: grid;
+    margin-bottom: 10px;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
+    padding: 0 1rem; /* 親要素のパディングを追加 */
+    box-sizing: border-box; /* パディングを含めて幅を計算 */
+    overflow: hidden; /* 親要素からはみ出さないようにする */
 }
 
 /* 各スポットのカードスタイル */
 .spot-card {
     background-color: white;
     border-radius: 8px;
+    margin-bottom: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 1rem;
     width: 100%; /* 横幅を最大化 */
@@ -107,7 +116,7 @@ form {
     transition: transform 0.2s, box-shadow 0.2s;
     margin: 0 auto; /* 中央揃え */
     max-width: 100%; /* 最大幅を100%に設定 */
-    overflow: visible; /* カードの外側に影を表示 */
+    overflow: hidden; /* カードの外側に影を表示 */
 }
 
 .spot-header {
@@ -243,11 +252,6 @@ form {
     background-color: #0056b3;
 }
 
-.spot-card {
-    position: relative; /* 吹き出しの位置を調整するために相対位置を指定 */
-    margin-bottom: 20px; /* スポットカード間のスペース */
-}
-
 /* display_styles.css */
 .mypage {
     display: flex;
@@ -301,5 +305,15 @@ form {
     button {
         font-size: 14px;
         padding: 10px;
+    }
+    
+    /* スポットリストのスタイル */
+    .spot-list {
+        display: grid;
+        margin-bottom: 20px;
+        gap: 1.5rem;
+        padding: 0 1rem; /* 親要素のパディングを追加 */
+        box-sizing: border-box; /* パディングを含めて幅を計算 */
+        overflow: hidden; /* 親要素からはみ出さないようにする */
     }
 }
