@@ -4,7 +4,8 @@ routing/__pycache__/
 routingSystem/__pycache__/
 routingSystem/backend/__pycache__/
 routingSystem/backend/core/__pycache__/
-routing/templates/static/
+# routing/templates/static/
+routing/templates/static/map/
 routing/templates/staticfiles/
 app.log
 db.sqlite3
