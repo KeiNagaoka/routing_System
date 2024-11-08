@@ -299,7 +299,7 @@ class DeleteTagView(TemplateView):
             message = "指定されたタグが見つかりませんでした。"
 
         # spots_dataを取得
-        spots_data, all_tags = get_spots_data(user)
+        spots_data, _ = get_spots_data(user)
         spots_data = filter_tag_added_spot(spots_data) # spots_dataをタグが追加されたものに限定
         spots = [data["name"] for data in spots_data if data["name"] != spot]
         spot_addedtag = {data["name"]:data["added_tags"] for data in spots_data}
@@ -318,6 +318,13 @@ class DeleteTagView(TemplateView):
                 'spot_tags':first_spot_tags}
 
         return render(request, "deletetag.html", data)
+    
+class InstructionView(View):
+    template_name = "instruction.html"
+    login_url = 'accounts:index'  # ログインページのURLを指定
+
+    def get(self, request):
+        return render(request, 'instruction.html')
     
 class GetSpotTagView(View):
     def get(self, request, *args, **kwargs):

@@ -12,7 +12,9 @@
 {% block content %}
 <form method="post">
     {% csrf_token %}
+    <p class="error">
     {{ form.non_field_errors }}
+    </p>
     
     {% for field in form %}
         <div class="form-group">
@@ -20,7 +22,10 @@
                 {{ field.label }}
             </label>
             {{ field }}
+            <br>
+            <p class="error">
             {{ field.errors }}
+            </p>
         </div>
     {% endfor %}
 

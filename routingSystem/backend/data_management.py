@@ -57,6 +57,14 @@ def get_spots_data(user,spot_name=None,tag_name=None):
     added_tags = AddedTag.objects.filter(user=user)
     for tag in added_tags:
         spot_info.at[int(tag.spot.idx),'added_tags'] += str2list_strings(tag.tag)
+        
+    # タグの情報
+    all_tags_nested = spot_info["original_tags"].tolist() + spot_info["added_tags"].tolist()
+    cleaned_list = [x for x in all_tags_nested if isinstance(x, list)]
+    flattened_tags = [tag for sublist in cleaned_list for tag in sublist]
+    user_added_tags = [tag.tag for tag in Tag.objects.filter(user=user)]
+    all_tags = list(set(flattened_tags)) + user_added_tags
+    all_tags = sorted(list({tag for tag in all_tags if tag!=""}))
 
     # 絞り込み処理
     spot_info["tag_text"] = spot_info.apply(lambda row:', '.join(row["original_tags"] + row["added_tags"]), axis=1)
@@ -73,14 +81,6 @@ def get_spots_data(user,spot_name=None,tag_name=None):
          }
         for idx, row in spot_info.iterrows()
     ]
-    
-    # タグの情報
-    all_tags_nested = spot_info["original_tags"].tolist() + spot_info["added_tags"].tolist()
-    cleaned_list = [x for x in all_tags_nested if isinstance(x, list)]
-    flattened_tags = [tag for sublist in cleaned_list for tag in sublist]
-    user_added_tags = [tag.tag for tag in Tag.objects.filter(user=user)]
-    all_tags = list(set(flattened_tags)) + user_added_tags
-    all_tags = sorted(list({tag for tag in all_tags if tag!=""}))
 
     return spots_data, all_tags
 

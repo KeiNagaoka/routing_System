@@ -38,7 +38,8 @@ INDEX_NODE = os.path.join(FOLDER_PATH, settings["index_to_node"])
 MAP_PATH = os.path.join(RESULT_FOLDER, settings["tsp_result"])
 RESULT_TEXT = os.path.join(FOLDER_PATH, settings["result_text"])
 
-try:
+# try:
+if True:
 	# 下準備
 	query = settings["area"]
 	city = query.split(',')[0].lower()
@@ -101,8 +102,8 @@ try:
 		elif aim_tags[args[i]] < int(args[i+1]):
 			aim_tags[args[i]] = int(args[i+1])
 	print(f'aim_tags:{aim_tags}')
-except Exception as e:
-	print(f"エラー:{e}")
+# except Exception as e:
+# 	print(f"エラー:{e}")
 
 # ルートの隣り合う同じ値を消す
 def shrink_route(route):

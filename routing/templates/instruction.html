@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block header %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/instruction_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<div class="top-container">
+    <div class="h1">システムの使い方</div>
+    <div class="detail_script">このページでは、 巡回経路探索システム「まわるくん」の使い方を解説しています。</div>
+</div>
+
+<div class="center-container">
+    <div class="feature">
+        <h2 class="feature-title">サイドバー</h2>
+        {% load static %}
+        <img src="{% static 'img/sidebar.png' %}" alt="サイドバー" class="feature-image">
+        <p class="feature-description">
+            ≡ボタンをクリックすると、サイドバーが表示されます。<br>
+            ここから、各ページに遷移して、経路検索、タグの編集、保存した経路の閲覧などが可能です。
+        </p>
+    </div>
+    
+    <div class="feature">
+        <h2 class="feature-title">経路検索</h2>
+        <p class="feature-description">
+            自分の目的に合った巡回経路を検索することができます。<br>
+            出発地点、到着地点としてスポットを入力してください。<br>
+            そして、経由地点を<font color="red">スポット</font>/<font color="red">タグ</font>から選択し、探索ボタンを押すと、経路が検索されます。
+        </p>
+        <img src="{% static 'img/joken.png' %}" alt="検索条件" class="feature-image">
+        <p class="feature-description">
+            <font color="red">タグ</font>は、スポットに付与することができるラベルです。<br>
+            経由地点に指定すると、そのタグを持つスポットが含まれる経路が検索されます。
+        </p>
+        <img src="{% static 'img/keiro1.png' %}" alt="経路1" class="feature-image">
+        <br>
+        <img src="{% static 'img/keiro2.png' %}" alt="経路2" class="feature-image">
+        <p class="feature-description">
+            入力条件を満たす、５つの経路が表示されます。<br>
+            経路を保存して後から確認することも可能です。
+        </p>
+        <p class="feature-description">
+            なお、対象地域を調布市としているため、登録されているスポットは調布市内のスポットのみとなります。
+        </p>
+    </div>
+    
+    <div class="feature">
+        <h2 class="feature-title">タグの登録/追加/削除方法</h2>
+        <img src="{% static 'img/toroku.png' %}" alt="タグの登録" class="feature-image">
+        <p class="feature-description">
+            まず、「タグの登録」画面で、新しいタグを入力して登録します。<br>
+        </p>
+        <img src="{% static 'img/addtag1.png' %}" alt="タグの追加1" class="feature-image">
+        <p class="feature-description">
+            次に、「スポット情報」画面で、登録したいスポットを検索します。<br>
+        </p>
+        <img src="{% static 'img/addtag2.png' %}" alt="タグの追加2" class="feature-image">
+        <p class="feature-description">
+            そして、+ボタンより、タグを追加します。<br>
+        </p>
+        <img src="{% static 'img/sakujo.png' %}" alt="タグの削除" class="feature-image">
+        <p class="feature-description">
+            「タグの削除」画面で、登録したスポットのタグを選択して削除することもできます。<br>
+        </p>
+    </div>
+    
+    <div class="feature">
+        <h2 class="feature-title">マイページ</h2>
+        <img src="{% static 'img/mypage.png' %}" alt="マイページ" class="feature-image">
+        <p class="feature-description">
+            マイページでは、保存した巡回経路の情報を閲覧したり、これまでにタグを追加したスポットの一覧を見たりすることができます。
+        </p>
+        <img src="{% static 'img/route_disp.png' %}" alt="経路表示" class="feature-image">
+        <p class="feature-description">
+            「保存した巡回経路一覧」の、「詳細を表示」ボタンをクリックすると、保存した巡回経路の情報と地図を閲覧することができます。<br>
+            「時間」は、分速80mで歩いた場合の所要時間を表しています。
+        </p>
+    </div>
+    
+    <div class="feature">
+        <h2 class="feature-title">ログアウト</h2>
+        <p class="feature-description">
+            システムからログアウトします。<br>
+            ログアウトする前に、<font color="red"><a href="https://forms.gle/DkbLBiLaY9sqCs9PA" target="_blank">アンケート</a></font>のご協力をぜひよろしくお願いいたします。
+        </p>
+    </div>
+</div>
+
+
+    
+{% else %}
+<div class="for_login">
+    <div class="h2">
+        アカウントを登録してください。アカウントをお持ちの方は、ログインしてください。
+    </div>
+
+    <div class="btn-group">
+        <a href="{% url 'accounts:signup' %}" class="btn btn-primary">アカウント登録</a>
+        <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+    </div>
+</div>
+{% endif %}
+
+
+{% endblock %}

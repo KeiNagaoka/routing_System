@@ -268,7 +268,10 @@ input[type="submit"]:active {
     margin: 2rem; /* Optional: Add margin around the element */
 }
 
-
+.errorlist {
+    color:red;
+    font-weight: bold;
+}
 
 /* スマートフォンなど小さいデバイス用のスタイル */
 @media (max-width: 600px) {
@@ -281,8 +284,9 @@ input[type="submit"]:active {
     }
 
     .btn {
-        width: 100%; /* ボタンを幅いっぱいに */
+        width: 90%; /* ボタンを幅いっぱいに */
         padding: 12px 0;
+        font-size: 12px;
     }
 
     

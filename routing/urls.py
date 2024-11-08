@@ -14,6 +14,7 @@ urlpatterns = [
     path('login/', views.LoginView.as_view(), name="login"), # ログイン
     path('logout/', views.CustomLogoutView.as_view(), name="logout"), # ログアウト
     path('routesearch/', views.SearchingView.as_view(), name="routesearch"), # 経路探索
+    path('instruction/', views.InstructionView.as_view(), name="instruction"), # 経路探索
     path('save_route/', views.SaveRouteView.as_view(), name="save_route"), # 経路保存処理
     path('add_user_tag/', views.AddTagView.as_view(), name="add_user_tag"), # タグ登録
     path('delete_user_tag/', views.DeleteTagView.as_view(), name="delete_user_tag"), # タグ削除

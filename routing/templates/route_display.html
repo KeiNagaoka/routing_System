@@ -10,7 +10,7 @@
 {% block content %}
 {% if user.is_authenticated %}
 <div class="route_container">
-    <h2>保存した巡回経路一覧</h2>
+    <h2>保存した巡回経路情報</h2>
 
     <div class="route-list">
 
@@ -18,7 +18,7 @@
             <div class="route-header">
                 <div class="route-title">
                     <h2>{{ route.title }}</h2>
-                    <span class="route-id">ID: {{ route.id }}</span>
+                    <!-- <span class="route-id">ID: {{ route.id }}</span> -->
                 </div>
                 <h3>{{ route.start_spot }} ~ {{ route.goal_spot }}</h3>
             </div>

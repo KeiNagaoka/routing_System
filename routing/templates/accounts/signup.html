@@ -14,18 +14,23 @@
   <br>
   <form method="POST">
     {% csrf_token %}
-      {{ form.non_field_errors }}
+    <p class="error">
+    {{ form.non_field_errors }}
+    </p>
+
     {% for field in form %}
       <div class="form-group">
         <label for="{{ field.id_for_label }}">
           {{ field.label }}
         </label>
         {{ field }}
-        {{ field.errors }}
         <br>
       </div>
+      <p class="error">
+      {{ field.errors }}
+      </p>
     {% endfor %}
-    <div class="mt-3">
+    <div class="btn-group">
       
       <button type="submit" class="btn btn-primary">アカウント登録</button>
       <!-- index.htmlへ -->
