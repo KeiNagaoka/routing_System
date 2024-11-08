@@ -125,7 +125,7 @@
 
 .admin-message-content {
     text-align: center;
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: bold;
     padding: 10px; /* 余裕を持たせるためのパディング */
     box-sizing: border-box; /* パディングを含めたボックスサイズ */

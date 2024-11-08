@@ -71,13 +71,6 @@ class LoginView(BaseLoginView):
 class LogoutView(BaseLogoutView):
     success_url = reverse_lazy("accounts:index")
 
-from django.contrib.auth import logout
-class CustomLogoutView(View):
-    success_url = reverse_lazy("accounts:index")
-    def get(self, request, *args, **kwargs):
-        logout(request)
-        return redirect('accounts:index')  # ログアウト後にリダイレクトするURLを指定
-
 class SearchingView(TemplateView):
     template_name = "routesearch.html"
     login_url = 'accounts:index'  # ログインページのURLを指定

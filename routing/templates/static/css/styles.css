@@ -114,7 +114,9 @@ main {
     margin: 10px 0;
 }
 
-.sidebar ul li a {
+.sidebar ul li a,
+.sidebar ul li button {
+    font-size: 1rem;
     text-decoration: none;
     color: #333;
     display: block;
@@ -122,9 +124,11 @@ main {
     position: relative;
     overflow: hidden;
     transition: color 0.3s;
+    text-align: left; /* テキストを左詰めにする */
 }
 
-.sidebar ul li a::before {
+.sidebar ul li a::before,
+.sidebar ul li button::before {
     content: '';
     position: absolute;
     width: 100%;
@@ -138,16 +142,19 @@ main {
     transition: transform 0.5s ease;
 }
 
-.sidebar ul li a:hover::before {
+.sidebar ul li a:hover::before,
+.sidebar ul li button:hover::before {
     transform: scaleX(1);
     transform-origin: left;
 }
 
-.sidebar ul li a:hover {
+.sidebar ul li a:hover,
+.sidebar ul li button:hover {
     color: #666;
 }
 
-.sidebar.collapsed ul li a {
+.sidebar.collapsed ul li a,
+.sidebar.collapsed ul li button {
     opacity: 0;
 }
 
@@ -268,9 +275,20 @@ input[type="submit"]:active {
     margin: 2rem; /* Optional: Add margin around the element */
 }
 
+.logout-form {
+    display: inline;
+}
+
 .errorlist {
     color:red;
     font-weight: bold;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer; 
 }
 
 /* スマートフォンなど小さいデバイス用のスタイル */
