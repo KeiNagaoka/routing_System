@@ -67,14 +67,14 @@ def str2list_strings(string):
     else:
         string_list = string.strip('[]').split(', ')
         string_list = [s.strip('"').strip("'") for s in string_list]
+        string_list = [s for s in string_list if s not in ['',' ']]
         return string_list
     
-def organize_aim_tags(request, via_spots_num, all_tags):
+def organize_aim_tags(target_via_spots, via_spots_num, all_tags):
     aim_tags = dict({})
     aim_list = []
     invalid_tags = set({})
-    for i in range(1, int(via_spots_num)+1):
-        spot_name = request.POST.get(f'spot{i}')
+    for spot_name in target_via_spots:
         if spot_name in all_tags:
             aim_list.append(spot_name)
         else:
@@ -88,10 +88,14 @@ def is_passed_order(order, passed_orders):
             return True
     return False
 
-def valid_search(start_spot, goal_spot, aim_tags):
+def valid_search(start_spot, goal_spot, aim_tags, all_spots):
     via_spots = list(aim_tags.keys())
     spots = list(set(via_spots + [start_spot, goal_spot]))
+    # 1箇所しか通らない
     if len(spots) <= 1:
+        return False
+    # 出発点/到着点がスポットでない
+    elif start_spot not in all_spots or goal_spot not in all_spots:
         return False
     else:
         return True

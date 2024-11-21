@@ -42,7 +42,7 @@
                 <li><a href="{% url 'accounts:delete_user_tag' %}">タグの削除</a></li>
                 <li><a href="{% url 'accounts:instruction' %}">システムの使い方</a></li>
                 <li>
-                    <form method="post" action="{% url 'accounts:logout' %}">
+                    <form class="sidebar-logout" method="post" action="{% url 'accounts:logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="logout-button">
                             ログアウト

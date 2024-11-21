@@ -101,9 +101,10 @@ def create_tag():
 
 def create_adjacent_matrix(G=G,settings=settings):
     node_df = get_node_df()
+    node_names = node_df["name"].tolist()
     node_list = node_df.index.tolist()
     distance_dict = dict({})
-    for start_node in tqdm(node_list, total=len(node_list), desc="ADJ MATRIX:"):
+    for start_node in tqdm(node_list, total=len(node_list), desc="ADJ MATRIX"):
         # 最短距離を計算
         shortest_paths = nx.single_source_dijkstra_path_length(G, source=start_node, weight="length")
         distance_dict[start_node] = shortest_paths
@@ -111,12 +112,24 @@ def create_adjacent_matrix(G=G,settings=settings):
     adj_matrix = np.array([[distance_dict[node1][node2] 
                             for node1 in node_list]
                             for node2 in node_list])
+    
     index_node = {index:node for index, node in enumerate(node_list)}
 
     # 保存機能
     ADJACENT_MATRIX_PATH = os.path.join(base_path,settings["folder_path"],settings["adjacent_matrix"])
     INDEX_NODE = os.path.join(base_path,settings["folder_path"],settings["index_to_node"])
     np.save(ADJACENT_MATRIX_PATH, adj_matrix)  # 'my_array.npy'という名前で保存
+
+    # 隣接行列をDataFrameに変換し、node_namesを行名と列名に設定
+    node_names = [" + ".join(name) for name in node_names]
+    adj_df = pd.DataFrame(adj_matrix, index=node_names, columns=node_names)
+
+    # ベースパスの設定と保存先パスの定義
+    ADJACENT_DF_PATH = os.path.join(base_path, settings["folder_path"], settings["adjacent_df"])
+    
+    # 隣接行列をCSVとして保存
+    adj_df.to_csv(ADJACENT_DF_PATH, encoding="utf-8")
+
 
     with open(INDEX_NODE, "w", encoding="utf-8") as f:
         ujson.dump(index_node, f)
@@ -135,3 +148,4 @@ if __name__ == "__main__":
     create_tag()
     print("TAG added successfully.")
     create_adjacent_matrix()
+    print("ADJACENT MATRIX IS CALCLATEED successfully.")

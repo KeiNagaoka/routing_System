@@ -158,6 +158,10 @@ main {
     opacity: 0;
 }
 
+.sidebar-logout {
+    padding: 0; /* パディングを消す */
+}
+
 .content {
     flex: 1;
     padding: 20px;

@@ -54,6 +54,8 @@
                     <form method="POST" action="{% url 'accounts:update_tag' %}">
                         {% csrf_token %}
                         <input type="hidden" name="spot_id" value="{{ spot.id }}">
+                        <input type="hidden" name="spot_name" value="{{ spot_name }}">
+                        <input type="hidden" name="tag_name" value="{{ tag_name }}">
                         <label for="tags-{{ spot.id }}">タグを選択:</label>
                         <select id="tags-{{ spot.id }}" name="tag">
                             {% for tag in all_tags %}

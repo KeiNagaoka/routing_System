@@ -10,6 +10,7 @@
     "spot_info":"spot_information_4data.csv",
     "node_df":"nodes_df.csv",
     "index_to_node":"index2node.json",
+    "adjacent_df":"adjacent_df.csv",
 
     "network_view":"network_view.html",
     "tsp_result":"sample_map.html",

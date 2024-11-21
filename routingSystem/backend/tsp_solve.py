@@ -132,13 +132,13 @@ class TSP:
 		self.gamma = gamma					# 通過済みエッジ　フェロモンの塗布量の制限係数
 		self.epsilon = epsilon				# 通過済みエッジ　フェロモンの蒸発率
 		self.passed_edges = passed_edges	# 通過済みエッジ　既に通過したためデバフをかけるエッジ
-		#巡回都市関係
+		# 巡回都市関係
 		self.patrol_dict = patrol_dict #タグごとに巡回するべき都市数
 		self.n_patrol = patrol
 		self.patrol_all = patrol_all #全ての都市を巡回する場合　set_loc参照
 		self.cost_list = []
 		self.adj_matrix_path = adj_matrix_path
-		#局所解対策関係
+		# 局所解対策関係
 		self.kick_cd = kick_interval #こっちは１つずつ少なくなる
 		self.kick_interval = kick_interval #こっちは初期化用
 		self.kick_start = kick_start
@@ -250,7 +250,8 @@ class TSP:
 	def proposed_cities(self,now_order):
 		candidate_tags = []
 		if not (self.aim_tags.keys() <= self.now_tags.keys()):
-			raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags{self.now_tags.keys()}に含まれないよ！")
+			return []
+			# raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags{self.now_tags.keys()}に含まれないよ！")
 		for key_aim,val_aim in self.aim_tags.items():
 			if self.now_tags[key_aim] < val_aim:
 				candidate_tags.append(key_aim)
@@ -260,11 +261,19 @@ class TSP:
 	
 	# メインの部分
 	def solve(self,n_agent=1000):
+		# 経由地点なしの場合
+		if len(self.aim_tags) == 0 and self.startNode == self.goalNode:
+			message = "出発地点と到着地点が近すぎます。"
+			print(f"message:{message}")
+			return message
+		elif len(self.aim_tags) == 0:
+			order = [self.startNode, self.goalNode]
+			return message
+
 		self.n_agent = n_agent
 		delta = np.zeros((self.n_data,self.n_data))	#フェロモン変化量
 		
-		if self.startNode==None: raise Exception("エラー：スタートノードを設定してください。")
-
+		# n_agent匹の蟻を歩かせる
 		for k in range(n_agent):
 			city = [self.startNode] + [i for i in np.arange(self.n_data) if i != self.startNode and i != self.goalNode] + [self.goalNode] #巡回都市
 			
@@ -278,6 +287,10 @@ class TSP:
 			# aim_list =  {key for key, value in aim_tags.items() if value > 0}
 			# city = [key for key,val in index_tags.items() if len(set(val) & aim_list) > 0 and key!=now_city]
 			city = self.proposed_cities(order)
+			if len(city)==0:
+				message = "入力された条件を満たす経路はありませんでした。"
+				print(f"message:{message}")
+				return message
 			
 			#for j in range(1,self.n_patrol):
 			j = 0
@@ -306,13 +319,17 @@ class TSP:
 						self.now_tags[tag] = 1
 				#タグが条件を満たしていれば終了
 				if not (self.aim_tags.keys() <= self.now_tags.keys()):
-					# return None
-					raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags:{self.now_tags.keys()}に含まれないよ！")
+					message = "登録されているスポットが存在しないタグが含まれています。"
+					print(f"巡回都市キーエラー:{message}")
+					return message
+					# raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags:{self.now_tags.keys()}に含まれないよ！")
 				if self.tag_fill():
 					break
 				elif len(city)==0:
-					# return None
-					raise Exception("全ての都市を周りました！")
+					message = "入力された条件を満たす経路はありませんでした。"
+					print(f"移動候補都市なし:{message}")
+					return message
+					# raise Exception("移動候補都市なし")
 				
 			# ゴールノードに移動
 			order.append(self.goalNode) #開始点=終了点の場合
@@ -361,8 +378,10 @@ class TSP:
 			# print("Agent ... %d , Cost ... %lf" % (k,self.cost(self.result)))
 			# print(f'距離:{cost_order}, order:{order}')
 
-		if self.result is None:
-			return None
+		if not self.tag_fill():
+			message = "入力された条件を満たす経路はありませんでした。"
+			print(f"message:{message}")
+			return message
 		return self.result
 
 	
@@ -443,6 +462,9 @@ def tsp_execute(node_df,
 	index_tags = {index_node_rev[node]:row['tags'] for node,row in node_df.iterrows()}
 	name_tags = {row['name']:row['tags'] for _,row in spot_info_df.iterrows()}
 
+	# アリの数を経由地点の数によって決定する
+	n_agent = len(aim_tags) * 100 + 1
+
 	# 入力できるタグの最大値をカウント
 	count_tags = {}
 	for _,row in node_df.iterrows():
@@ -479,9 +501,9 @@ def tsp_execute(node_df,
 		print(f"route_index:{route_index+1}回目の経路探索")
 		tsp = TSP(node_df=node_df,
 				adj_matrix_path=ADJACENT_MATRIX,
-				alpha = 0.5,
-				beta_pre=0.1, 
-				beta_after = 0.1, 
+				alpha = 0.3,
+				beta_pre=0.01, 
+				beta_after = 0.01, 
 				Q = 1.0,
 				gamma=0.3,
 				epsilon=0.6,
@@ -502,9 +524,12 @@ def tsp_execute(node_df,
 		
 		# メイン処理
 		order = tsp.solve(n_agent=n_agent)		# n_agent匹の蟻を歩かせる
-		if order is None:
+		# エラー時の処理
+		if type(order)==str and route_index == 0:
+			return order
+		elif type(order)==str or len(order) == 0:
 			break
-		elif len(order) == 0:
+		elif len(aim_tags) == 0 and route_index > 0:
 			break
 
 		passed_edges += [(order[i],order[i+1]) for i in range(len(order)-1)] + [(order[i+1],order[i]) for i in range(len(order)-1)]
@@ -560,7 +585,13 @@ def tsp_execute(node_df,
 		print(f"部分グラフ:{timelist[-1]-timelist[-2]}秒")
 
 		# エッジのジオメトリ情報を含むGeoDataFrameを取得
-		gdf_edges = ox.graph_to_gdfs(route_G, nodes=False)
+		try:
+			gdf_edges = ox.graph_to_gdfs(route_G, nodes=False)
+		# エッジが存在しない場合
+		except Exception as e:
+			print(f"エラー:{e}")
+			message = "出発地点/経由地点/到着地点が近すぎます。"
+			return message
 		# geometry列の座標情報を修正
 		gdf_edges['geometry'] = gdf_edges.apply(fix_coordinates, axis=1)
 		timelist.append(time.time())
@@ -579,9 +610,11 @@ def tsp_execute(node_df,
 			for name in name_list:
 				if name in spots:
 					loc = name_coord[name]
-					pop_name = f"{name}"
+					pop_name = f"<div class='popup'>{name}</div>"
+					# ポップアップの横幅を広くするためにPopupオブジェクトを使用
+					popup = folium.Popup(pop_name, max_width=300)  # 300pxの幅を設定（必要に応じて調整）
 					j += 1
-					folium.Marker(loc, popup=pop_name, icon=folium.Icon(color='red')).add_to(map)
+					folium.Marker(loc, popup=popup, icon=folium.Icon(color='red')).add_to(map)
 
 		# 縮尺とズームを設定
 		map.fit_bounds(map.get_bounds())
@@ -593,39 +626,6 @@ def tsp_execute(node_df,
 		# 保存
 		map_html_str = map._repr_html_()
 		map_html_str = map_html_str.replace('padding-bottom:60%;', '').replace('height:0;', 'height:80vh;')
-		# # 正規表現パターン
-		# pattern = r'<iframe\b[^>]*>(.*?)</iframe>'
-
-		# # 正規表現検索
-		# iframe_content = re.search(pattern, map_html_str, re.DOTALL)
-		# # 結果の表示
-		# if iframe_content:
-		# 	map_html_str = iframe_content.group(0)
-		# 	print(map_html_str)  # <iframe>タグから</iframe>タグまでの文字列全体
-		# else:
-		# 	print("一致する<iframe>タグが見つかりません")
-		# 	break
-
-		# map_html_index = map_html.replace('.html',f'_{route_index+1}.html')
-		# MAP_PATH = os.path.join(d_settings.STATIC_ROOT, map_html_index)
-		# map.save(MAP_PATH)
-		# # HTMLの文字列データを取得
-		# map_html_str = map._repr_html_()
-		# timelist.append(time.time())
-		# print(f"mapを保存:{timelist[-1]-timelist[-2]}秒")
-
-		# # デバッグのためのスクリプト
-		# print("デバッグ2")
-		# if os.path.exists(MAP_PATH):
-		# 	print(f"mapを保存しました:{MAP_PATH}")
-		# 	# MAP_FOLDERの内容を表示
-		# 	map_folder_contents = os.listdir(d_settings.STATIC_ROOT)
-		# 	print("MAP_FOLDERの内容:")
-		# 	for item in map_folder_contents:
-		# 		print(item)
-		# else:
-		# 	raise FileNotFoundError(f"MAP_PATHが存在しませんでした:{MAP_PATH}")
-
 
 		# 距離と所要時間を計算
 		dist = int(tsp.cost(tsp.result))

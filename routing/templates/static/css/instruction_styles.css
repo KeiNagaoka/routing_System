@@ -1,4 +1,8 @@
-/* addtag_styles.css */
+/* すべてのimg要素に適用するスタイル */
+img {
+    padding-top: 10px; /* 上部の余白 */
+    padding-bottom: 10px; /* 下部の余白 */
+}
 
 .top-container {
     text-align: center;
@@ -24,7 +28,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
+    padding: 0.5rem;
     max-width: 1200px;
     margin: 0 auto;
     box-sizing: border-box;
@@ -55,10 +59,67 @@
     margin-bottom: 1rem;
 }
 
+/* .toc のスタイル */
+.toc {
+    text-align: center;
+    background-color: #f9f9f9;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 20px; /* 上部に余白を追加 */
+}
+
+/* .toc のスタイル */
+.toc {
+    text-align: center;
+    background-color: #f9f9f9;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 20px; /* 上部に余白を追加 */
+}
+
+/* ol の部分だけ左詰めにする */
+.toc ol {
+    text-align: left;
+    list-style-type: decimal; /* 番号付きリスト */
+    list-style-position: outside; /* 番号を外側に配置 */
+    padding-left: 20px; /* 左側の余白を追加 */
+}
+
+.toc ol li {
+    margin-bottom: 5px;
+    padding-left: 10px; /* 番号とテキストの間に余白を追加 */
+}
+
+.toc ol li a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.toc ol li a:hover {
+    text-decoration: underline;
+}
+
 .feature-description {
     font-size: 1.2rem;
     color: #333;
     line-height: 1.5;
+}
+
+.feature-description {
+    font-size: 1.2rem;
+    color: #333;
+    line-height: 1.5;
+}
+
+.red-bold {
+    color: red;       /* 赤色 */
+    font-weight: bold; /* 太字 */
+}
+
+.bold {
+    font-weight: bold; /* 太字 */
 }
 
 /* レスポンシブデザインの調整 */

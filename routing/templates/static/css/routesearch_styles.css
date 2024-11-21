@@ -132,6 +132,41 @@ select, input[type="number"] {
     background-color: #45a049; /* 濃い緑色 */
 }
 
+.via-btn {
+    background-color: #28a745; /* 緑色の背景色 */
+    color: white; /* テキストの色 */
+    border: none; /* ボーダーを削除 */
+    padding: 3px 6px; /* パディングを追加 */
+    text-align: center; /* テキストを中央揃え */
+    text-decoration: none; /* テキストの装飾を削除 */
+    display: inline-block; /* インラインブロック要素に設定 */
+    font-size: 12px; /* フォントサイズを設定 */
+    margin: 4px 2px; /* マージンを追加 */
+    cursor: pointer; /* カーソルをポインタに変更 */
+    border-radius: 5px; /* 角を丸くする */
+    transition: background-color 0.3s ease; /* 背景色のトランジションを追加 */
+}
+
+.via-btn:hover {
+    background-color: #218838; /* ホバー時の濃い緑色 */
+}
+
+.message {
+    color: #d32f2f; /* 赤色のテキスト */
+    font-weight: bold; /* 太字 */
+    font-size: 1.2rem; /* フォントサイズを少し大きくする */
+    text-align: center; /* テキストを中央揃え */
+}
+
+.hide {
+    display: none; /* 要素を非表示にする */
+}
+
+#loading {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+}
 
 /* レスポンシブ対応：画面幅が600px以下のデバイス用 */
 @media (max-width: 600px) {

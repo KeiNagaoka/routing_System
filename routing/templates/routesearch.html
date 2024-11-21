@@ -12,7 +12,7 @@
 <p>検索条件を入力してください</p>
 
 <!-- 入力欄 -->
-<form action="/routesearch/" method="post">
+<form id="routesearch-form" action="/routesearch/" method="post">
     {% csrf_token %}
         
     <div class="form-group"> 
@@ -29,16 +29,41 @@
         <label for="spot_num">経由地点数:</label>
         <input type="number" id="number_spot" name="number_spot" min="0" max="10"
         placeholder="0~10の半角数字を入力"
-        value="0" onchange="ChangeSpotNum()" required>
+        value="{{ via_spots_num }}" onchange="ChangeSpotNum()" required>
     </div>
 
     {% for via_spot in via_spots %}
-        <div class="form-group hide" id="spot-group{{ via_spot.idx }}"> 
-            <label for="spot{{ via_spot.idx }}">経由地点{{ via_spot.idx }}:</label>
-            <input type="text" id="spot{{ via_spot.idx }}" name="spot{{ via_spot.idx }}" placeholder="経由地点を入力"
-            value="{{ via_spot.name }}" autocomplete="off" class="input-wide" />
+    <div class="{{ via_spot.divclass }}" id="via-container{{ via_spot.idx }}">
+
+        <!-- テキストから書き込み式 -->
+        <div class="text-spot{{ via_spot.idx }}" id="text-spot{{ via_spot.idx }}"> 
+            <div class="form-group" id="spot-group{{ via_spot.idx }}"> 
+                <label for="spot{{ via_spot.idx }}">経由地点{{ via_spot.idx }}:</label>
+                <input type="text" id="spot{{ via_spot.idx }}" name="spot{{ via_spot.idx }}" placeholder="経由地点を入力"
+                value="{{ via_spot.name }}" autocomplete="off" class="input-wide" />
+                <button type="button" class="via-btn" onclick="ChangeSelectForm({{ via_spot.idx }})">
+                    タグ
+                </button>
+            </div>
+            <div id="suggest{{ via_spot.idx }}" class="suggest"></div>
         </div>
-        <div id="suggest{{ via_spot.idx }}" class="suggest"></div>
+
+        <!-- 全てのタグから選択式 -->
+        <div class="selec-tag{{ via_spot.idx }} hide" id="selec-tag{{ via_spot.idx }}"> 
+            <div class="form-group" id="tag-group{{ via_spot.idx }}"> 
+                <label for="spot{{ via_spot.idx }}">経由地点{{ via_spot.idx }}:</label>
+                <select id="spot{{ via_spot.idx }}-select" name="spot{{ via_spot.idx }}-hide">
+                    {% for tag in all_tags %}
+                        <option value="{{ tag }}" {% if forloop.first %}selected{% endif %}>{{ tag }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="via-btn" onclick="ChangeTextForm({{ via_spot.idx }})">
+                    テキスト
+                </button>
+            </div>
+        </div>
+
+    </div>
     {% endfor %}
     
     <div class="form-group"> 
@@ -54,11 +79,12 @@
         <input type="submit" value="探索">
     </div>
 </form>
-<br>
 
+<br>
 <div id="log_text">
     {{ text }}
 </div>
+
 <div class="route-display-area">
     {% for route in routes %}
         <div class="route-wrapper">
@@ -68,15 +94,17 @@
                 <p>距離: {{ route.distance }} m</p>  <!-- 距離の表示 -->
                 <p>時間: {{ route.time }} 分</p>     <!-- 時間の表示 -->
                 <p>出発: {{ start_spot }}</p>       <!-- 出発地点 -->
-                <p>経由地点:
-                    <ol>
-                        {% for via_spot in route.via_spots %}
-                            <li>{{ via_spot }}</li>  <!-- 経由地点をリスト項目として表示 -->
-                        {% endfor %}
-                    </ol>
-                </p>
+                {% if route.via_spots %}  <!-- 経由地点がある場合 -->
+                    <p>経由地点:
+                        <ol>
+                            {% for via_spot in route.via_spots %}
+                                <li>{{ via_spot }}</li>  <!-- 経由地点をリスト項目として表示 -->
+                            {% endfor %}
+                        </ol>
+                    </p>
+                {% endif %}
                 <p>到着: {{ goal_spot }}</p>    <!-- 到着地点 -->
-                <form method="POST" class="save-route-form" id="save-route-form" action="{% url 'accounts:save_route' %}">
+                <form method="POST" class="save-route-form" id="save-route-form{{ forloop.counter }}" action="{% url 'accounts:save_route' %}">
                     {% csrf_token %}
                     <input type="hidden" name="route_name" value="{{ route.name }}">
                     <input type="hidden" name="route_distance" value="{{ route.distance }}">
@@ -91,7 +119,7 @@
                     value="" autocomplete="off" class="input-wide" required/>
                     <button type="submit" class="btn-save">経路を保存</button>
                     <br>
-                    <div class="h2" id="route-message-{{ route.name }}"></div>
+                    <div class="message" id="route-message-{{ route.name }}"></div>
                 </form>
                 
             </div>

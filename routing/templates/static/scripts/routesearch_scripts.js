@@ -1,14 +1,15 @@
+// 経路保存ボタンが押されたときのイベント
 document.addEventListener('DOMContentLoaded', function() {
-    const saveRouteForm = document.getElementById('save-route-form');
-    if (saveRouteForm) {
-        saveRouteForm.addEventListener('submit', function(event) {
+    const saveRouteForms = document.querySelectorAll('.save-route-form');
+    saveRouteForms.forEach(function(form) {
+        form.addEventListener('submit', function(event) {
             event.preventDefault();  // フォームのデフォルトの送信を防ぐ
 
             const formData = new FormData(this);
             const csrfToken = formData.get('csrfmiddlewaretoken');
             const route_name = formData.get('route_name');
 
-            fetch('/save_route/', {
+            fetch(this.action, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrfToken
@@ -23,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error:', error);
             });
         });
-    }
+    });
 });
 
 
@@ -35,12 +36,67 @@ function ChangeSpotNum() {
 
     // 1から10の範囲で表示・非表示を制御
     for (let i = 1; i < 11; i++) {
-        const spotGroup = document.getElementById(`spot-group${i}`);
+        const spotGroup = document.getElementById(`via-container${i}`);
         if (i <= currentCount) {
             spotGroup.classList.remove('hide'); // 表示
         } else {
             spotGroup.classList.add('hide'); // 非表示
         }
+    }
+}
+
+
+// テキスト入力にする
+function ChangeTextForm(idx) {
+    console.log(`ChangeTextForm idx:${idx}`);
+    const textSpotElement = document.getElementById(`text-spot${idx}`);
+    const textSpotTarget = document.getElementById(`spot${idx}`);
+    const selectSpotTarget = document.getElementById(`spot${idx}-select`);
+
+    // selectフォームをhide
+    if (textSpotElement) {
+        console.log(`textSpotElement:${textSpotElement.classList}`);
+        textSpotElement.classList.remove('hide');
+    }
+    const selectTagElement = document.getElementById(`selec-tag${idx}`);
+    if (selectTagElement) {
+        selectTagElement.classList.add('hide');
+    }
+
+    // POSTデータを変更
+    if (textSpotTarget) {
+        textSpotTarget.name = `spot${idx}`;
+    }
+    if (selectSpotTarget) {
+        selectSpotTarget.name = `spot${idx}-hide`;
+    }
+
+}
+
+// 選択入力にする
+function ChangeSelectForm(idx) {
+    console.log(`ChangeSelectForm idx:${idx}`);
+    // セレクトタグの要素を非表示にする
+    const selectTagElement = document.getElementById(`selec-tag${idx}`);
+    const textSpotTarget = document.getElementById(`spot${idx}`);
+    const selectSpotTarget = document.getElementById(`spot${idx}-select`);
+
+    // textフォームをhide
+    if (selectTagElement) {
+        selectTagElement.classList.remove('hide');
+    }
+    const textSpotElement = document.getElementById(`text-spot${idx}`);
+    if (textSpotElement) {
+        textSpotElement.classList.add('hide');
+    }
+
+    
+    // POSTデータを変更
+    if (textSpotTarget) {
+        textSpotTarget.name = `spot${idx}-hide`;
+    }
+    if (selectSpotTarget) {
+        selectSpotTarget.name = `spot${idx}`;
     }
 }
 

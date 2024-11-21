@@ -27,6 +27,14 @@
     margin-top: 20px;
 }
 
+.form-container form {
+    font-size: 1rem;
+    width: 100%;
+    max-width: 600px; /* 必要に応じて最大幅を調整してください */
+    margin: 0 auto; /* フォームを中央に配置 */
+    box-sizing: border-box; /* パディングやボーダーを含めて幅を計算 */
+}
+
 .form-group {
     display: flex;
     flex-direction: row;
@@ -89,4 +97,23 @@
         align-items: left;
         margin-top: 20px;
     }
+
+    .form-container form {
+        font-size: 0.6rem;
+        width: 100%;
+        max-width: 600px; /* 必要に応じて最大幅を調整してください */
+        margin: 0 auto; /* フォームを中央に配置 */
+        box-sizing: border-box; /* パディングやボーダーを含めて幅を計算 */
+    }
+
+    .h1 {
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+    
+    .h2 {
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+    
 }

@@ -49,7 +49,11 @@ def get_spot_df(user=None):
     
     return df
 
-def get_spots_data(user,spot_name=None,tag_name=None):
+def get_spots_data(user,
+                   spot_name=None,
+                   tag_name=None,
+                   tags_original=False,
+                   ):
     spot_info = get_spot_df(user=user)
 
     # ユーザ依存の追加タグを加える処理
@@ -63,7 +67,10 @@ def get_spots_data(user,spot_name=None,tag_name=None):
     cleaned_list = [x for x in all_tags_nested if isinstance(x, list)]
     flattened_tags = [tag for sublist in cleaned_list for tag in sublist]
     user_added_tags = [tag.tag for tag in Tag.objects.filter(user=user)]
-    all_tags = list(set(flattened_tags)) + user_added_tags
+    all_tags = list(set(flattened_tags))
+    # tags_originalなら、AddedTagのうち、スポットに登録されているもののみを追加
+    if not tags_original:
+        all_tags += user_added_tags
     all_tags = sorted(list({tag for tag in all_tags if tag!=""}))
 
     # 絞り込み処理

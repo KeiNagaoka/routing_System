@@ -76,19 +76,25 @@ class SearchingView(TemplateView):
     login_url = 'accounts:index'  # ログインページのURLを指定
 
     def get(self, request):
+        user = request.user
         text = ""
         routes = []
         start_spot = ""
         goal_spot = ""
         via_spots = [{"idx":i,
-                      "name":""}
+                      "name":"",
+                      "divclass":f"via-container{i} hide"}
                       for i in range(1,11)]
+        
+        _, all_tags_original = get_spots_data(user, tags_original=True)
 
         data = {'routes':routes,
+                'text':text,
                 'start_spot':start_spot,
                 'goal_spot':goal_spot,
                 'via_spots':via_spots,
-                'text':text,
+                'via_spots_num':0,
+                'all_tags': all_tags_original,
                 }
         return render(request, 'routesearch.html', data)
 
@@ -97,23 +103,31 @@ class SearchingView(TemplateView):
         start_spot = request.POST.get('start_spot')
         goal_spot = request.POST.get('goal_spot')
         user = request.user
-        via_spots_num = request.POST.get('number_spot')
+        via_spots_num = int(request.POST.get('number_spot'))
         print(f"via_spots_num:{via_spots_num}/{type(via_spots_num)}")
         via_spots = [{"idx":i,
-                      "name":""}
+                      "name":"",
+                      "divclass":f"via-container{i} hide"}
                       for i in range(1,11)]
+        # 入力された経由すべき地点
+        target_via_spots = []
+        for i in range(1, int(via_spots_num)+1):
+            spot_name = request.POST.get(f'spot{i}')
+            target_via_spots.append(spot_name)
+            via_spots[i-1]["name"] = spot_name
+            via_spots[i-1]["divclass"] = f"via-container{i}"
 
         # node_dfとspot_info_df
-        range10 = list(range(1,11))
         node_df = get_node_df(user=user)
         spot_info_df = get_spot_df(user=user)
-        _, all_tags = get_spots_data(user)
+        _, all_tags_original = get_spots_data(user, tags_original=True)
 
 
         # 目的地のタグの処理
-        all_tags += spot_info_df['name'].tolist()
-        aim_tags, invalid_tags = organize_aim_tags(request, via_spots_num, all_tags)
-        is_valid = valid_search(start_spot, goal_spot, aim_tags)
+        all_spots = spot_info_df['name'].tolist()
+        all_tags = all_tags_original + all_spots
+        aim_tags, invalid_tags = organize_aim_tags(target_via_spots, via_spots_num, all_tags)
+        is_valid = valid_search(start_spot, goal_spot, aim_tags, all_spots)
         if len(invalid_tags)==0 and is_valid:
             print(f"aim_tags:{aim_tags}")
 
@@ -122,7 +136,12 @@ class SearchingView(TemplateView):
                                     start_name=start_spot,
                                     goal_name=goal_spot,
                                     aim_tags=aim_tags,)
-            if len(route_list)==0:
+            # エラー発生時
+            if type(route_list)==str:
+                text = route_list
+                route_list = []
+            # 経路が見つからなかった場合
+            elif len(route_list)==0:
                 text = "経路を探索しましたが、条件に合う経路が見つかりませんでした。"
 
             data = {'routes':route_list,
@@ -131,11 +150,16 @@ class SearchingView(TemplateView):
                     'goal_spot':goal_spot,
                     'aim_tags':str(aim_tags),
                     'via_spots':via_spots,
+                    'via_spots_num':via_spots_num,
+                    'all_tags': all_tags_original,
                     }
         # start goal via全て同じスポットが指定された場合
         elif not is_valid:
+            if start_spot not in all_spots or goal_spot not in all_spots:
+                text = "出発地点と到着地点にはスポット名を入力してください。"
+            else:
+                text = f"{start_spot} しか通らない経路です。"
             route_list = []
-            text = f"{start_spot} しか通らない経路です。"
             
             data = {'routes':route_list,
                     'text':text,
@@ -143,6 +167,8 @@ class SearchingView(TemplateView):
                     'goal_spot':goal_spot,
                     'aim_tags':str(aim_tags),
                     'via_spots':via_spots,
+                    'via_spots_num':via_spots_num,
+                    'all_tags': all_tags_original,
                     }
         else:
             # 無効なタグが入力された場合
@@ -157,6 +183,8 @@ class SearchingView(TemplateView):
                     'goal_spot':goal_spot,
                     'aim_tags':str(aim_tags),
                     'via_spots':via_spots,
+                    'via_spots_num':via_spots_num,
+                    'all_tags': all_tags_original,
                     }
         
         return render(request, 'routesearch.html', data)
@@ -174,32 +202,19 @@ class SaveRouteView(View):
         map_html_str = request.POST.get('map_html_str')
         via_spot_names = request.POST.get('via_spots').split(',')
         
-        # MAP_HTML_PATH = os.path.join(base_path, "..", settings["static_folder"], iframe_src)
-        # MAP_HTML_SAVED_PATH = os.path.join(base_path, "..", settings["static_folder"], new_iframe_src)
-
-        # try:
-        #     shutil.copy(MAP_HTML_PATH, MAP_HTML_SAVED_PATH)
-        #     logger.info(f"ファイルが {MAP_HTML_PATH} から {MAP_HTML_SAVED_PATH} に正常にコピーされました。")
-        # except Exception as e:
-        #     logger.error(f"ファイルのコピー中にエラーが発生しました: {e}")
-        # if os.path.exists(MAP_HTML_SAVED_PATH):
-        #     print("正しく生成されています！")
-        # else:
-        #     print("生成されていません")
-        
         # Spotを参照してオブジェクトを取得
         message = ""
         try:
             start_spot = Spot.objects.get(name=start_spot_name)
             goal_spot = Spot.objects.get(name=goal_spot_name)
-            via_spots = [Spot.objects.get(name=name) for name in via_spot_names]
+            via_spots = [Spot.objects.get(name=name) for name in via_spot_names if name != ""]
 
             # userとnameの組み合わせが既に存在するか確認
             if Mapdata.objects.filter(user=user, name=got_route_name).exists():
                 print(f"user:{user}, name:{got_route_name} の組み合わせは既に存在します。")
                 message = "同じ名前の経路が既に存在します。"
                 data = {"message": message}
-                return JsonResponse(data, status=400)
+                return JsonResponse(data, status=200)
 
             mapdata = Mapdata.objects.create(
                 user=user,
@@ -219,9 +234,9 @@ class SaveRouteView(View):
             data = {"message": message}
             return JsonResponse(data, status=202)
         except:
-            message = "経路情報の保存が完了しました。"
+            message = "経路情報が正しく保存できませんでした。"
             data = {"message": message}
-            return JsonResponse(data, status=400)
+            return JsonResponse(data, status=200)
 
 
 class AddTagView(TemplateView):
@@ -386,9 +401,10 @@ class SpotlistView(LoginRequiredMixin, TemplateView):
         # スポット情報のリスト (ここでは例としてリストを作成しています)
         spots_data, all_tags = get_spots_data(user=user,spot_name=spot_name,tag_name=tag_name)
         
-        paginator = Paginator(spots_data, 10)  # 10個ずつ表示
+        paginator = Paginator(spots_data, 12)  # 12個ずつ表示
         page_number = request.GET.get('page')
         spots = paginator.get_page(page_number)
+
         values = {'spots': spots,
                   'all_tags':all_tags,
                   # 検索条件を保持するための変数
@@ -399,7 +415,10 @@ class SpotlistView(LoginRequiredMixin, TemplateView):
         return render(request, template_name, values)
 
 class UpdateTagView(View):
-    def post(self, request, *args, **kwargs):
+    template_name = "display.html"
+    login_url = 'accounts:index'  # ログインページのURLを指定
+
+    def post(self, request, template_name=template_name):
         spot_id = float(request.POST.get('spot_id'))
         tag = request.POST.get('tag')
 
@@ -429,8 +448,26 @@ class UpdateTagView(View):
         else:
             messages.error(request, "タグの選択に失敗しました。")
 
+
+        # SpotlistViewと同じ処理
+        spot_name = request.POST.get('spot_name')
+        tag_name = request.POST.get('tag_name')
+        
+        # スポット情報のリスト (ここでは例としてリストを作成しています)
+        spots_data, all_tags = get_spots_data(user=user,spot_name=spot_name,tag_name=tag_name)
+        paginator = Paginator(spots_data, 10)  # 10個ずつ表示
+        page_number = request.GET.get('page')
+        spots = paginator.get_page(page_number)
+
         # POST後のリダイレクト
-        return redirect('accounts:display')
+        values = {'spots': spots,
+                  'all_tags':all_tags,
+                  # 検索条件を保持するための変数
+                  'spot_name':spot_name,
+                  'tag_name':tag_name,
+                  }
+        
+        return render(request, template_name, values)
 
 # 経路の詳細情報ページ表示
 class RouteInfoView(View):
