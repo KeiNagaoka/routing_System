@@ -75,6 +75,11 @@ class SearchingView(TemplateView):
     template_name = "routesearch.html"
     login_url = 'accounts:index'  # ログインページのURLを指定
 
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(self.login_url)
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request):
         user = request.user
         text = ""
