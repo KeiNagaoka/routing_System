@@ -77,7 +77,7 @@ name,lat,lon,hp,tags
 国領交番,35.65051055,139.5574072,-,['交番']
 国領分館,35.65079054,139.5602591,https://www.lib.city.chofu.tokyo.jp/contents?2&pid=30#02access,[]
 仙川駅東自転車等駐車場,35.66271321,139.5860279,/kurashi/koutsuu/chuurinjou/chuurinjou/index.html,['駐輪場']
-調布消防署つつじケ丘出張所,35.657363,139.569749,-,[]
+調布消防署つつじケ丘出張所,35.657363,139.569749,-,['消防署']
 野川中央児童遊園,35.65427909,139.5591465,-,"['児童遊園', '公園・児童遊園']"
 第14消防分団,35.6724908,139.5580303,-,[]
 調布市立調布南第1自転車駐車場,35.65031076,139.5439329,/kurashi/koutsuu/chuurinjou/chuurinjou/index.html,['駐輪場']
@@ -91,7 +91,7 @@ name,lat,lon,hp,tags
 佐須分館,35.65862623,139.5561773,https://www.lib.city.chofu.tokyo.jp/contents?12&pid=39#11access,[]
 調布たちばな幼稚園,35.65412554,139.5781332,-,['幼稚園']
 多摩川1丁目児童遊園,35.64982579,139.5320663,-,"['児童遊園', '公園・児童遊園']"
-文化会館たづくり,35.65114243,139.5412254,https://www.chofu-culture-community.org/tazukuri,[]
+文化会館たづくり,35.65114243,139.5412254,https://www.chofu-culture-community.org/tazukuri,['ホール']
 布田交番,35.64701696,139.5482211,-,['交番']
 緑ケ丘仲よし公園,35.66968423,139.5785592,-,"['公園・児童遊園', '公園']"
 野草園,35.66331895,139.5565653,-,[]
@@ -195,7 +195,7 @@ name,lat,lon,hp,tags
 調布仙川二郵便局,35.66423446,139.5830824,https://map.japanpost.jp/p/search/dtl/300101459000/?&cond1=2&cond200=1&&his=sw,['郵便局']
 うえのはら第1・第2学童クラブ,35.66151524,139.5633959,-,['学童クラブ']
 柴崎2丁目第3公園,35.66057868,139.5641097,-,"['公園・児童遊園', '公園']"
-宮の上駐在所,35.66224696,139.5672437,-,[]
+宮の上駐在所,35.66224696,139.5672437,-,['警察署']
 神代保育園,35.66065462,139.5700237,-,['保育園']
 堂山児童遊園,35.67412227,139.5553008,-,"['児童遊園', '公園・児童遊園']"
 御塔坂児童遊園,35.66521979,139.5433977,-,"['児童遊園', '公園・児童遊園']"
@@ -216,7 +216,7 @@ name,lat,lon,hp,tags
 しいの木公園,35.67625659,139.558703,-,"['公園・児童遊園', '公園']"
 佐須児童館,35.65853054,139.5561721,-,[]
 ふじみ交流プラザ,35.68172363,139.5583725,-,[]
-グリーンホール,35.65153671,139.5429834,https://www.chofu-culture-community.org/green-hall,[]
+グリーンホール,35.65153671,139.5429834,https://www.chofu-culture-community.org/green-hall,['ホール']
 晃華学園マリアの園幼稚園,35.66274071,139.5604258,-,['幼稚園']
 (休館中)郷土博物館分室,35.64378011,139.5484829,-,[]
 第一小学校学童クラブ,35.65519256,139.5439728,-,"['小学校', '学童クラブ']"
@@ -370,7 +370,6 @@ KNベルーガ園,35.65204972,139.5465168,-,[]
 北浦児童遊園,35.6513014,139.556611,-,"['児童遊園', '公園・児童遊園']"
 国領町4丁目児童遊園,35.64914199,139.557454,-,"['児童遊園', '公園・児童遊園']"
 西調布体育館,35.65742996,139.5274372,-,[]
-味の素スタジアム,35.66427752,139.5271968,https://www.ajinomotostadium.com/,[]
 第二小学校学童クラブ,35.64696687,139.5561562,-,"['小学校', '学童クラブ']"
 富士見町ゲートボール場,35.66204616,139.5383779,-,['ゲートボール場']
 多摩川かつら公園,35.65133461,139.5267513,-,"['公園・児童遊園', '公園']"
@@ -378,7 +377,7 @@ KNベルーガ園,35.65204972,139.5465168,-,[]
 凸凹山児童公園,35.65335932,139.5267037,-,"['公園・児童遊園', '公園']"
 国領駅南口市営駐車場,35.6498001,139.558833,/kurashi/koutsuu/chuurinjou/chuurinjou/index.html,[]
 国領児童館,35.64800759,139.5616665,-,[]
-調布警察署,35.65292543,139.5622248,https://www.keishicho.metro.tokyo.lg.jp/about_mpd/shokai/ichiran/kankatsu/chofu/index.html,[]
+調布警察署,35.65292543,139.5622248,https://www.keishicho.metro.tokyo.lg.jp/about_mpd/shokai/ichiran/kankatsu/chofu/index.html,['警察署']
 菊野台きりかぶ公園,35.65140493,139.5700535,-,"['公園・児童遊園', '公園']"
 調布市立調布西第3自転車等駐車場,35.65146178,139.5404712,/kurashi/koutsuu/chuurinjou/chuurinjou/index.html,['駐輪場']
 第15消防分団,35.67313929,139.5455245,-,[]
@@ -1110,7 +1109,6 @@ PINO（ピノ）,35.647236,139.560364,http://pino-pan.com,"['パン', '飲食店
 ホロホロカフェ（HoloHoloCafe）,35.645908,139.561813,http://holoholocafe.com/,"['カフェ', '飲食店']"
 すき家仙川店,35.661591,139.584534,-,"['牛丼', 'カレー', '食堂', '飲食店']"
 ナマステインドレストラン飛田給店,35.662659,139.521042,-,"['インド料理', 'インドカレー', '飲食店']"
-味の素スタジアム,35.66367,139.5289,-,"['その他', '飲食店']"
 こしじ,35.662037,139.58577,-,"['居酒屋', '日本料理', '海鮮', '飲食店']"
 地鶏と伊勢海老中華そば頑,35.651993,139.546371,-,"['ラーメン', '飲食店']"
 宇奈とと調布店,35.65382,139.543716,http://www.unatoto.com/,"['うなぎ', '飲食店']"
@@ -1707,7 +1705,7 @@ PINO（ピノ）,35.647236,139.560364,http://pino-pan.com,"['パン', '飲食店
 ホロホロカフェ（HoloHoloCafe）,35.645908,139.561813,http://holoholocafe.com/,"['カフェ', '飲食店']"
 すき家仙川店,35.661591,139.584534,-,"['牛丼', 'カレー', '食堂', '飲食店']"
 ナマステインドレストラン飛田給店,35.662659,139.521042,-,"['インド料理', 'インドカレー', '飲食店']"
-味の素スタジアム,35.66367,139.5289,-,"['その他', '飲食店']"
+味の素スタジアム,35.66367,139.5289,-,"['スタジアム']"
 こしじ,35.662037,139.58577,-,"['居酒屋', '日本料理', '海鮮', '飲食店']"
 地鶏と伊勢海老中華そば頑,35.651993,139.546371,-,"['ラーメン', '飲食店']"
 宇奈とと調布店,35.65382,139.543716,http://www.unatoto.com/,"['うなぎ', '飲食店']"
@@ -1724,7 +1722,7 @@ PINO（ピノ）,35.647236,139.560364,http://pino-pan.com,"['パン', '飲食店
 さかなや道場調布東口店,35.652275,139.545364,-,"['海鮮', 'かに', '飲食店']"
 支那そばめでた屋（しなそばめでたや）,35.661213,139.587387,-,"['ラーメン', 'つけ麺', '餃子', '飲食店']"
 旬菜人おしどり,35.660404,139.582855,-,"['日本料理', '居酒屋', '飲食店']"
-籠屋仙川店,35.660881,139.585602,https://www.kago-ya.net/business/business_kagoya.html,"['その他', '飲食店']"
+籠屋仙川店,35.660881,139.585602,https://www.kago-ya.net/business/business_kagoya.html,"['飲食店']"
 仙川食堂ジョージ,35.661739,139.584991,http://georgegeorge.co.jp/,"['アメリカ料理', 'ヨーロッパ料理', 'イタリアン', '飲食店']"
 たい焼き慎之介,35.662521,139.547806,-,"['たい焼き・大判焼き', '甘味処', 'ソフトクリーム', '飲食店']"
 きくや,35.662037,139.58577,-,"['焼き鳥', '居酒屋', 'もつ焼き', '飲食店']"
@@ -1794,7 +1792,7 @@ AOSAN仙川店（アオサン）,35.660404,139.582855,https://aosan628.thebase.i
 ぶっ豚調布店（ぶっとん）,35.652378,139.54567,-,"['ラーメン', '油そば・まぜそば', 'つけ麺', '飲食店']"
 江川亭調布店（えがわてい）,35.655949,139.52774,https://www.egawatei.jp/shop/#chofu,"['ラーメン', '油そば・まぜそば', '飲食店']"
 aona,35.650826,139.543777,https://cafeaona.jimdofree.com/,"['カフェ', '飲食店']"
-鳥肉専門店 鳥文,35.650059,139.554291,-,"['その他', '飲食店']"
+鳥肉専門店 鳥文,35.650059,139.554291,-,"['飲食店']"
 ロイヤルホスト仙川駅前店（RoyalHost）,35.662685,139.585938,https://www.royalhost.jp/,"['ファミレス', '飲食店']"
 横浜くりこ庵調布店,35.649811,139.543167,https://www.kuriko-an.com/,"['たい焼き・大判焼き', '飲食店']"
 極楽よだれ酒場調布（ゴクラクヨダレサカバ）,35.651993,139.546371,-,"['居酒屋', '串焼き', '揚げ物', '飲食店']"
@@ -1931,39 +1929,34 @@ Paston（パストン）,35.650005,139.540421,https://www.paston.website/,"['カ
 京王閣競輪場,35.643463,139.533813,https://4travel.jp/redirect/cjump?hurl=FGdgZ1jCBgLfKhhzRg1g6QgO02rbCgmgz%2FCcPL9EWlQ%3D%0A,"['観光', '遊ぶ', '名所', '史跡']"
 サレジオ神学院,35.660408,139.542145,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb7nSuRE0kM0VWOzCOHTqnAZbiYOYXJLwPyiBn0LiL9XCRqfI%2BRH%0A575uKnH%2FmoP%2BoSs%3D%0A,"['観光', '遊ぶ', '寺', '神社', '教会']"
 映画俳優の碑,35.645023,139.538528,-,"['観光', '遊ぶ', '名所', '史跡']"
-青渭神社,35.667545,139.552826,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb6Z565mv04RcBs0%2Fgfbv6mW%0A,"['観光', '遊ぶ', '寺', '神社', '教会']"
+青渭神社,35.667545,139.552826,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb6Z565mv04RcBs0%2Fgfbv6mW%0A,"['観光', '遊ぶ', '神社']"
 明照院 糟嶺神社,35.649925,139.582748,-,"['観光', '遊ぶ', '寺', '神社', '教会']"
 東京五輪マラソン折返点記念碑,35.666344,139.52269,-,"['観光', '遊ぶ', '名所', '史跡']"
 安善寺,35.657314,139.584625,-,"['観光', '遊ぶ', '寺', '神社', '教会']"
-深大寺,35.667267,139.550781,https://4travel.jp/redirect/cjump?hurl=FGdgZ1jCBgLJn6QWjK%2Beh23SY%2FPayqxJCeNuvKrEvxg%3D%0A,"['観光', '遊ぶ', '寺', '神社', '教会']"
-調布市武者小路実篤記念館 実篤公園,35.65633,139.581268,https://4travel.jp/redirect/cjump?hurl=FGdgZ1jCBgKBdJUatUGoVxIbPeYcoFJSz%2FCcPL9EWlQ%3D%0A,"['観光', '遊ぶ', '公園', '植物園']"
+深大寺,35.667267,139.550781,https://4travel.jp/redirect/cjump?hurl=FGdgZ1jCBgLJn6QWjK%2Beh23SY%2FPayqxJCeNuvKrEvxg%3D%0A,"['観光', '遊ぶ', '寺']"
 古天神公園,35.644505,139.544022,-,"['観光', '遊ぶ', '公園', '植物園']"
 蓮慶寺,35.651669,139.546967,-,"['観光', '遊ぶ', '寺', '神社', '教会']"
 仙川湯けむりの里,35.658268,139.588058,-,"['観光', '遊ぶ', '温泉']"
-虎狛神社,35.661476,139.550323,-,"['観光', '遊ぶ', '寺', '神社', '教会']"
+虎狛神社,35.661476,139.550323,-,"['観光', '遊ぶ', '神社']"
 湯の森 深大湯,35.677456,139.546402,https://4travel.jp/redirect/cjump?hurl=FTobd6cqBGB%2B91lCRNG0ru0hGi61cPTFVkzF1PdlwS0%3D%0A,"['観光', '遊ぶ', '温泉']"
 調布市観光案内所 ぬくもりステーション,35.651039,139.540237,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb6TtiGO4w5rfWz%2FLNbAH9BH4W5%2BGyoeZsw%3D%0A,"['観光', '遊ぶ', '名所', '史跡']"
 ポケットガーデン,35.66367,139.5289,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb7QBKs6HGReCmDg1mdSojmbeHISTx9ygZ5aoo5w52y%2Be%2BzGZjTg%0AW86pw9HSX7pdKSXP8Jw8v0RaVA%3D%3D%0A,"['観光', '遊ぶ', '名所', '史跡']"
 イオンシネマ シアタス調布,35.651039,139.540237,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb59U%2Fi2sX5k%2BDpxkOkHG2vlK8v1NqUt%2BWVpM9WDOAVAOs%2FwnDy%2F%0ARFpU%0A,"['観光', '遊ぶ', '名所', '史跡']"
 野川の桜,35.63483,139.578705,-,"['観光', '遊ぶ', '花見']"
-布多天神社,35.656986,139.545441,https://4travel.jp/redirect/cjump?hurl=pWPdvRPWLedNZGesKCRa2%2B%2Boe6UwL12xz%2FCcPL9EWlQ%3D%0A,"['観光', '遊ぶ', '寺', '神社', '教会']"
-スタジアム通り,35.661606,139.524033,-,"['観光', '遊ぶ', '名所', '史跡']"
-上石原若宮八幡神社,35.652924,139.528671,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb52bCrtw1RMvHGCsQweN%2FaODGoSU9qg%2FRlq7558I9PfEfgFaoel%0Alg1dUpGmstaD4oFsxXTD6Oqakg%3D%3D%0A,"['観光', '遊ぶ', '寺', '神社', '教会']"
-光西寺,35.658276,139.584717,-,"['観光', '遊ぶ', '寺', '神社', '教会']"
+布多天神社,35.656986,139.545441,https://4travel.jp/redirect/cjump?hurl=pWPdvRPWLedNZGesKCRa2%2B%2Boe6UwL12xz%2FCcPL9EWlQ%3D%0A,"['観光', '遊ぶ', '神社']"
+上石原若宮八幡神社,35.652924,139.528671,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb52bCrtw1RMvHGCsQweN%2FaODGoSU9qg%2FRlq7558I9PfEfgFaoel%0Alg1dUpGmstaD4oFsxXTD6Oqakg%3D%3D%0A,"['観光', '遊ぶ', '神社']"
+光西寺,35.658276,139.584717,-,"['観光', '遊ぶ', '寺']"
 味の素スタジアム,35.66367,139.5289,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb7QBKs6HGReCmDg1mdSojmbeHISTx9ygZ5E0hQ%2F0ZzQCw%3D%3D%0A,"['観光', '遊ぶ', '名所', '史跡']"
 アミノバイタルフィールド,35.66367,139.5289,https://4travel.jp/redirect/cjump?hurl=FGdgZ1jCBgLWYQ%2Bz1lB0udK7FcKnrsgUUe20dk9ikubDCRyziHZ3Ac%2FwnDy%2F%0ARFpU%0A,"['観光', '遊ぶ', '名所', '史跡']"
-調布市せんがわ劇場,35.660851,139.5867,-,"['観光', '遊ぶ', '名所', '史跡']"
-天神通り,35.653183,139.545654,-,"['観光', '遊ぶ', '名所', '史跡', 'ショッピング', '市場', '商店街']"
-旧甲州街道,35.651684,139.559219,-,"['観光', '遊ぶ', '名所', '史跡']"
+調布市せんがわ劇場,35.660851,139.5867,-,"['観光', '遊ぶ', '名所']"
 鬼太郎ひろば,35.654095,139.537292,-,"['観光', '遊ぶ', '公園', '植物園']"
 深大寺自然広場 野草園,35.663979,139.556931,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb52bCrtw1RMvHGCsQweN%2FaODGoSU9qg%2FRlq7558I9PfEago5NXk%0AFCX7E6vJBnu4TagtlLdA%2Bys%2BWhG8ZiblmB83%0A,"['観光', '遊ぶ', '公園', '植物園']"
 光徳寺,35.657009,139.584152,-,"['観光', '遊ぶ', '寺', '神社', '教会']"
-武蔵野の森 総合スポーツプラザ,35.666344,139.52269,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb6lzUCQJXLfBK5QTGL1RdC287VRi3cZUtM%3D%0A,"['観光', '遊ぶ', '名所', '史跡']"
+武蔵野の森 総合スポーツプラザ,35.666344,139.52269,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb6lzUCQJXLfBK5QTGL1RdC287VRi3cZUtM%3D%0A,"['観光', '遊ぶ', '名所']"
 東京アートミュージアム,35.661213,139.587387,https://4travel.jp/redirect/cjump?hurl=FGdgZ1jCBgJHM7fB0ylzNQlT0cvlPh8vJHNSyxIl%2BA4%3D%0A,"['観光', '遊ぶ', '美術館', '博物館']"
-西光寺,35.658142,139.529861,https://4travel.jp/redirect/cjump?hurl=FGdgZ1jCBgIabLfCPMZ1ISdJbY20WFIK5Rc0H92813ib5yYFEy6DPP6eGdf8%0Azk%2BTKRp21OuWk8%2BErPc4THGti2t3Lx8RpHsn%0A,"['観光', '遊ぶ', '寺', '神社', '教会']"
+西光寺,35.658142,139.529861,https://4travel.jp/redirect/cjump?hurl=FGdgZ1jCBgIabLfCPMZ1ISdJbY20WFIK5Rc0H92813ib5yYFEy6DPP6eGdf8%0Azk%2BTKRp21OuWk8%2BErPc4THGti2t3Lx8RpHsn%0A,"['観光', '遊ぶ', '寺']"
 くすのきホール,35.65147,139.541443,https://4travel.jp/redirect/cjump?hurl=FGdgZ1jCBgJKbuLsfIYQTtwx3tyxA7B4mgnV%2BH4M5%2BEF52HBl4lXZh4AiFcr%0AXPazIi9z5Un5KGVyw7XPLgaxLEQJ7DEVHDcj%0A,"['観光', '遊ぶ', '名所', '史跡']"
 調布航空宇宙センター,35.680248,139.558182,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb7g8%2BMgIYHdNVfztsGhb215WtXJ23lajyr9UuQKm86Ikg%3D%3D%0A,"['観光', '遊ぶ', '美術館', '博物館']"
-電気通信大学,35.657433,139.544327,https://4travel.jp/redirect/cjump?hurl=Q3vbQJJBlb5FA%2BsyVtm0Q9P%2F9nspaPWa%0A,"['大学']"
 東宝調布スポーツパーク,35.648163,139.528336,-,"['観光', '遊ぶ', 'テーマパーク', '観光', '遊ぶ', '公園', '植物園']"
 大寒桜,35.658936,139.54921,https://4travel.jp/redirect/cjump?hurl=FGdgZ1jCBgIabLfCPMZ1ISdJbY20WFIK5Rc0H92813ib5yYFEy6DPCHvpilj%0A5053%2BoGOHnqLhMMIjzB19YqgvGt3Lx8RpHsn%0A,"['観光', '遊ぶ', '名所', '史跡']"
 武者小路実篤記念館,35.65633,139.581268,-,"['観光', '遊ぶ', '美術館', '博物館']"

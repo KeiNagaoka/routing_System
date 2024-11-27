@@ -9,3 +9,4 @@ routing/templates/static/map/
 routing/templates/staticfiles/
 app.log
 db.sqlite3
+herokuコマンド.txt

@@ -56,6 +56,7 @@
                         <input type="hidden" name="spot_id" value="{{ spot.id }}">
                         <input type="hidden" name="spot_name" value="{{ spot_name }}">
                         <input type="hidden" name="tag_name" value="{{ tag_name }}">
+                        <input type="hidden" name="page" value="{{ spots.number }}">
                         <label for="tags-{{ spot.id }}">タグを選択:</label>
                         <select id="tags-{{ spot.id }}" name="tag">
                             {% for tag in all_tags %}
@@ -76,13 +77,13 @@
     <!-- ページネーション -->
     <div class="pagination">
         {% if spots.has_previous %}
-            <a href="?page={{ spots.previous_page_number }}&spot_name={{ spot_name }}&tag_name={{ tag_name }}" class="prev">前のページ</a>
+            <a href="/display/?page={{ spots.previous_page_number }}&spot_name={{ spot_name }}&tag_name={{ tag_name }}" class="prev">前のページ</a>
         {% endif %}
     
         <span class="current-page">Page {{ spots.number }} of {{ spots.paginator.num_pages }}</span>
     
         {% if spots.has_next %}
-            <a href="?page={{ spots.next_page_number }}&spot_name={{ spot_name }}&tag_name={{ tag_name }}" class="next">次のページ</a>
+            <a href="/display/?page={{ spots.next_page_number }}&spot_name={{ spot_name }}&tag_name={{ tag_name }}" class="next">次のページ</a>
         {% endif %}
     </div>    
 </div>

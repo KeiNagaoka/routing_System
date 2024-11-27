@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.views import LoginView as BaseLoginView,  LogoutView as BaseLogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .forms import SignUpForm, LoginFrom
@@ -423,6 +423,31 @@ class UpdateTagView(View):
     template_name = "display.html"
     login_url = 'accounts:index'  # ログインページのURLを指定
 
+    def get(self, request, template_name=template_name):
+        # GETリクエストからスポット名とタグ名を取得
+        spot_name = request.GET.get('spot_name', "")
+        tag_name = request.GET.get('tag_name', "")
+        user = request.user
+
+        # スポット情報のリストを取得
+        spots_data, all_tags = get_spots_data(user=user,spot_name=spot_name,tag_name=tag_name)
+        
+        # ページネーション
+        paginator = Paginator(spots_data, 12)  # 12個ずつ表示
+        page_number = request.GET.get('page')
+        print(f"page_number:{page_number}")
+        spots = paginator.get_page(page_number)
+        
+        # コンテキストを設定
+        values = {
+            'spots': spots,
+            'all_tags': all_tags,
+            'spot_name': spot_name,
+            'tag_name': tag_name,
+        }
+
+        return render(request, template_name, values)
+    
     def post(self, request, template_name=template_name):
         spot_id = float(request.POST.get('spot_id'))
         tag = request.POST.get('tag')
@@ -439,8 +464,6 @@ class UpdateTagView(View):
     
 
                 # タグがスポットに既に存在するか確認し、存在しない場合のみ追加
-                print(f"tag:{tag}")
-                print(f"spot_tags:{spot_tags}")
                 if tag not in spot_tags:
                     # AddedTagに記録を追加
                     AddedTag.objects.create(user=user, tag=tag, spot=spot)
@@ -461,17 +484,20 @@ class UpdateTagView(View):
         # スポット情報のリスト (ここでは例としてリストを作成しています)
         spots_data, all_tags = get_spots_data(user=user,spot_name=spot_name,tag_name=tag_name)
         paginator = Paginator(spots_data, 12)  # 10個ずつ表示
-        page_number = request.GET.get('page')
+        page_number = request.POST.get('page')
+        print(f"page_number:{page_number}")
         spots = paginator.get_page(page_number)
 
         # POST後のリダイレクト
-        values = {'spots': spots,
-                  'all_tags':all_tags,
-                  # 検索条件を保持するための変数
-                  'spot_name':spot_name,
-                  'tag_name':tag_name,
-                  }
-        
+        values = {
+            'message': 'タグが正常に追加されました。',
+            'spots': spots,
+            'all_tags':all_tags,
+            'spot_name':spot_name,
+            'tag_name':tag_name,
+        }
+
+        # POST後のリダイレクト
         return render(request, template_name, values)
 
 # 経路の詳細情報ページ表示

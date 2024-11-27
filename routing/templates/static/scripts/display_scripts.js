@@ -32,3 +32,37 @@ document.addEventListener('DOMContentLoaded', function () {
     //     });
     // });
 });
+
+// // タグの更新
+// document.addEventListener('DOMContentLoaded', function() {
+//     const forms = document.querySelectorAll('form[id^="update-tag-form-"]');
+//     forms.forEach(function(form) {
+//         form.addEventListener('submit', function(event) {
+//             event.preventDefault(); // フォームのデフォルトの送信を防ぐ
+
+//             const formData = new FormData(this);
+//             const csrfToken = formData.get('csrfmiddlewaretoken');
+
+//             fetch(this.action, {
+//                 method: 'POST',
+//                 headers: {
+//                     'X-CSRFToken': csrfToken,
+//                     'Accept': 'application/json',
+//                     'Content-Type': 'application/json'
+//                 },
+//                 body: JSON.stringify(Object.fromEntries(formData))
+//             })
+//             .then(response => response.json())
+//             .then(data => {
+//                 // 成功時の処理
+//                 console.log('Success:', data);
+//                 alert('タグが正常に追加されました。');
+//             })
+//             .catch(error => {
+//                 // エラー時の処理
+//                 console.error('Error:', error);
+//                 alert('タグの追加に失敗しました。');
+//             });
+//         });
+//     });
+// });
