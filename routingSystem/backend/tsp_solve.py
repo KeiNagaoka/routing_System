@@ -243,6 +243,7 @@ class TSP:
 					route = new_route
 					self.result = route
 		if improved: # 改善できなくなるまでtwo_opt
+			print("improved!!!!!")
 			route = self.two_opt(route)
 		return route
 	
@@ -273,6 +274,7 @@ class TSP:
 	
 	# メインの部分
 	def solve(self,n_agent=1000):
+		print(f"n_agent:{n_agent}")
 		# 経由地点なしの場合
 		if len(self.aim_tags) == 0 and self.startNode == self.goalNode:
 			message = "出発地点と到着地点が近すぎます。"
@@ -385,6 +387,10 @@ class TSP:
 			# デバッグ用
 			# print("Agent ... %d , Cost ... %lf" % (k,self.cost(self.result)))
 			# print(f'距離:{cost_order}, order:{order}')
+
+		# より良い順番がないか確認
+		for i in range(int(self.n_agent / 2)):
+			self.result = self.two_opt(self.result)
 
 		if not self.tag_fill():
 			message = "入力された条件を満たす経路はありませんでした。"
@@ -509,9 +515,9 @@ def tsp_execute(node_df,
 		print(f"route_index:{route_index+1}回目の経路探索")
 		tsp = TSP(node_df=node_df,
 				adj_matrix_path=ADJACENT_MATRIX,
-				alpha = 0.3,
-				beta_pre=0.01, 
-				beta_after = 0.01, 
+				alpha = 0.8,
+				beta_pre=0.3, 
+				beta_after = 0.3, 
 				Q = 1.0,
 				gamma=0.3,
 				epsilon=0.6,
