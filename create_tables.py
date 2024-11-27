@@ -112,6 +112,9 @@ def create_adjacent_matrix(G=G,settings=settings):
     adj_matrix = np.array([[distance_dict[node1][node2] 
                             for node1 in node_list]
                             for node2 in node_list])
+    # 対角成分を5に設定　0除算回避のため
+    for i in range(len(adj_matrix)):
+        adj_matrix[i][i] = 5
     
     index_node = {index:node for index, node in enumerate(node_list)}
 

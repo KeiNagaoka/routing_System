@@ -175,7 +175,6 @@ class TSP:
 
 	def create_evap_matrix(self):
 		evap_matrix = np.full((self.n_data, self.n_data), self.vanish_ratio)
-		print(f"self.passed_edges:{self.passed_edges[:10]}...")
 		for coord in self.passed_edges:
 			evap_matrix[coord] = self.epsilon
 		return evap_matrix
@@ -250,13 +249,26 @@ class TSP:
 	def proposed_cities(self,now_order):
 		candidate_tags = []
 		if not (self.aim_tags.keys() <= self.now_tags.keys()):
+			print(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags{self.now_tags.keys()}に含まれないよ！")
 			return []
 			# raise Exception(f"巡回都市キーエラー！\n aim_tags:{self.aim_tags.keys()}はnow_tags{self.now_tags.keys()}に含まれないよ！")
 		for key_aim,val_aim in self.aim_tags.items():
 			if self.now_tags[key_aim] < val_aim:
 				candidate_tags.append(key_aim)
-		city = [idx for idx,tags in self.index_tags.items() if len(set(tags) & set(candidate_tags)) > 0 and idx not in now_order]
+		city = [
+			idx 
+			for idx, tags in self.index_tags.items()
+			if len(set(tags) & set(candidate_tags)) > 0 and idx not in now_order[1:]
+		]
 		return city
+	
+	# タグの情報を更新
+	def update_tags(self,now_city):
+		for tag in self.index_tags[now_city]:
+			if tag in self.now_tags.keys():
+				self.now_tags[tag] += 1
+			else:
+				self.now_tags[tag] = 1
 
 	
 	# メインの部分
@@ -267,32 +279,33 @@ class TSP:
 			print(f"message:{message}")
 			return message
 		elif len(self.aim_tags) == 0:
-			order = [self.startNode, self.goalNode]
-			return message
+			self.result = [self.startNode, self.goalNode]
+			return self.result
 
 		self.n_agent = n_agent
 		delta = np.zeros((self.n_data,self.n_data))	#フェロモン変化量
 		
 		# n_agent匹の蟻を歩かせる
 		for k in range(n_agent):
+			# 最も長い経路（最初はダミー経路）
 			city = [self.startNode] + [i for i in np.arange(self.n_data) if i != self.startNode and i != self.goalNode] + [self.goalNode] #巡回都市
 			
 			now_city = self.startNode
 			# firsttags = self.index_tags[self.startNode]
 			# self.now_tags = {tag:1  if tag in firsttags else 0 for tag in self.count_tags.keys()} #今のタグ数
-			self.now_tags = {tag:0 for tag in self.count_tags.keys()} #今のタグ数
+			self.now_tags = {tag:0 for tag in self.count_tags.keys()} # 今のタグ数
 			order = [self.startNode] 		# 巡回経路
 
-			
-			# aim_list =  {key for key, value in aim_tags.items() if value > 0}
-			# city = [key for key,val in index_tags.items() if len(set(val) & aim_list) > 0 and key!=now_city]
 			city = self.proposed_cities(order)
 			if len(city)==0:
-				message = "入力された条件を満たす経路はありませんでした。"
-				print(f"message:{message}")
-				return message
+				if self.tag_fill():
+					self.result = [self.startNode, self.goalNode]
+					return self.result
+				else:
+					message = "入力された条件を満たす経路はありませんでした。"
+					print(f"No City Error:{message}")
+					return message
 			
-			#for j in range(1,self.n_patrol):
 			j = 0
 			while city:
 				# フェロモン濃度^α × 距離の逆数^(-β)
@@ -305,18 +318,13 @@ class TSP:
 
 				# 状態の更新
 				now_city = city[ index ]
-				# city = [key for key,val in index_tags.items() if len(set(val) & aim_list) > 0 and key!=now_city]
 				order.append(now_city)
 				city = self.proposed_cities(order)
 				
 				j+=1
 					
-				#タグの更新
-				for tag in self.index_tags[now_city]:
-					if tag in self.now_tags.keys():
-						self.now_tags[tag] += 1
-					else:
-						self.now_tags[tag] = 1
+				# タグの更新
+				self.update_tags(now_city)
 				#タグが条件を満たしていれば終了
 				if not (self.aim_tags.keys() <= self.now_tags.keys()):
 					message = "登録されているスポットが存在しないタグが含まれています。"
@@ -380,7 +388,7 @@ class TSP:
 
 		if not self.tag_fill():
 			message = "入力された条件を満たす経路はありませんでした。"
-			print(f"message:{message}")
+			print(f"tag fill Error:{message}")
 			return message
 		return self.result
 
@@ -546,6 +554,7 @@ def tsp_execute(node_df,
 						  passed_spot_names=passed_spot_names,
 						  start_name=start_name,
 						  goal_name=goal_name)
+		print(f"neccessary_spots:{spots}")
 		
 		# 出力したスポットと経路を保存
 		passed_spot_names = passed_spot_names + spots
@@ -612,7 +621,7 @@ def tsp_execute(node_df,
 					loc = name_coord[name]
 					pop_name = f"<div class='popup'>{name}</div>"
 					# ポップアップの横幅を広くするためにPopupオブジェクトを使用
-					popup = folium.Popup(pop_name, max_width=300)  # 300pxの幅を設定（必要に応じて調整）
+					popup = folium.Popup(pop_name, max_width=300)  # 300pxの幅を設定
 					j += 1
 					folium.Marker(loc, popup=popup, icon=folium.Icon(color='red')).add_to(map)
 

@@ -460,7 +460,7 @@ class UpdateTagView(View):
         
         # スポット情報のリスト (ここでは例としてリストを作成しています)
         spots_data, all_tags = get_spots_data(user=user,spot_name=spot_name,tag_name=tag_name)
-        paginator = Paginator(spots_data, 10)  # 10個ずつ表示
+        paginator = Paginator(spots_data, 12)  # 10個ずつ表示
         page_number = request.GET.get('page')
         spots = paginator.get_page(page_number)
 
