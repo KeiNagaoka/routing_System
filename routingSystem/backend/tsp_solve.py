@@ -477,7 +477,9 @@ def tsp_execute(node_df,
 	name_tags = {row['name']:row['tags'] for _,row in spot_info_df.iterrows()}
 
 	# アリの数を経由地点の数によって決定する
-	n_agent = len(aim_tags) * 100 + 1
+	# via_spot_num = sum([val for _,val in aim_tags.items() if val > 0])
+	# n_agent = via_spot_num * 100 + 1
+	n_agent = 300
 
 	# 入力できるタグの最大値をカウント
 	count_tags = {}
