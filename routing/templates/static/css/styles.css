@@ -294,6 +294,21 @@ input[type="submit"]:active {
     padding: 0;
     cursor: pointer; 
 }
+footer {
+    padding: 20px 0; /* フッターの上下のパディング */
+    text-align: center; /* テキストを中央揃え */
+}
+
+.footer-content {
+    max-width: 1200px; /* フッターの最大幅 */
+    margin: 0 auto; /* フッターを中央に配置 */
+    padding: 0 20px; /* フッターの左右のパディング */
+}
+
+.footer-content p {
+    margin: 0; /* 段落の余白をリセット */
+    font-size: 14px; /* フッターの文字サイズ */
+}
 
 /* スマートフォンなど小さいデバイス用のスタイル */
 @media (max-width: 600px) {
