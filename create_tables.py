@@ -13,7 +13,7 @@ import numpy as np
 import pickle
 import ujson
 import logging
-from routing.models import Spot, Node, Tag
+from routing.models import Spot, Node, Tag, User, AddedTag, Mapdata
 from routingSystem.backend.data_management import get_spot_df, get_node_df, get_spots_data
 from routingSystem.backend.core.utils import base_path, get_setting, str2list_strings, get_spot_info_from_csv
 
@@ -141,9 +141,12 @@ def create_adjacent_matrix(G=G,settings=settings):
 
 
 if __name__ == "__main__":
+    User.objects.all().delete()
     Spot.objects.all().delete()
     Node.objects.all().delete()
     Tag.objects.all().delete()
+    Mapdata.objects.all().delete()
+    AddedTag.objects.all().delete()
     add_spots()
     print("SPOTS added successfully.")
     create_node_df()
