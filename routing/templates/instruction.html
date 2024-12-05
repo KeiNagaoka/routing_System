@@ -47,6 +47,9 @@
             <img src="{% static 'img/example_keiro3.png' %}" alt="経路3" class="feature-image">
             <img src="{% static 'img/example_keiro4.png' %}" alt="経路4" class="feature-image">
             <img src="{% static 'img/example_keiro5.png' %}" alt="経路5" class="feature-image">
+            
+            <br>
+            条件に入力した通り、「調布駅」を出発し、「コンビニ」と「飲食店」を１件ずつ経由して、「深大寺」に到着する経路が表示されます。
             <br>
             なお、巡回経路探索にはアリコロニー最適化というアルゴリズムを使用しており、
             もう一度同じ条件で探索しても違う経路が提案される場合があります。<br>
@@ -88,7 +91,7 @@
         <img src="{% static 'img/select_input.png' %}" alt="選択式入力" class="feature-image">
         <br>
         <p class="feature-description">
-            <font class="red-bold">タグ</font>は、スポットの特徴を表し、１つのスポットに複数付与することができます。<br>
+            <font class="red-bold">タグ</font>は、スポットのカテゴリーを表し、１つのスポットに複数付与することができます。<br>
             経由地点にタグを指定すると、そのタグを持つスポットが含まれる経路が検索されます。
         </p>
         <img src="{% static 'img/keiro1.png' %}" alt="経路1" class="feature-image">
@@ -148,6 +151,14 @@
             ログアウトする前に、<font class="red-bold"><a href="https://forms.gle/4aKw21wnqznyc8HM7" target="_blank">アンケート</a></font>のご協力をぜひよろしくお願いいたします。
         </p>
     </div>
+
+    
+    <!-- Center aligned buttons -->
+    <div class="btn-group">
+        <a href="/" class="btn btn-primary">マイページ</a> 
+        <a href="{% url 'accounts:routesearch' %}" class="btn btn-primary">経路検索</a> 
+    </div>
+
 </div>
 
 <!-- JavaScriptの追加 -->
